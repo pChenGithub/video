@@ -9,8 +9,8 @@ echo "build gsoap..."
 cd $GSOAP_SRC
 
 # 配置,指定安装目录
-./configure --prefix=${PWD}/gsoap_x86
-make -j8 && make install
+./configure --prefix=${PWD}/../gsoap_x86
+make -j4 && make install
 
 cd -
 

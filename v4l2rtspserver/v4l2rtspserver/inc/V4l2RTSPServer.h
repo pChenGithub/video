@@ -29,7 +29,9 @@ class V4l2RTSPServer {
             , m_env(BasicUsageEnvironment::createNew(*BasicTaskScheduler::createNew()))
             , m_rtspPort(rtspPort)
         {     
+            // 创建一个保存鉴权信息的数据库???
             UserAuthenticationDatabase* auth = createUserAuthenticationDatabase(userPasswordList, realm);
+            // 创建一个http服务
             m_rtspServer = HTTPServer::createNew(*m_env, rtspPort, auth, timeout, hlsSegment, webroot, sslkeycert);
            	if (m_rtspServer != NULL)
             {

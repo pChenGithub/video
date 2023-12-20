@@ -29,18 +29,22 @@ StreamReplicator* V4l2RTSPServer::CreateVideoReplicator(
 					int queueSize, V4L2DeviceSource::CaptureMode captureMode, int repeatConfig,
 					const std::string& outputFile, V4l2IoType ioTypeOut, V4l2Output*& out) {
 
+    // live555的类,视频流???
 	StreamReplicator* videoReplicator = NULL;
+    // 获取设备节点
     std::string videoDev(inParam.m_devName);
 	if (!videoDev.empty())
 	{
 		// Init video capture
 		LOG(NOTICE) << "Create V4L2 Source..." << videoDev;
 		
+        // 创建摄像头采集对象
 		V4l2Capture* videoCapture = V4l2Capture::create(inParam);
 		if (videoCapture)
 		{
 			int outfd = -1;
 			
+            // 文件路径为空,暂时无需关注
 			if (!outputFile.empty())
 			{
 				V4L2DeviceParameters outparam(outputFile.c_str(), videoCapture->getFormat(), videoCapture->getWidth(), videoCapture->getHeight(), 0, ioTypeOut, inParam.m_verbose);
@@ -54,6 +58,7 @@ StreamReplicator* V4l2RTSPServer::CreateVideoReplicator(
 				}
 			}
 			
+            // 获取摄像头参数,采集
 			std::string rtpVideoFormat(BaseServerMediaSubsession::getVideoRtpFormat(videoCapture->getFormat()));
 			if (rtpVideoFormat.empty()) {
 				LOG(FATAL) << "No Streaming format supported for device " << videoDev;

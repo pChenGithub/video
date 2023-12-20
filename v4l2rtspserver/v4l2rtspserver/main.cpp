@@ -52,7 +52,9 @@ void decodeMulticastUrl(const std::string & maddr, in_addr & destinationAddress,
 {
 	std::istringstream is(maddr);
 	std::string ip;
-	getline(is, ip, ':');						
+	getline(is, ip, ':');		
+
+    // maddr没有指定,IP肯定是为空的
 	if (!ip.empty())
 	{
 		destinationAddress.s_addr = inet_addr(ip.c_str());
@@ -61,6 +63,8 @@ void decodeMulticastUrl(const std::string & maddr, in_addr & destinationAddress,
 	std::string port;
 	getline(is, port, ':');						
 	rtpPortNum = 20000;
+
+    // maddr没有指定,port肯定是为空的
 	if (!port.empty())
 	{
 		rtpPortNum = atoi(port.c_str());
@@ -88,7 +92,8 @@ std::string getDeviceName(const std::string & devicePath)
 	return deviceName;
 }
 
-		
+
+// 本次阅读,以 v4l2rtspserver /dev/video0 执行
 // -----------------------------------------
 //    entry point
 // -----------------------------------------
@@ -237,6 +242,8 @@ int main(int argc, char** argv)
 			}
 		}
 	}
+
+    // 这里把设备节点加入 devList, /dev/video0
 	std::list<std::string> devList;
 	while (optind<argc)
 	{
@@ -248,6 +255,7 @@ int main(int argc, char** argv)
 		devList.push_back(dev_name);
 	}
 	
+    // 指定视频格式列表, h264, mjpeg, jpeg, nv12
 	// default format tries
 	if ((videoformatList.empty()) && (format!=0)) {
 		videoformatList.push_back(V4L2_PIX_FMT_H264);
@@ -268,7 +276,7 @@ int main(int argc, char** argv)
 	initLogger(verbose);
 	LOG(NOTICE) << "Version: " << VERSION << " live555 version:" << LIVEMEDIA_LIBRARY_VERSION_STRING;
      	
-	
+	// 创建rtsp服务,这里使用到了live555的模块,
 	// create RTSP server
 	V4l2RTSPServer rtspServer(rtspPort, rtspOverHTTPPort, timeout, hlsSegment, userPasswordList, realm, webroot, sslKeyCert);
 	if (!rtspServer.available()) 
@@ -279,24 +287,41 @@ int main(int argc, char** argv)
 	{		
 		// decode multicast info
 		struct in_addr destinationAddress;
+        // 随机获取一个IP地址???
 		destinationAddress.s_addr = chooseRandomIPv4SSMAddress(*rtspServer.env());
+
+        // 指定rtp和rtcp的端口,相邻的一个奇一个偶
 		unsigned short rtpPortNum = 20000;
 		unsigned short rtcpPortNum = rtpPortNum+1;
-		decodeMulticastUrl(maddr, destinationAddress, rtpPortNum, rtcpPortNum);	
+        // maddr 这次执行没有指定内容
+        // 这里是解析maddr,构建 destinationAddress,rtpPortNum 和 rtpPortNum
+        // maddr 没有内容,不会修改以上变量
+		decodeMulticastUrl(maddr, destinationAddress, rtpPortNum, rtpPortNum);	
 
 		std::list<V4l2Output*> outList;
 		int nbSource = 0;
+
+
+        // 遍历 devList, 这次执行 devList 里面只有 /dev/video0
+        // 循环将会执行一次
 		std::list<std::string>::iterator devIt;
 		for ( devIt=devList.begin() ; devIt!=devList.end() ; ++devIt)
 		{
+            // deviceName 是 /dev/video0
 			std::string deviceName(*devIt);
 			
 			std::string videoDev;
 			std::string audioDev;
-			decodeDevice(deviceName, videoDev, audioDev);
-			
-			std::string baseUrl;
+            // 分割字符串 deviceName ,按','分割,第一个字符串给 videoDev, 第二个给 audioDev
+            // 这里结果 videoDev 将为 /dev/video0,  audioDev 为空
+            decodeDevice(deviceName, videoDev, audioDev);
+
+            std::string baseUrl;
+
+            // 这次执行没有指定 outputFile, 结果 output 为空
 			std::string output(outputFile);
+
+            // devList.size = 1
 			if (devList.size() > 1)
 			{
 				baseUrl = getDeviceName(videoDev);
@@ -305,8 +330,17 @@ int main(int argc, char** argv)
 				output.assign("");
 			}
 
+
 			V4l2Output* out = NULL;
+            // 设置摄像头的参数,
+            // videoDev /dev/video0
+            // width 0, height0, fps 25,
+            // ioTypeIn IOTYPE_MMAP
+            // verbose 0
+            // openflags O_RDWR | O_NONBLOCK
 			V4L2DeviceParameters inParam(videoDev.c_str(), videoformatList, width, height, fps, ioTypeIn, verbose, openflags);
+
+            // 创建一个 视频 采集器???
 			StreamReplicator* videoReplicator = rtspServer.CreateVideoReplicator( 
 					inParam,
 					queueSize, captureMode, repeatConfig,

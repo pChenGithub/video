@@ -176,6 +176,7 @@ class HTTPServer : public RTSPServer
 		  	int ourSocketIPv6 = setUpOurSocket(env, rtspPort, AF_INET6);
 #endif		  
 
+            // ourSocketIPv4是创建的socket
 			if (ourSocketIPv4 != -1) 
 			{
 				httpServer = new HTTPServer(env, ourSocketIPv4, ourSocketIPv6, rtspPort, authDatabase, reclamationTestSeconds, hlsSegment, webroot, sslCert);

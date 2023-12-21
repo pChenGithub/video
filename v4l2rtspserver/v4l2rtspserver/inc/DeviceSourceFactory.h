@@ -21,6 +21,8 @@ class DeviceSourceFactory {
     public:
 		static FramedSource* createFramedSource(UsageEnvironment* env, int format, DeviceInterface* devCapture, int queueSize = 5, V4L2DeviceSource::CaptureMode captureMode = V4L2DeviceSource::CAPTURE_INTERNAL_THREAD, int outfd = -1, bool repeatConfig = true) {
             FramedSource* source = NULL;
+
+            // 根据不同的像素格式,创建 FramedSource
             if (format == V4L2_PIX_FMT_H264)
             {
                 source = H264_V4L2DeviceSource::createNew(*env, devCapture, outfd, queueSize, captureMode, repeatConfig, false);

@@ -62,8 +62,11 @@ V4L2DeviceSource::V4L2DeviceSource(UsageEnvironment& env, DeviceInterface * devi
 	pthread_mutex_init(&m_mutex, NULL);
 	if (m_device)
 	{
+        // 本次执行,使用的是 CAPTURE_INTERNAL_THREAD
 		switch (captureMode) {
 			case CAPTURE_INTERNAL_THREAD:
+                // 创建一个线程,,,threadStub 线程,处理什么???
+                // threadStub 是 参数的thread,即 this->thread
 				pthread_create(&m_thid, NULL, threadStub, this);		
 			break;
 			case CAPTURE_LIVE555_THREAD:
@@ -88,6 +91,7 @@ V4L2DeviceSource::~V4L2DeviceSource()
 // thread mainloop
 void* V4L2DeviceSource::thread()
 {
+    // 这个线程是处理摄像头数据的
 	int stop=0;
 	fd_set fdset;
 	FD_ZERO(&fdset);
@@ -96,16 +100,21 @@ void* V4L2DeviceSource::thread()
 	LOG(NOTICE) << "begin thread"; 
 	while (!stop) 
 	{
+        // m_device 是之前创建的采集摄像头的对象,这里就是获取摄像头的文件描述符
 		int fd = m_device->getFd();
 		FD_SET(fd, &fdset);
 		tv.tv_sec=1;
 		tv.tv_usec=0;	
+
+        // 监听摄像头,,,等待数据
 		int ret = select(fd+1, &fdset, NULL, NULL, &tv);
 		if (ret == 1)
 		{
 			if (FD_ISSET(fd, &fdset))
 			{
 				LOG(DEBUG) << "waitingFrame\tdelay:" << (1000-(tv.tv_usec/1000)) << "ms"; 
+
+                // 获取一帧数据
 				if (this->getNextFrame() <= 0)
 				{
 					if (errno == EAGAIN)
@@ -123,6 +132,7 @@ void* V4L2DeviceSource::thread()
 		else if (ret == -1)
 		{
 			LOG(ERROR) << "stop " << strerror(errno); 
+            // select失败,,停止线程
 			stop=1;
 		}
 	}
@@ -203,7 +213,20 @@ int V4L2DeviceSource::getNextFrame()
 {
 	timeval ref;
 	gettimeofday(&ref, NULL);											
+
+    // 创建buff,大小为图缓存大小,这个是最大大小
 	char* buffer = new char[m_device->getBufferSize()];	
+    // 读取图片到缓存
+    // DeviceInterface--->VideoCaptureAccess(这个是当前的 m_device,传的是 DeviceInterface 类型)
+    // VideoCaptureAccess 里面有一个 V4l2Capture* m_device;
+    // VideoCaptureAccess 调用 read 最终是调用 V4l2Capture 的 read
+    // V4l2Access--->V4l2Capture
+    // V4l2Access 里面有一个 V4l2Device* m_device;
+    // V4l2Capture 调用 read 最终调用的是 V4l2Device 的 readInternal
+    // V4l2Device--->V4l2MmapDevice
+
+    // 至此获取到一帧摄像头数据,放在 buffer 中,大小为 frameSize
+    // 这个是原始数据
 	int frameSize = m_device->read(buffer,  m_device->getBufferSize());	
 	if (frameSize < 0)
 	{
@@ -215,6 +238,7 @@ int V4L2DeviceSource::getNextFrame()
 	}
 	else
 	{
+        // 提交这一帧数据
 		this->postFrame(buffer,frameSize,ref);
 	}			
 	return frameSize;
@@ -227,10 +251,18 @@ void V4L2DeviceSource::postFrame(char * frame, int frameSize, const timeval &ref
 	gettimeofday(&tv, NULL);												
 	timeval diff;
 	timersub(&tv,&ref,&diff);
+    // ???
 	m_in.notify(tv.tv_sec, frameSize);
 	LOG(DEBUG) << "postFrame\ttimestamp:" << ref.tv_sec << "." << ref.tv_usec << "\tsize:" << frameSize <<"\tdiff:" <<  (diff.tv_sec*1000+diff.tv_usec/1000) << "ms";
 	
+
+    // 这里可以看到,,,采集到的摄像头数据,,,,有2个方向,
+    // 写入 m_outfd(文件描述符)
+    // 放到队列里面 m_captureQueue
+    // 处理一帧图像数据
 	processFrame(frame,frameSize,ref);
+
+    // m_outfd 是什么???
 	if (m_outfd != -1) 
 	{
 		int written = write(m_outfd, frame, frameSize);
@@ -243,22 +275,31 @@ void V4L2DeviceSource::postFrame(char * frame, int frameSize, const timeval &ref
 		
 void V4L2DeviceSource::processFrame(char * frame, int frameSize, const timeval &ref) 
 {
+// frame 是原始图片数据
+// frameSize 是数据大小
 	timeval tv;
 	gettimeofday(&tv, NULL);												
 	timeval diff;
 	timersub(&tv,&ref,&diff);
-		
+
+    // 图片数据分片???(入队)
 	std::list< std::pair<unsigned char*,size_t> > frameList = this->splitFrames((unsigned char*)frame, frameSize);
 	while (!frameList.empty())
 	{
+        // 获取一帧数据
 		std::pair<unsigned char*,size_t>& item = frameList.front();
+        // 拿第二个对象(size_t)
 		size_t size = item.second;
 		char* allocatedBuffer = NULL;
 		if (frameList.size() == 1) {
 			// last frame will release buffer
 			allocatedBuffer = frame;
 		}
+
+        // 处理一帧数据???
+        // 参数1 第一个对象(unsigned char*)
 		queueFrame((char*)item.first,size,ref,allocatedBuffer);
+        // 图片数据出队
 		frameList.pop_front();
 
 		LOG(DEBUG) << "queueFrame\ttimestamp:" << ref.tv_sec << "." << ref.tv_usec << "\tsize:" << size <<"\tdiff:" <<  (diff.tv_sec*1000+diff.tv_usec/1000) << "ms";		
@@ -269,15 +310,22 @@ void V4L2DeviceSource::processFrame(char * frame, int frameSize, const timeval &
 void V4L2DeviceSource::queueFrame(char * frame, int frameSize, const timeval &tv, char * allocatedBuffer) 
 {
 	pthread_mutex_lock (&m_mutex);
+
+    // m_captureQueue 在哪里初始化的,哪里使用的???
+    // 如果当前队列内大小,大于最大长度,,,,对象出队,清理,,,空出位置
 	while (m_captureQueue.size() >= m_queueSize)
 	{
 		LOG(DEBUG) << "Queue full size drop frame size:"  << (int)m_captureQueue.size() ;		
 		delete m_captureQueue.front();
 		m_captureQueue.pop_front();
 	}
+
+    // 将新的图片数据插入到队列里面
+    // m_captureQueue 是保存采集图片的数据内容,,,,有长度限制(好像是5),,,,,
 	m_captureQueue.push_back(new Frame(frame, frameSize, tv, allocatedBuffer));	
 	pthread_mutex_unlock (&m_mutex);
 	
+    // 发送一个事件,,,,通知有新数据了???
 	// post an event to ask to deliver the frame
 	envir().taskScheduler().triggerEvent(m_eventTriggerId, this);
 }	

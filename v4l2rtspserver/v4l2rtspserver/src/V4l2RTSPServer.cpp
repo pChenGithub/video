@@ -31,7 +31,7 @@ StreamReplicator* V4l2RTSPServer::CreateVideoReplicator(
 
     // live555的类,视频流???
 	StreamReplicator* videoReplicator = NULL;
-    // 获取设备节点
+    // 获取设备节点 videoDev 是 /dev/video0
     std::string videoDev(inParam.m_devName);
 	if (!videoDev.empty())
 	{
@@ -39,6 +39,10 @@ StreamReplicator* V4l2RTSPServer::CreateVideoReplicator(
 		LOG(NOTICE) << "Create V4L2 Source..." << videoDev;
 		
         // 创建摄像头采集对象
+        // 1 打开摄像头
+        // 2 设置摄像头参数
+        // 3 映射所有的图片缓存到应用空间
+        // 4 启动摄像头
 		V4l2Capture* videoCapture = V4l2Capture::create(inParam);
 		if (videoCapture)
 		{
@@ -59,12 +63,18 @@ StreamReplicator* V4l2RTSPServer::CreateVideoReplicator(
 			}
 			
             // 获取摄像头参数,采集
+            // BaseServerMediaSubsession 是 live555 的模块
+            // 根据摄像头的像素格式,,初始化rtp包的 rtpFormat
 			std::string rtpVideoFormat(BaseServerMediaSubsession::getVideoRtpFormat(videoCapture->getFormat()));
 			if (rtpVideoFormat.empty()) {
 				LOG(FATAL) << "No Streaming format supported for device " << videoDev;
 				delete videoCapture;
 			} else {
 				LOG(NOTICE) << "Create Source ..." << videoDev;
+
+                // 创建 createStreamReplicator
+                // 参数3 为什么要创建一个 VideoCaptureAccess
+                // 参数4 队列长度
 				videoReplicator = DeviceSourceFactory::createStreamReplicator(this->env(), videoCapture->getFormat(), new VideoCaptureAccess(videoCapture), queueSize, captureMode, outfd, repeatConfig);
 				if (videoReplicator == NULL) 
 				{

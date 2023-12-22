@@ -263,6 +263,7 @@ void V4L2DeviceSource::postFrame(char * frame, int frameSize, const timeval &ref
 	processFrame(frame,frameSize,ref);
 
     // m_outfd 是什么???
+    // m_outfd 是创建 DeviceSourceFactory 的时候传进来的 输出文件的文件描述符
 	if (m_outfd != -1) 
 	{
 		int written = write(m_outfd, frame, frameSize);

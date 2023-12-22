@@ -341,26 +341,43 @@ int main(int argc, char** argv)
 			V4L2DeviceParameters inParam(videoDev.c_str(), videoformatList, width, height, fps, ioTypeIn, verbose, openflags);
 
             // 创建一个 视频 采集器???
+            // 这个采集器,会启动线程,读取摄像头数据
+            // 如果指定了文件,会将数据写入文件
+            // 然后将一帧一帧的数据放入队列中
 			StreamReplicator* videoReplicator = rtspServer.CreateVideoReplicator( 
 					inParam,
 					queueSize, captureMode, repeatConfig,
 					output, ioTypeOut, out);
 			if (out != NULL) {
+                // 把 V4l2Output 放入列表管理,如果有
+                // V4l2Output 是传入文件的实例化对象
 				outList.push_back(out);
 			}
 					
 			// Init Audio Capture
 			StreamReplicator* audioReplicator = NULL;
+
+            // 如果开启alsa,还需要创建一个,音频的采集器,,这个稍后分析
 #ifdef HAVE_ALSA
 			audioReplicator = rtspServer.CreateAudioReplicator(
 					audioDev, audioFmtList, audioFreq, audioNbChannels, verbose,
 					queueSize, captureMode);		
 #endif
 					
-										
+            // 创建3个session,我们一个一个分析
+            // 在分析之前,我们再次回顾下前面的内容,,
+            // 1 打开了摄像头
+            // 2 开启了线程
+            // 3 循环读取摄像头数据按队列保存的一个队列中
+
+            // ServerMediaSession 是live555的模块的类
 			// Create Multicast Session
 			if (multicast)						
 			{		
+                // baseUrl 因为只有一个设备/dev/video0,所以 baseUrl 是空的
+                // destinationAddress 是一个ip地址
+                // rtpPortNum rtcpPortNum 是端口
+                // videoReplicator audioReplicator 分别是视频和音频的采集器
 				ServerMediaSession* sms = rtspServer.AddMulticastSession(baseUrl+murl, destinationAddress, rtpPortNum, rtcpPortNum, videoReplicator, audioReplicator);
 				if (sms) {
 					nbSource += sms->numSubsessions();

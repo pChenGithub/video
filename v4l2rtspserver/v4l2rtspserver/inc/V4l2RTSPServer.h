@@ -145,16 +145,20 @@ class V4l2RTSPServer {
 
             LOG(NOTICE) << "RTP  address " << inet_ntoa(destinationAddress) << ":" << rtpPortNum;
             LOG(NOTICE) << "RTCP address " << inet_ntoa(destinationAddress) << ":" << rtcpPortNum;
+
+            // ttl  的作用???
         	unsigned char ttl = 5;
             std::list<ServerMediaSubsession*> subSession;						
             if (videoReplicator)
             {
+                // 创建一个sessoin,视频,
                 subSession.push_back(MulticastServerMediaSubsession::createNew(*this->env(), destinationAddress, Port(rtpPortNum), Port(rtcpPortNum), ttl, videoReplicator));					
                 // increment ports for next sessions
                 rtpPortNum+=2;
                 rtcpPortNum+=2;
             }
             
+            // 这是音频的session
             if (audioReplicator)
             {
                 subSession.push_back(MulticastServerMediaSubsession::createNew(*this->env(), destinationAddress, Port(rtpPortNum), Port(rtcpPortNum), ttl, audioReplicator));				

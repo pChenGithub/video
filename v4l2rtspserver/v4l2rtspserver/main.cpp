@@ -371,10 +371,11 @@ int main(int argc, char** argv)
             // 3 循环读取摄像头数据按队列保存的一个队列中
 
             // ServerMediaSession 是live555的模块的类
+            // 多播
 			// Create Multicast Session
 			if (multicast)						
 			{		
-                // baseUrl 因为只有一个设备/dev/video0,所以 baseUrl 是空的
+                // baseUrl 因为只有一个设备/dev/video0,所以 baseUrl 是空的, multicast 是 "multicast", 最终是 "multicast"
                 // destinationAddress 是一个ip地址
                 // rtpPortNum rtcpPortNum 是端口
                 // videoReplicator audioReplicator 分别是视频和音频的采集器
@@ -393,6 +394,7 @@ int main(int argc, char** argv)
 				}
 			}
 			
+            // 单播
 			// Create Unicast Session
 			ServerMediaSession* sms  = rtspServer.AddUnicastSession(baseUrl+url, videoReplicator, audioReplicator);		
 			if (sms) {
@@ -404,6 +406,7 @@ int main(int argc, char** argv)
 		{
 			// main loop
 			signal(SIGINT,sighandler);
+            // 开始循环处理事件???,,,在哪里创建并初始化的呢
 			rtspServer.eventLoop(&quit); 
 			LOG(NOTICE) << "Exiting....";			
 		}

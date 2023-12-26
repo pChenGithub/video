@@ -232,6 +232,8 @@ class V4l2RTSPServer {
                 sms = ServerMediaSession::createNew(*m_env, sessionName.c_str());
                 if (sms != NULL)
                 {
+                    // 创建 ServerMediaSession 之后,遍历之前创建的视频音频轨道,, ServerMediaSubsession
+                    // 将其添加到 ServerMediaSession
                     std::list<ServerMediaSubsession*>::const_iterator subIt;
                     for (subIt = subSession.begin(); subIt != subSession.end(); ++subIt)
                     {

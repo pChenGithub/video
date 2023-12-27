@@ -56,6 +56,7 @@ public:
       // returns True iff we were actually able to delete our object
 
   // task scheduler:
+  // 返回 UsageEnvironment 中的 TaskScheduler
   TaskScheduler& taskScheduler() const {return fScheduler;}
 
   // result message handling:
@@ -107,6 +108,10 @@ class TaskScheduler {
 public:
   virtual ~TaskScheduler();
 
+
+// 提交一个延时 microseconds 毫秒的任务
+// 如果 microseconds 赋值 小于0,,,那么不延时
+// 返回一个token以便在任务执行之前可以取消
   virtual TaskToken scheduleDelayedTask(int64_t microseconds, TaskFunc* proc,
 					void* clientData) = 0;
 	// Schedules a task to occur (after a delay) when we next
@@ -116,11 +121,13 @@ public:
 	// unscheduleDelayedTask() or rescheduleDelayedTask()
         // (but only if the task has not yet occurred).
 
+// 取消一个任务
   virtual void unscheduleDelayedTask(TaskToken& prevTask) = 0;
 	// (Has no effect if "prevTask" == NULL)
         // Sets "prevTask" to NULL afterwards.
         // Note: This MUST NOT be called if the scheduled task has already occurred.
 
+// 重新提交一次一体交任务
   virtual void rescheduleDelayedTask(TaskToken& task,
 				     int64_t microseconds, TaskFunc* proc,
 				     void* clientData);

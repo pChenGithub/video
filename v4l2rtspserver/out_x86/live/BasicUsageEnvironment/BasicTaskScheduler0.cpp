@@ -84,6 +84,8 @@ void BasicTaskScheduler0::doEventLoop(char volatile* watchVariable) {
   // Repeatedly loop, handling readble sockets and timed events:
   while (1) {
     if (watchVariable != NULL && *watchVariable != 0) break;
+
+    // SingleStep 将会在 BasicTaskScheduler0 的子类 BasicTaskScheduler 中实现
     SingleStep();
   }
 }

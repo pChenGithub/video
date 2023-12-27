@@ -20,6 +20,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #include "strDup.hh"
 
+// 分配一段内存,放入str,,,返回指针
 char* strDup(char const* str) {
   if (str == NULL) return NULL;
   size_t len = strlen(str) + 1;

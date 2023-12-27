@@ -63,9 +63,15 @@ void usage(UsageEnvironment& env, char const* progName) {
 
 char eventLoopWatchVariable = 0;
 
+
+// 入口,,,
 int main(int argc, char** argv) {
   // Begin by setting up our usage environment:
+  // 创建任务调度,,任务调度???
   TaskScheduler* scheduler = BasicTaskScheduler::createNew();
+
+  // 创建事件处理对象
+  // UsageEnvironment 内部有一个 TaskScheduler 对象引用, 这个引用将会指向 scheduler
   UsageEnvironment* env = BasicUsageEnvironment::createNew(*scheduler);
 
   // We need at least one "rtsp://" URL argument:
@@ -76,6 +82,7 @@ int main(int argc, char** argv) {
 
   // There are argc-1 URLs: argv[1] through argv[argc-1].  Open and start streaming each one:
   for (int i = 1; i <= argc-1; ++i) {
+    // 好像就是做了一些准备工作,,创建了一个 RTSPClient, 复位一些变量
     openURL(*env, argv[0], argv[i]);
   }
 
@@ -442,6 +449,7 @@ void shutdownStream(RTSPClient* rtspClient, int exitCode) {
 
 ourRTSPClient* ourRTSPClient::createNew(UsageEnvironment& env, char const* rtspURL,
 					int verbosityLevel, char const* applicationName, portNumBits tunnelOverHTTPPortNum) {
+                    // 调用的地方 tunnelOverHTTPPortNum 没有传,,给默认值 0
   return new ourRTSPClient(env, rtspURL, verbosityLevel, applicationName, tunnelOverHTTPPortNum);
 }
 

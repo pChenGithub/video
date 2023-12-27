@@ -402,13 +402,18 @@ RTSPClient::RTSPClient(UsageEnvironment& env, char const* rtspURL,
     fSessionCookieCounter(0), fHTTPTunnelingConnectionIsPending(False),
     fTLS(*this), fPOSTSocketTLS(*this) {
   fInputTLS = fOutputTLS = &fTLS; // fOutputTLS will change if we're doing RTSP-over-HTTPS
+
+  // rtsp地址 保存在 RTSPClient 中
   setBaseURL(rtspURL);
-
+    // 分配指定大小的 responseBufferSize 的空间,,, responseBufferSize 是 RTSPClient 的类属性, 默认值 20000
   fResponseBuffer = new char[responseBufferSize+1];
+  // 复位 resp 缓存所属的参数,相当与复位缓存
   resetResponseBuffer();
-
+  // 复位 req 缓存
   setRequireValue();
 
+    // 这次调用,,socketNumToServer 给的是 -1
+    // 所以 if 不会执行
   if (socketNumToServer >= 0) {
     // This socket number is (assumed to be) already connected to the server.
     // Use it, and arrange to handle responses to requests sent on it:
@@ -431,6 +436,8 @@ RTSPClient::RTSPClient(UsageEnvironment& env, char const* rtspURL,
     = strlen(applicationName) + strlen(libPrefix) + strlen(libName) + strlen(libVersionStr) + strlen(libSuffix) + 1;
   char* userAgentName = new char[userAgentNameSize];
   sprintf(userAgentName, "%s%s%s%s%s", applicationName, libPrefix, libName, libVersionStr, libSuffix);
+
+  // 复位 fUserAgentHeaderStr
   setUserAgentString(userAgentName);
   delete[] userAgentName;
 }
@@ -458,6 +465,7 @@ void RTSPClient::reset() {
 }
 
 void RTSPClient::setBaseURL(char const* url) {
+    // 把地址放入 fBaseURL , fBaseURL 是全局变量
   delete[] fBaseURL; fBaseURL = strDup(url);
 }
 

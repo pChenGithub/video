@@ -340,6 +340,8 @@ RTSPServer::RTSPClientConnection
     fOurRTSPServer(ourServer), fClientInputSocket(fOurSocket), fClientOutputSocket(fOurSocket),
     fPOSTSocketTLS(envir()), fAddressFamily(clientAddr.ss_family),
     fIsActive(True), fRecursionCount(0), fOurSessionCookie(NULL), fScheduledDelayedTask(0) {
+
+    // 复位请求buff
   resetRequestBuffer();
 }
 
@@ -735,6 +737,7 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
       }
       newBytesRead = toIndex;
       
+      // 使用 base64 解码,,,客户端发过来的内容是 base64 加密的
       unsigned numBytesToDecode = fBase64RemainderCount + newBytesRead;
       unsigned newBase64RemainderCount = numBytesToDecode%4;
       numBytesToDecode -= newBase64RemainderCount;
@@ -794,6 +797,8 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
     Boolean urlIsRTSPS;
     Boolean playAfterSetup = False;
     fLastCRLF[2] = '\0'; // temporarily, for parsing
+
+    // 解析客户端请求内容
     Boolean parseSucceeded = parseRTSPRequestString((char*)fRequestBuffer, fLastCRLF+2 - fRequestBuffer,
 						    cmdName, sizeof cmdName,
 						    urlPreSuffix, sizeof urlPreSuffix,
@@ -850,6 +855,9 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 	  handleCmd_OPTIONS();
 	}
       } else if (urlPreSuffix[0] == '\0' && urlSuffix[0] == '*' && urlSuffix[1] == '\0') {
+
+
+      // 处理请求命令
 	// The special "*" URL means: an operation on the entire server.  This works only for GET_PARAMETER and SET_PARAMETER:
 	if (strcmp(cmdName, "GET_PARAMETER") == 0) {
 	  handleCmd_GET_PARAMETER((char const*)fRequestBuffer);
@@ -861,6 +869,8 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
       } else if (strcmp(cmdName, "DESCRIBE") == 0) {
 	handleCmd_DESCRIBE(urlPreSuffix, urlSuffix, (char const*)fRequestBuffer);
       } else if (strcmp(cmdName, "SETUP") == 0) {
+      // 处理 SETUP
+
 	Boolean areAuthenticated = True;
 
 	if (!requestIncludedSessionId) {
@@ -877,6 +887,8 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 	  }
 	  strcat(urlTotalSuffix, urlSuffix);
 	  if (authenticationOK("SETUP", urlTotalSuffix, (char const*)fRequestBuffer)) {
+
+      // 遇到 SETUP 命令,,,创建新的 session
 	    clientSession
 	      = (RTSPServer::RTSPClientSession*)fOurRTSPServer.createNewClientSessionWithId();
 	  } else {
@@ -884,6 +896,8 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 	  }
 	}
 	if (clientSession != NULL) {
+
+    // 回复 SETUP 命令
 	  clientSession->handleCmd_SETUP(this, urlPreSuffix, urlSuffix, (char const*)fRequestBuffer);
 	  playAfterSetup = clientSession->fStreamAfterSETUP;
 	} else if (areAuthenticated) {
@@ -987,6 +1001,8 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
     if (fOutputTLS->isNeeded) {
         fOutputTLS->write((char const*)fResponseBuffer, numBytesToWrite);
     } else {
+
+    // 回复客户端
         send(fClientOutputSocket, (char const*)fResponseBuffer, numBytesToWrite, MSG_NOSIGNAL);
    }
     

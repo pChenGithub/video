@@ -87,6 +87,9 @@ int main(int argc, char** argv) {
   }
 
   // All subsequent activity takes place within the event loop:
+
+  
+  // 循环监听并处理 socket,,事件,,延时任务
   env->taskScheduler().doEventLoop(&eventLoopWatchVariable);
     // This function call does not return, unless, at some point in time, "eventLoopWatchVariable" gets set to something non-zero.
 

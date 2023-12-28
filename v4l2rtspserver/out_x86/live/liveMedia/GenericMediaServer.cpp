@@ -128,9 +128,12 @@ GenericMediaServer
     fClientSessions(HashTable::create(STRING_HASH_KEYS)),
     fPreviousClientSessionId(0),
     fTLSCertificateFileName(NULL), fTLSPrivateKeyFileName(NULL) {
+
+    // 设置 socket 属性
   ignoreSigPipeOnSocket(fServerSocketIPv4); // so that clients on the same host that are killed don't also kill us
   ignoreSigPipeOnSocket(fServerSocketIPv6); // ditto
   
+  // 提交 socket 到任务监听
   // Arrange to handle connections from others:
   env.taskScheduler().turnOnBackgroundReadHandling(fServerSocketIPv4, incomingConnectionHandlerIPv4, this);
   env.taskScheduler().turnOnBackgroundReadHandling(fServerSocketIPv6, incomingConnectionHandlerIPv6, this);
@@ -188,18 +191,22 @@ int GenericMediaServer::setUpOurSocket(UsageEnvironment& env, Port& ourPort, int
     NoReuse dummy(env); // Don't use this socket if there's already a local server using it
 #endif
     
+    // 创建socket
     ourSocket = setupStreamSocket(env, ourPort, domain, True, True);
     if (ourSocket < 0) break;
     
+    // 创建发送buff
     // Make sure we have a big send buffer:
     if (!increaseSendBufferTo(env, ourSocket, 50*1024)) break;
     
+    // 监听
     // Allow multiple simultaneous connections:
     if (listen(ourSocket, LISTEN_BACKLOG_SIZE) < 0) {
       env.setResultErrMsg("listen() failed: ");
       break;
     }
     
+    //  绑定ip,bind
     if (ourPort.num() == 0) {
       // bind() will have chosen a port for us; return it also:
       if (!getSourcePort(env, ourSocket, domain, ourPort)) break;
@@ -230,6 +237,8 @@ void GenericMediaServer::incomingConnectionHandlerIPv6() {
 void GenericMediaServer::incomingConnectionHandlerOnSocket(int serverSocket) {
   struct sockaddr_storage clientAddr;
   SOCKLEN_T clientAddrLen = sizeof clientAddr;
+
+  // 等待客户端连接,,,有客户端连接后,,,创建新的 socket,,clientSocket
   int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
   if (clientSocket < 0) {
     int err = envir().getErrno();
@@ -238,14 +247,19 @@ void GenericMediaServer::incomingConnectionHandlerOnSocket(int serverSocket) {
     }
     return;
   }
+
+  // 忽略 信号 什么的???
   ignoreSigPipeOnSocket(clientSocket); // so that clients on the same host that are killed don't also kill us
+  // 设置非阻塞
   makeSocketNonBlocking(clientSocket);
+  // 修改socket缓存大小
   increaseSendBufferTo(envir(), clientSocket, 50*1024);
   
 #ifdef DEBUG
   envir() << "accept()ed connection from " << AddressString(clientAddr).val() << "\n";
 #endif
   
+  // 对新客户端,创建一个新连接,,,后面会调用 ClientConnection
   // Create a new object for handling this connection:
   (void)createNewClientConnection(clientSocket, clientAddr);
 }
@@ -280,6 +294,8 @@ GenericMediaServer::ClientConnection
 
   // Arrange to handle incoming requests:
   resetRequestBuffer();
+
+  // 监听客户端 socket,,,和客户端通信的 socket,,, incomingRequestHandler 将会处理客户端的请求
   envir().taskScheduler()
     .setBackgroundHandling(fOurSocket, SOCKET_READABLE|SOCKET_EXCEPTION, incomingRequestHandler, this);
 }
@@ -318,8 +334,11 @@ void GenericMediaServer::ClientConnection::incomingRequestHandler() {
   } else {
     struct sockaddr_storage dummy; // 'from' address, meaningless in this case
   
+  // 读取客户端的请求内容
     bytesRead = readSocket(envir(), fOurSocket, &fRequestBuffer[fRequestBytesAlreadySeen], fRequestBufferBytesLeft, dummy);
   }
+
+  // 处理客户端的请求(RTSP)
   handleRequestBytes(bytesRead);
 }
 
@@ -397,6 +416,8 @@ GenericMediaServer::ClientSession* GenericMediaServer::createNewClientSessionWit
   // (it will be encoded as a 8-digit hex number).  (We avoid choosing session id 0,
   // because that has a special use by some servers.  Similarly, we avoid choosing the same
   // session id twice in a row.)
+
+  // 获取一个随机ID
   do {
     sessionId = (u_int32_t)our_random32();
     snprintf(sessionIdStr, sizeof sessionIdStr, "%08X", sessionId);
@@ -404,9 +425,12 @@ GenericMediaServer::ClientSession* GenericMediaServer::createNewClientSessionWit
 	   || lookupClientSession(sessionIdStr) != NULL);
   fPreviousClientSessionId = sessionId;
 
+
+// 创建一个新的 session
   ClientSession* clientSession = createNewClientSession(sessionId);
   if (clientSession != NULL) fClientSessions->Add(sessionIdStr, clientSession);
 
+// 返回 session
   return clientSession;
 }
 

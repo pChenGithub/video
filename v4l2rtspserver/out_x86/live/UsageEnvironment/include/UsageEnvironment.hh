@@ -96,6 +96,8 @@ protected:
   virtual ~UsageEnvironment(); // we are deleted only by reclaim()
 
 private:
+
+// 定义运行环境里面必然会有一个任务调度器,并且是引用变量,需要的构造的时候初始化
   TaskScheduler& fScheduler;
 };
 
@@ -121,13 +123,13 @@ public:
 	// unscheduleDelayedTask() or rescheduleDelayedTask()
         // (but only if the task has not yet occurred).
 
-// 取消一个任务
+// 取消一个延时任务
   virtual void unscheduleDelayedTask(TaskToken& prevTask) = 0;
 	// (Has no effect if "prevTask" == NULL)
         // Sets "prevTask" to NULL afterwards.
         // Note: This MUST NOT be called if the scheduled task has already occurred.
 
-// 重新提交一次一体交任务
+// 重新提交一次延时任务,会被替换
   virtual void rescheduleDelayedTask(TaskToken& task,
 				     int64_t microseconds, TaskFunc* proc,
 				     void* clientData);
@@ -139,11 +141,17 @@ public:
   typedef void BackgroundHandlerProc(void* clientData, int mask);
     // Possible bits to set in "mask".  (These are deliberately defined
     // the same as those in Tcl, to make a Tcl-based subclass easy.)
+
+    // conditionSet 变量mask
     #define SOCKET_READABLE    (1<<1)
     #define SOCKET_WRITABLE    (1<<2)
     #define SOCKET_EXCEPTION   (1<<3)
+
+    // 提交一个 socket 监听
   virtual void setBackgroundHandling(int socketNum, int conditionSet, BackgroundHandlerProc* handlerProc, void* clientData) = 0;
+  // 取消一个 socket 监听
   void disableBackgroundHandling(int socketNum) { setBackgroundHandling(socketNum, 0, NULL, NULL); }
+  // 
   virtual void moveSocketHandling(int oldSocketNum, int newSocketNum) = 0;
         // Changes any socket handling for "oldSocketNum" so that occurs with "newSocketNum" instead.
 
@@ -152,11 +160,18 @@ public:
       // Delayed tasks, background I/O handling, and other events are handled, sequentially (as a single thread of control).
       // (If "watchVariable" is not NULL, then we return from this routine when *watchVariable != 0)
 
+
+// 添加一个事件监听
   virtual EventTriggerId createEventTrigger(TaskFunc* eventHandlerProc) = 0;
       // Creates a 'trigger' for an event, which - if it occurs - will be handled (from the event loop) using "eventHandlerProc".
       // (Returns 0 iff no such trigger can be created (e.g., because of implementation limits on the number of triggers).)
+
+
+      // 删除一个事件监听
   virtual void deleteEventTrigger(EventTriggerId eventTriggerId) = 0;
 
+
+// 触发 一个事件
   virtual void triggerEvent(EventTriggerId eventTriggerId, void* clientData = NULL) = 0;
       // Causes the (previously-registered) handler function for the specified event to be handled (from the event loop).
       // The handler function is called with "clientData" as parameter.
@@ -169,9 +184,12 @@ public:
       // has been handled.)
 
   // The following two functions are deprecated, and are provided for backwards-compatibility only:
+
+  // 封装成只监听 读的 socket监听接口
   void turnOnBackgroundReadHandling(int socketNum, BackgroundHandlerProc* handlerProc, void* clientData) {
     setBackgroundHandling(socketNum, SOCKET_READABLE, handlerProc, clientData);
   }
+  // 取消监听
   void turnOffBackgroundReadHandling(int socketNum) { disableBackgroundHandling(socketNum); }
 
   virtual void internalError(); // used to 'handle' a 'should not occur'-type error condition within the library.

@@ -418,6 +418,8 @@ RTSPClient::RTSPClient(UsageEnvironment& env, char const* rtspURL,
     // This socket number is (assumed to be) already connected to the server.
     // Use it, and arrange to handle responses to requests sent on it:
     fInputSocketNum = fOutputSocketNum = socketNumToServer;
+
+    // 提交 fInputSocketNum 监听处理 执行 incomingDataHandler
     env.taskScheduler().setBackgroundHandling(fInputSocketNum, SOCKET_READABLE|SOCKET_EXCEPTION,
 						  (TaskScheduler::BackgroundHandlerProc*)&incomingDataHandler, this);
   }

@@ -78,21 +78,28 @@ int sample_common_isp_init(int cam_id, rk_aiq_working_mode_t WDRMode, bool Multi
 		LOG_ERROR("%s : cam_id is over 3\n", __FUNCTION__);
 		return -1;
 	}
+    // 设置标准输出遇\n输出
 	setlinebuf(stdout);
 	if (iq_file_dir == NULL) {
 		LOG_ERROR("rk_isp_init : not start.\n");
+        // g_aiq_ctx 是模块内维护的一个全局数组,维护摄像头的信息
 		g_aiq_ctx[cam_id] = NULL;
 		return 0;
 	}
 
 	// must set HDR_MODE, before init
+    // g_WDRMode 是另一个维护摄像头的全局数组
+    // 这里的很多数据结构是估计是 media 模块里面定义的,,所以需要去了解rk对于 isp 的封装
 	g_WDRMode[cam_id] = WDRMode;
 	char hdr_str[16];
 	snprintf(hdr_str, sizeof(hdr_str), "%d", (int)WDRMode);
+    // 设置为环境变量
 	setenv("HDR_MODE", hdr_str, 1);
 
 	rk_aiq_sys_ctx_t *aiq_ctx;
 	rk_aiq_static_info_t aiq_static_info;
+    // rk_aiq_uapi2_sysctl_enumStaticMetasByPhyId 是 media 里面的接口,按摄像头编号获取信息
+    // 下面不往下看了,建议先去熟悉关于 isp 的接口
 	rk_aiq_uapi2_sysctl_enumStaticMetasByPhyId(cam_id, &aiq_static_info);
 	if (aiq_static_info.sensor_info.phyId == -1) {
 		LOG_INFO("WARN: aiq_static_info.sensor_info.phyId is %d\n",
@@ -124,6 +131,7 @@ int sample_common_isp_init(int cam_id, rk_aiq_working_mode_t WDRMode, bool Multi
 	// if (MultiCam)
 	// 	rk_aiq_uapi2_sysctl_setMulCamConc(aiq_ctx, true);
 
+    // 最终是获取了一个实例 aiq_ctx,,,赋值到全局数组 g_aiq_ctx 对应的位置
 	g_aiq_ctx[cam_id] = aiq_ctx;
 
 	return 0;
@@ -131,12 +139,15 @@ int sample_common_isp_init(int cam_id, rk_aiq_working_mode_t WDRMode, bool Multi
 
 int sample_common_isp_run(int cam_id) {
 	RK_ISP_CHECK_CAMERA_ID(cam_id);
+    // 按 cam_id 为下标获取摄像头实例,,,并做一些启动的工作
+    // 这里几个接口需要去了解以下,,,了解 rk 关于 isp 是使用过程
 	if (rk_aiq_uapi2_sysctl_prepare(g_aiq_ctx[cam_id], 0, 0, g_WDRMode[cam_id])) {
 		LOG_ERROR("rk_aiq_uapi2_sysctl_prepare failed !\n");
 		g_aiq_ctx[cam_id] = NULL;
 		return -1;
 	}
 	LOG_INFO("%s: rk_aiq_uapi2_sysctl_prepare succeed\n", get_time_string());
+    // 启动摄像头
 	if (rk_aiq_uapi2_sysctl_start(g_aiq_ctx[cam_id])) {
 		LOG_ERROR("rk_aiq_uapi2_sysctl_start  failed\n");
 		return -1;
@@ -268,17 +279,21 @@ int rk_isp_set_frame_rate(int cam_id, int value) {
 	char entry[128] = {'\0'};
 	Uapi_ExpSwAttrV2_t expSwAttr;
 	LOG_DEBUG("start %d\n", value);
+    // 读取参数
 	ret = rk_aiq_user_api2_ae_getExpSwAttr(rkipc_aiq_get_ctx(cam_id), &expSwAttr);
+    // 修改参数
 	if (value == 0) {
 		expSwAttr.stAuto.stFrmRate.isFpsFix = false;
 	} else {
 		expSwAttr.stAuto.stFrmRate.isFpsFix = true;
 		expSwAttr.stAuto.stFrmRate.FpsValue = value;
 	}
+    // 设置参数
 	ret = rk_aiq_user_api2_ae_setExpSwAttr(rkipc_aiq_get_ctx(cam_id), expSwAttr);
 	LOG_DEBUG("end, %d\n", value);
 
 	snprintf(entry, 127, "isp.%d.adjustment:fps", rkipc_get_scenario_id(cam_id));
+    // 保存实际摄像头使用的 fps
 	rk_param_set_int(entry, value);
 
 	return 0;
@@ -1819,12 +1834,16 @@ int rk_isp_set_from_ini(int cam_id) {
 
 int rk_isp_init(int cam_id, char *iqfile_path) {
 	int ret;
+    // 如果设置了qfile路径,模块内使用这个这个路径
+    // 否则使用默认内路径 /etc/iqfiles
+    // 我们这里用的是 /oem/usr/share/iqfiles/
 	if (iqfile_path)
 		memcpy(g_iq_file_dir_, iqfile_path, strlen(iqfile_path));
 	else
 		memcpy(g_iq_file_dir_, "/etc/iqfiles", strlen("/etc/iqfiles"));
 	LOG_INFO("g_iq_file_dir_ is %s\n", g_iq_file_dir_);
 
+    // 读取参数配置,目前这个参数不知道有啥用???
 	const char *scenario = rk_param_get_string("isp:scenario", "normal");
 	if (!strcmp(scenario, "normal")) {
 		current_scenario_id = 0;
@@ -1837,14 +1856,17 @@ int rk_isp_init(int cam_id, char *iqfile_path) {
 	char entry[128] = {'\0'};
 	snprintf(entry, 127, "isp.%d.blc:hdr", rkipc_get_scenario_id(cam_id));
 	const char *hdr_mode = rk_param_get_string(entry, "close");
+    // 以上都是获取摄像头的以下信息
 	LOG_INFO("cam_id is %d, hdr_mode is %s, scenario is %s\n", cam_id, hdr_mode, scenario);
 
+    // 根据配置的摄像头的模式,设置
 	if (!strcmp(hdr_mode, "HDR2")) {
 		ret = sample_common_isp_init(cam_id, RK_AIQ_WORKING_MODE_ISP_HDR2, true, g_iq_file_dir_);
 	} else {
 		ret = sample_common_isp_init(cam_id, RK_AIQ_WORKING_MODE_NORMAL, true, g_iq_file_dir_);
 	}
 
+    // 启动摄像头
 	ret |= sample_common_isp_run(cam_id);
 
 	return ret;

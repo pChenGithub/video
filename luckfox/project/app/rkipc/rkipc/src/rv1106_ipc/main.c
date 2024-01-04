@@ -150,28 +150,44 @@ int main(int argc, char **argv) {
 	signal(SIGINT, sig_proc);
 	signal(SIGTERM, sig_proc);
 
-    // 解析参数
+    // 解析参数,
+    // 对配置文件解析配置,放在一个全局变量(这个全局变量被参素模块维护)里面,后面的模块会用到这个全局变量
 	rkipc_get_opt(argc, argv);
 	LOG_INFO("rkipc_ini_path_ is %s, rkipc_iq_file_path_ is %s, rkipc_log_level "
 	         "is %d\n",
 	         rkipc_ini_path_, rkipc_iq_file_path_, rkipc_log_level);
 
 	// init
+    // 解析参数配置文件,但是现在不清除在设置写什么,先跳过
 	rk_param_init(rkipc_ini_path_);
+    // 初始化网络模块,处理网络,这里没有给回调
+    // 内部起线程监听网络上下线,开启了线程定时更新网络时间
 	rk_network_init(NULL);
+    // 里面啥都没干,就一句打印
 	rk_system_init();
+    // 如果npu配置了,就启用
+    // 设置检测相关的东西,具体需要去研究以下 media 相关模块
+    // 模块内部设置了一个回调
+    // 模块内部创建了一个链表,设置的回调会处理这个链表,目前不太了解具体用处???
 	if (rk_param_get_int("video.source:enable_npu", 0))
 		rkipc_rockiva_init();
+    // 如果aiq启用,就启用,,
+    // 是摄像头启动???
+    // 
 	if (rk_param_get_int("video.source:enable_aiq", 1)) {
+        // 开启摄像头,
+        // 读取设置参数,初始化摄像头并启动,
 		rk_isp_init(0, rkipc_iq_file_path_);
 		rk_isp_set_frame_rate(0, rk_param_get_int("isp.0.adjustment:fps", 30));
 		if (rk_param_get_int("isp:init_form_ini", 1))
 			rk_isp_set_from_ini(0);
 	}
+    // rk 的接口,,,估计应该在 media 里面实现的,先不讨论
 	RK_MPI_SYS_Init();
+    // 视频初始化
 	rk_video_init();
 
-    // 音频初始化
+    // 如果启用了音频,,,音频初始化
 	if (rk_param_get_int("audio.0:enable", 0))
 		rkipc_audio_init();
 

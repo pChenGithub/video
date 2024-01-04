@@ -176,6 +176,7 @@ int rkipc_rockiva_init() {
 	LOG_INFO("begin\n");
 	RockIvaRetCode ret;
 	const char *model_type;
+    // 获取旋转角度
 	int rotation = rk_param_get_int("video.source:rotation", 0);
 	// char *license_path = NULL;
 	// char *license_key;
@@ -195,8 +196,11 @@ int rkipc_rockiva_init() {
 	snprintf(globalParams.modelPath, ROCKIVA_PATH_LENGTH, "/usr/lib/");
 	globalParams.coreMask = 0x04;
 	globalParams.logLevel = ROCKIVA_LOG_ERROR;
+
+    // 设置检测人脸和人???
 	globalParams.detObjectType |= ROCKIVA_OBJECT_TYPE_FACE;
 	globalParams.detObjectType |= ROCKIVA_OBJECT_TYPE_PERSON;
+    // 根据设置设置了什么???
 	model_type = rk_param_get_string("event.regional_invasion:rockiva_model_type", "small");
 	if (!strcmp(model_type, "small") || !strcmp(model_type, "medium")) {
 		globalParams.detObjectType |= ROCKIVA_OBJECT_TYPE_PET;
@@ -204,11 +208,13 @@ int rkipc_rockiva_init() {
 		globalParams.detObjectType |= ROCKIVA_OBJECT_TYPE_NON_VEHICLE;
 		globalParams.detObjectType |= ROCKIVA_OBJECT_TYPE_VEHICLE;
 	}
+    // 设置图片大小和格式
 	globalParams.imageInfo.width = rk_param_get_int("video.2:width", 960);
 	globalParams.imageInfo.height = rk_param_get_int("video.2:height", 540);
 	globalParams.imageInfo.format = ROCKIVA_IMAGE_FORMAT_YUV420SP_NV12;
 	// temporary solution
 	// which will be changed to reinitialize when the resolution is dynamically switched
+    // 设置图片旋转角度
 	if (rotation == 0 || rotation == 180) {
 		globalParams.imageInfo.transformMode = ROCKIVA_IMAGE_TRANSFORM_ROTATE_180;
 	} else if (rotation == 90) {
@@ -217,6 +223,9 @@ int rkipc_rockiva_init() {
 		globalParams.imageInfo.transformMode = ROCKIVA_IMAGE_TRANSFORM_ROTATE_270;
 	}
 
+    // rockiva 初始化,,现在还不知道这个 rockiva 具体是做什么???
+    // 这个估计是 media 里面的库调用做人脸检测的???
+    // 这里获取一个实例 rkba_handle, 后面会用到
 	ROCKIVA_Init(&rkba_handle, ROCKIVA_MODE_VIDEO, &globalParams, NULL);
 	LOG_INFO("ROCKIVA_Init over\n");
 #if 0
@@ -374,12 +383,15 @@ int rkipc_rockiva_init() {
 	initParams.aiConfig.detectResultMode = 1; // 上报没有触发规则的检测目标, 临时调试用
 #endif
 #endif
+    // 对实例 rkba_handle 设置了一些规则,并由回调 rkba_callback 返回来处理相关事件
+    // 这部分内容可能要去研究一下 media 相关模块
 	ret = ROCKIVA_BA_Init(rkba_handle, &initParams, rkba_callback);
 	if (ret != ROCKIVA_RET_SUCCESS) {
 		printf("ROCKIVA_BA_Init error %d\n", ret);
 		return -1;
 	}
 	LOG_INFO("ROCKIVA_BA_Init success\n");
+    // 初始化一个链表 rknn_list_,,这个链表有什么作用,现在还不清楚???
 	create_rknn_list(&rknn_list_);
 	rockit_run_flag = 1;
 	LOG_INFO("end\n");

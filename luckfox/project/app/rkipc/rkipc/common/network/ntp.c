@@ -167,6 +167,7 @@ int rkipc_ntp_update(const char *ntp_server_addr) {
 	servaddr.sin_port = htons(NTP_PORT);
 	servaddr.sin_addr.s_addr = inet_host(ntp_server_addr);
 
+    // 使用socket方式访问时间服务器,获取当前时间
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		LOG_ERROR("socket error\n");
 		return -1;
@@ -178,11 +179,15 @@ int rkipc_ntp_update(const char *ntp_server_addr) {
 		return -1;
 	}
 	nbytes = BUFSIZE;
+
+    // 做一个ntp请求包
 	if (get_ntp_packet(buf, &nbytes) != 0) {
 		LOG_ERROR("construct ntp request error\n");
 		close(sockfd);
 		return -1;
 	}
+
+    // 发送
 	send(sockfd, buf, nbytes, 0);
 
 	FD_ZERO(&readfds);
@@ -192,6 +197,7 @@ int rkipc_ntp_update(const char *ntp_server_addr) {
 	timeout.tv_sec = TIMEOUT;
 	timeout.tv_usec = 0;
 
+    // 等待回复
 	if (select(maxfd1, &readfds, NULL, NULL, &timeout) > 0) {
 		if (FD_ISSET(sockfd, &readfds)) {
 			if ((nbytes = recv(sockfd, buf, BUFSIZE, 0)) < 0) {

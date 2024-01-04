@@ -684,6 +684,8 @@ int rk_network_get_cable_state() {
 	addr.nl_family = AF_NETLINK;
 	addr.nl_groups = RTNLGRP_LINK;
 	bind(fd, (struct sockaddr *)&addr, sizeof(addr));
+
+    // 使用socket监听网络的link状态
 	while ((retval = read(fd, buf, BUFLEN)) > 0) {
 		LOG_INFO("read Cable state\n");
 		for (nh = (struct nlmsghdr *)buf; NLMSG_OK(nh, retval); nh = NLMSG_NEXT(nh, retval)) {
@@ -705,15 +707,19 @@ int rk_network_get_cable_state() {
 
 			if (ifinfo->ifi_flags & IFF_LOWER_UP) {
 				status = 1;
+                // 关闭dhcp,删除默认网关,清除dns
 				system("killall -9 udhcpc");
 				system("route del default gw 0.0.0.0");
 				system("cat /dev/null > /etc/resolv.conf");
+                // 执行dhcp,,会设置dns???
 				system(cmd1);
 			} else {
 				status = 0;
+                // 设置0.0.0.0
 				system(cmd2);
 			}
 
+            // 如果设置了回调,执行回调
 			if (rk_cb)
 				rk_cb(status);
 
@@ -808,12 +814,18 @@ static void *rk_net_proc() {
 
 static void *ntp_client_thread() {
 	prctl(PR_SET_NAME, "ntp_client_thread", 0, 0, 0);
+    // 获取更新时间间隔
 	int refresh_time_s = rk_param_get_int("network.ntp:refresh_time_s", 60);
+    // 获取同步时间服务器
 	const char *ntp_server = rk_param_get_string("network:ntp.ntp_server", "119.28.183.184");
 	LOG_INFO("refresh_time_s is %d, ntp_server is %s\n", refresh_time_s, ntp_server);
 
+    // 循环同步网络时间
 	while (g_network_run_) {
+        // rk_signal_wait 是使用 信号量做了一个超时等待,,(经典)
 		rk_signal_wait(g_ntp_signal, refresh_time_s * 1000); // 60s
+        // 调用ntp模块同步网络时间,
+        // 里面用的是socket请求时间服务器获取时间,然后同步(有参考价值)
 		rkipc_ntp_update(ntp_server);
 	}
 
@@ -827,12 +839,19 @@ void rk_network_init(rk_network_cb func) { // func_cb func
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
 	pthread_t Net_trd;
+    // 创建 线程 rk_net_proc
+    // rk_net_proc 处理网络的上下线监听,设置ip并在设置了回调的情况下调用回调
+    // 这里没有设置回调,所以只设置了一下ip
 	if (pthread_create(&Net_trd, &attr, rk_net_proc, NULL) != 0) {
 		LOG_INFO("Creat thread failed!\n");
 	}
+
+     // 如果给了回调,赋值,这里没有给回调函数,为 NULL
 	if (func)
 		rk_cb = func;
 
+    // 创建一个信号量,不知道干嘛用,后面可能要用到
+    // 这个信号量是给同步时间线程使用,作为等待超时使用
 	if (g_ntp_signal)
 		rk_signal_destroy(g_ntp_signal);
 	g_ntp_signal = rk_signal_create(0, 1);
@@ -841,6 +860,9 @@ void rk_network_init(rk_network_cb func) { // func_cb func
 		return;
 	}
 
+    // 调用参数模块的接口了,参数是之前i解析的参数文件获取的
+    // 根据是否开启ntp配置,决定是否启动线程 ntp_client_thread
+    // ntp_client_thread 循环等待,间隔指定时间,同步一次系统时间
 	if (rk_param_get_int("network.ntp:enable", 0)) {
 		pthread_create(&ntp_client_thread_id, NULL, ntp_client_thread, NULL);
 	}

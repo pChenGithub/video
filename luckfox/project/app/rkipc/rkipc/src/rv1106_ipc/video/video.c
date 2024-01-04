@@ -3165,6 +3165,7 @@ int rk_roi_set(roi_data_s *roi_data) {
 int rk_video_init() {
 	LOG_DEBUG("begin\n");
 	int ret = 0;
+    // 这读取了很多参数,保存的模块内的全局变量中
 	enable_ivs = rk_param_get_int("video.source:enable_ivs", 1);
 	enable_jpeg = rk_param_get_int("video.source:enable_jpeg", 1);
 	enable_venc_0 = rk_param_get_int("video.source:enable_venc_0", 1);
@@ -3186,6 +3187,7 @@ int rk_video_init() {
 	g_video_run_ = 1;
 	g_nn_osd_run_ = 1;
 	ret |= rkipc_vi_dev_init();
+    // 根据使能的配置,,,一一初始化
 	if (enable_rtsp)
 		ret |= rkipc_rtsp_init();
 	if (enable_rtmp)

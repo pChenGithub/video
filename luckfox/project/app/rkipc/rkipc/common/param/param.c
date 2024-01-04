@@ -11,6 +11,8 @@
 #define LOG_TAG "param.c"
 
 char g_ini_path_[256];
+// dictionary 是一个字典库(hash表),k-v的存储结构,适合作为保存参数使用,
+// 可以保存文件,可以从文件读取
 dictionary *g_ini_d_;
 static pthread_mutex_t g_param_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -93,6 +95,8 @@ int rk_param_init(char *ini_path) {
 	g_ini_d_ = NULL;
 
     // 指定了文件使用指定的文件,未指定文件使用默认文件
+    // demo运行没有指定文件,使用的 /userdata/rkipc.ini
+    // 文件路径地址保存在 g_ini_path_
 	if (ini_path)
 		memcpy(g_ini_path_, ini_path, strlen(ini_path));
 	else
@@ -102,6 +106,9 @@ int rk_param_init(char *ini_path) {
 	g_ini_d_ = iniparser_load(g_ini_path_);
 	if (g_ini_d_ == NULL) {
 		LOG_ERROR("iniparser_load %s error! use /tmp/rkipc-factory-config.ini\n", g_ini_path_);
+
+        // 如果解析失败了,使用 /tmp/rkipc-factory-config.ini 重新解析
+        // 再解析失败,旧错误退出
 		snprintf(cmd, 127, "cp /tmp/rkipc-factory-config.ini %s", g_ini_path_);
 		LOG_INFO("cmd is %s\n", cmd);
 		system(cmd);

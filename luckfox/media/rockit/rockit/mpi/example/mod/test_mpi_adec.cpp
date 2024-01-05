@@ -447,9 +447,11 @@ int main(int argc, const char **argv) {
     RK_S32           s32Ret;
     TEST_ADEC_CTX_S *ctx;
 
+    // 分配结构体 TEST_ADEC_CTX_S,,,并清零
     ctx = reinterpret_cast<TEST_ADEC_CTX_S *>(malloc(sizeof(TEST_ADEC_CTX_S)));
     memset(ctx, 0, sizeof(TEST_ADEC_CTX_S));
 
+    // 初始化结构体
     ctx->srcFilePath     = RK_NULL;
     ctx->dstFilePath     = RK_NULL;
     ctx->s32LoopCount    = 1;
@@ -502,6 +504,7 @@ int main(int argc, const char **argv) {
         goto __FAILED;
     }
 
+    // 初始化 RK MPI 系统
     RK_MPI_SYS_Init();
 
     if (USE_EXT_ADEC) {

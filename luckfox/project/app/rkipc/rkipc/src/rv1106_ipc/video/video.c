@@ -752,9 +752,12 @@ int rkipc_vi_dev_init() {
 	memset(&stBindPipe, 0, sizeof(stBindPipe));
     // 这里 ipc 如果没有配置,清零初始化,如果设置过了,不清零
 	// 0. get dev config status
+    // 获取VI设备属性
 	ret = RK_MPI_VI_GetDevAttr(dev_id_, &stDevAttr);
 	if (ret == RK_ERR_VI_NOT_CONFIG) {
 		// 0-1.config dev
+        // 同一个进程在设置设备属性之前需要先查询VI的属性是否已经设置过，
+        // 同一个进程只能设置一次属性，如果要重新设置需要先禁用后再重新设置
 		ret = RK_MPI_VI_SetDevAttr(dev_id_, &stDevAttr);
 		if (ret != RK_SUCCESS) {
 			LOG_ERROR("RK_MPI_VI_SetDevAttr %x\n", ret);
@@ -775,8 +778,11 @@ int rkipc_vi_dev_init() {
 		}
         // 管道绑定,,,???
 		// 1-3.bind dev/pipe
+        // VI 绑定的 pipe 数目 pipe_id_=0 ,,, dev_id_=0
 		stBindPipe.u32Num = pipe_id_;
+        // VI 绑定的 pipe 号
 		stBindPipe.PipeId[0] = pipe_id_;
+        // 设置 VI 设备与PIPE 的绑定关系
 		ret = RK_MPI_VI_SetDevBindPipe(dev_id_, &stBindPipe);
 		if (ret != RK_SUCCESS) {
 			LOG_ERROR("RK_MPI_VI_SetDevBindPipe %x\n", ret);
@@ -808,7 +814,8 @@ int rkipc_pipe_0_init() {
 	int frame_max_qp = rk_param_get_int("video.0:frame_max_qp", 51);
 	int scalinglist = rk_param_get_int("video.0:scalinglist", 0);
 
-	// VI
+	// VI 
+    // 设置通道属性
 	VI_CHN_ATTR_S vi_chn_attr;
 	memset(&vi_chn_attr, 0, sizeof(vi_chn_attr));
 	vi_chn_attr.stIspOpt.u32BufCount = buf_cnt;
@@ -817,9 +824,12 @@ int rkipc_pipe_0_init() {
 	vi_chn_attr.stIspOpt.stMaxSize.u32Height = rk_param_get_int("video.0:max_height", 1440);
 	vi_chn_attr.stSize.u32Width = video_width;
 	vi_chn_attr.stSize.u32Height = video_height;
+    // 指定像素格式
 	vi_chn_attr.enPixelFormat = RK_FMT_YUV420SP;
 	vi_chn_attr.u32Depth = 0;
 	vi_chn_attr.enCompressMode = COMPRESS_MODE_NONE;
+    // pipe_id_ = 0
+    // #define VIDEO_PIPE_0 0
 	ret = RK_MPI_VI_SetChnAttr(pipe_id_, VIDEO_PIPE_0, &vi_chn_attr);
 	if (ret) {
 		LOG_ERROR("ERROR: create VI error! ret=%d\n", ret);
@@ -833,6 +843,7 @@ int rkipc_pipe_0_init() {
 	}
 
 	// VENC
+    // 设置
 	VENC_CHN_ATTR_S venc_chn_attr;
 	memset(&venc_chn_attr, 0, sizeof(venc_chn_attr));
 	tmp_output_data_type = rk_param_get_string("video.0:output_data_type", NULL);
@@ -3191,8 +3202,10 @@ int rk_video_init() {
 	          g_vi_chn_id, g_enable_vo, g_vo_dev_id, enable_npu, enable_osd);
 	g_video_run_ = 1;
 	g_nn_osd_run_ = 1;
+    // 这里使能了 VI 设备,并绑定了 pipe ,,,, pipe_id_=0 ,,, dev_id_=0
+    // 关于绑定 pipe ,,,  文档有说明,,目前PIPE传入跟DEV一样的数值即可
 	ret |= rkipc_vi_dev_init();
-    // 根据使能的配置,,,一一初始化
+    // 根据使能的配置,,,一一初始化,,,去了解 librtsp 使用方法,这边再来总结
 	if (enable_rtsp)
 		ret |= rkipc_rtsp_init();
 	if (enable_rtmp)

@@ -185,6 +185,8 @@ int main(int argc, char **argv) {
 			rk_isp_set_from_ini(0);
 	}
     // rk 的接口,,,估计应该在 media 里面实现的,先不讨论
+    // 这个接口是初始化 RK MPI (RK多媒体处理接口)系统的接口
+    // RK MPI 系统集成了包括音频处理,视频处理,内存管理等接口,方便使用
 	RK_MPI_SYS_Init();
     // 视频初始化
     // 这里使用了 librtsp 相关的东西,建议先去了解 librtsp 的用法

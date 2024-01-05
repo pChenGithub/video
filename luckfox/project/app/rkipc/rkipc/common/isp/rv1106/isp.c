@@ -78,7 +78,7 @@ int sample_common_isp_init(int cam_id, rk_aiq_working_mode_t WDRMode, bool Multi
 		LOG_ERROR("%s : cam_id is over 3\n", __FUNCTION__);
 		return -1;
 	}
-    // 设置标准输出遇\n输出
+    // 设置标准输出遇\n输出,设置行缓存
 	setlinebuf(stdout);
 	if (iq_file_dir == NULL) {
 		LOG_ERROR("rk_isp_init : not start.\n");

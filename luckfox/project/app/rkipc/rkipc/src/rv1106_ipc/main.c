@@ -98,6 +98,7 @@ static void *wait_key_event(void *arg) {
 	struct timeval timeout;
 	struct input_event key_event;
 
+    // 循环监听按键输入,等待
 	while (g_main_run_) {
 		// The rfds collection must be emptied every time,
 		// otherwise the descriptor changes cannot be detected
@@ -110,6 +111,7 @@ static void *wait_key_event(void *arg) {
 			read(key_fd, &key_event, sizeof(key_event));
 			LOG_INFO("[timeval:sec:%d,usec:%d,type:%d,code:%d,value:%d]\n", key_event.time.tv_sec,
 			         key_event.time.tv_usec, key_event.type, key_event.code, key_event.value);
+                     // 这里监听了音量键,根据
 			if ((key_event.code == KEY_VOLUMEDOWN) && key_event.value) {
 				LOG_INFO("get KEY_VOLUMEDOWN\n");
 				rkipc_ao_init();
@@ -185,6 +187,7 @@ int main(int argc, char **argv) {
     // rk 的接口,,,估计应该在 media 里面实现的,先不讨论
 	RK_MPI_SYS_Init();
     // 视频初始化
+    // 这里使用了 librtsp 相关的东西,建议先去了解 librtsp 的用法
 	rk_video_init();
 
     // 如果启用了音频,,,音频初始化
@@ -192,7 +195,9 @@ int main(int argc, char **argv) {
 		rkipc_audio_init();
 
     // 启动服务
+    // 服务启动了一个本地 socket 通信,,, /var/tmp/rkipc ,,,目前不太清除客户端是谁???
 	rkipc_server_init();
+    // 启动存储管理模块,估计是跟保存视频文件有关系
 	rk_storage_init();
 
     // 开启线程监听按键

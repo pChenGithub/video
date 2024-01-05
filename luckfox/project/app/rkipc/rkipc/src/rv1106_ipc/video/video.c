@@ -682,9 +682,11 @@ static void *rkipc_ivs_get_results(void *arg) {
 int rkipc_rtsp_init() {
 	LOG_DEBUG("start\n");
 	g_rtsplive = create_rtsp_demo(554);
+    // 创建2个对话
 	g_rtsp_session_0 = rtsp_new_session(g_rtsplive, RTSP_URL_0);
 	g_rtsp_session_1 = rtsp_new_session(g_rtsplive, RTSP_URL_1);
 	tmp_output_data_type = rk_param_get_string("video.0:output_data_type", "H.264");
+    // 设置视频的压缩方式
 	if (!strcmp(tmp_output_data_type, "H.264"))
 		rtsp_set_video(g_rtsp_session_0, RTSP_CODEC_ID_VIDEO_H264, NULL, 0);
 	else if (!strcmp(tmp_output_data_type, "H.265"))
@@ -748,6 +750,7 @@ int rkipc_vi_dev_init() {
 	VI_DEV_BIND_PIPE_S stBindPipe;
 	memset(&stDevAttr, 0, sizeof(stDevAttr));
 	memset(&stBindPipe, 0, sizeof(stBindPipe));
+    // 这里 ipc 如果没有配置,清零初始化,如果设置过了,不清零
 	// 0. get dev config status
 	ret = RK_MPI_VI_GetDevAttr(dev_id_, &stDevAttr);
 	if (ret == RK_ERR_VI_NOT_CONFIG) {
@@ -760,6 +763,7 @@ int rkipc_vi_dev_init() {
 	} else {
 		LOG_ERROR("RK_MPI_VI_SetDevAttr already\n");
 	}
+    // 如果没有使能,使能
 	// 1.get dev enable status
 	ret = RK_MPI_VI_GetDevIsEnable(dev_id_);
 	if (ret != RK_SUCCESS) {
@@ -769,6 +773,7 @@ int rkipc_vi_dev_init() {
 			LOG_ERROR("RK_MPI_VI_EnableDev %x\n", ret);
 			return -1;
 		}
+        // 管道绑定,,,???
 		// 1-3.bind dev/pipe
 		stBindPipe.u32Num = pipe_id_;
 		stBindPipe.PipeId[0] = pipe_id_;

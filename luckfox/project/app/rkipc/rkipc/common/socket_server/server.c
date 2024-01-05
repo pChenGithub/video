@@ -5761,6 +5761,7 @@ static const struct FunMap map[] = {
     {(char *)"rk_system_del_user", &ser_rk_system_del_user}};
 
 static void *rec_thread(void *arg) {
+    // fd 是跟客户端通信的 socket
 	int fd = (int)(intptr_t)arg;
 	char *name = NULL;
 	int len;
@@ -5769,11 +5770,13 @@ static void *rec_thread(void *arg) {
 	int maplen = sizeof(map) / sizeof(struct FunMap);
 	pthread_detach(pthread_self());
 
+    // 协议,发一个 0 到客户端
 	if (sock_write(fd, &ret, sizeof(int)) == SOCKERR_CLOSED) {
 		ret = -1;
 		goto out;
 	}
 again:
+    // 读取将接收数据长度
 	if (sock_read(fd, &len, sizeof(int)) == SOCKERR_CLOSED) {
 		ret = -1;
 		goto out;
@@ -5782,12 +5785,16 @@ again:
 		ret = -1;
 		goto out;
 	}
+    // 分配空间接受数据
 	name = (char *)malloc(len);
+    // 接受数据
 	if (sock_read(fd, name, len) == SOCKERR_CLOSED) {
 		ret = -1;
 		goto out;
 	}
 
+    // 根据接收的名称,调用函数,,,这些函数会操作 fd,,估计是要发送数据
+    // 根据客户端下发的命令,,,回复对应的消息
 	for (i = 0; i < maplen; i++) {
 		// printf("%s, %s\n", map[i].fun_name, name);
 		if (!strcmp(map[i].fun_name, name)) {
@@ -5799,6 +5806,7 @@ out:
 		free(name);
 	name = NULL;
 	if (ret == 0) {
+        // 最后回复一个 0 
 		sock_write(fd, &ret, sizeof(int));
 		goto again;
 	}
@@ -5812,12 +5820,16 @@ out:
 static void *rkipc_server_thread(void *arg) {
 	int clifd;
 	LOG_INFO("#Start %s thread, arg:%p\n", __func__, arg);
+    // 设置线程名称
 	prctl(PR_SET_NAME, "rkipc_server_thread", 0, 0, 0);
+    // 线程分离
 	pthread_detach(pthread_self());
 
+    // 这里使用了本地 socket 通信
 	if ((listen_fd = serv_listen(CS_PATH)) < 0)
 		LOG_ERROR("listen fail\n");
 
+    // 一直等待,,直到有客户端接入,,然后创建线程处理客户端通信
 	while (RkIpcServerRun) {
 		pthread_t thread_id;
 
@@ -5844,6 +5856,7 @@ int rkipc_server_init(void) {
 
 	RkIpcServerRun = 1;
 	if (RkIpcServerTid == 0)
+        // 创建线程 rkipc_server_thread
 		pthread_create(&RkIpcServerTid, NULL, rkipc_server_thread, NULL);
 	return 0;
 }

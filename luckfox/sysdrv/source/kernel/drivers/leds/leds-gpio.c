@@ -191,6 +191,7 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 	return priv;
 }
 
+//  定义了平台驱动匹配设备树 compatible
 static const struct of_device_id of_gpio_leds_match[] = {
 	{ .compatible = "gpio-leds", },
 	{},
@@ -246,6 +247,7 @@ static struct gpio_desc *gpio_led_get_gpiod(struct device *dev, int idx,
 
 static int gpio_led_probe(struct platform_device *pdev)
 {
+    // struct platform_device 是 struct device	dev 的子类
 	struct gpio_led_platform_data *pdata = dev_get_platdata(&pdev->dev);
 	struct gpio_leds_priv *priv;
 	int i, ret = 0;
@@ -303,6 +305,7 @@ static void gpio_led_shutdown(struct platform_device *pdev)
 	}
 }
 
+// 定义了一个平台驱动和设备数匹配,匹配后执行 probe
 static struct platform_driver gpio_led_driver = {
 	.probe		= gpio_led_probe,
 	.shutdown	= gpio_led_shutdown,
@@ -312,6 +315,7 @@ static struct platform_driver gpio_led_driver = {
 	},
 };
 
+// 典型的平台驱动模块
 module_platform_driver(gpio_led_driver);
 
 MODULE_AUTHOR("Raphael Assenat <raph@8d.com>, Trent Piepho <tpiepho@freescale.com>");

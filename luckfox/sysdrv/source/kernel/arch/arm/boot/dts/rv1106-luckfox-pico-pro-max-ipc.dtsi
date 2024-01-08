@@ -49,11 +49,17 @@
 
 		regulator-boot-on;
 	};
+
+    // gpio led灯模块
 	leds: leds {
 		compatible = "gpio-leds";
+        // 定义了一个运行灯
 		work_led: work{
+            // 选择的 gpio
 			gpios = <&gpio3 RK_PC6 GPIO_ACTIVE_HIGH>;
+            // 触发方式
 			linux,default-trigger = "activity";
+            // gpio 默认的状态
 			default-state = "on";
 		};	
 	};

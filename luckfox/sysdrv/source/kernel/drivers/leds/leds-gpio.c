@@ -132,14 +132,18 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 	struct gpio_leds_priv *priv;
 	int count, ret;
 
+    // 统计设备 dev 子节点的数量
 	count = device_get_child_node_count(dev);
 	if (!count)
 		return ERR_PTR(-ENODEV);
 
+    // 分配设备驱动私有数据
 	priv = devm_kzalloc(dev, struct_size(priv, leds, count), GFP_KERNEL);
 	if (!priv)
 		return ERR_PTR(-ENOMEM);
 
+    // 遍历设备 dev 子节点,,, 由 child 返回
+    // dev 的子节点 ???
 	device_for_each_child_node(dev, child) {
 		struct gpio_led_data *led_dat = &priv->leds[priv->num_leds];
 		struct gpio_led led = {};
@@ -248,11 +252,25 @@ static struct gpio_desc *gpio_led_get_gpiod(struct device *dev, int idx,
 static int gpio_led_probe(struct platform_device *pdev)
 {
     // struct platform_device 是 struct device	dev 的子类
+    // 这里有一组有一组获取 struct device 的数据的函数组
+    /**
+     * static inline void *dev_get_platdata(const struct device *dev)
+     * int dev_set_drvdata(struct device *dev, void *data)
+     * void *dev_get_drvdata(const struct device *dev)
+     * static inline void *platform_get_drvdata(const struct platform_device *pdev)
+     * static inline void platform_set_drvdata(struct platform_device *pdev, void *data)
+     * 说明:只能给 driver_data 赋值,,, platform_data 可能是设备树模块给赋值的???
+     * platform_data 姑且理解和设备数配置关联
+     */
 	struct gpio_led_platform_data *pdata = dev_get_platdata(&pdev->dev);
 	struct gpio_leds_priv *priv;
 	int i, ret = 0;
 
+    // 判断是否有平台数据,或者平台数据是否配置了 led
 	if (pdata && pdata->num_leds) {
+        // 处理单个led,设备树可能会 配置多个
+        // 分配私有数据,根据led数量
+        // gpio_leds_priv 是模块定义数据结构,参数包括,led个数,和一个数组描述每个led
 		priv = devm_kzalloc(&pdev->dev, struct_size(priv, leds, pdata->num_leds),
 				    GFP_KERNEL);
 		if (!priv)
@@ -260,6 +278,7 @@ static int gpio_led_probe(struct platform_device *pdev)
 
 		priv->num_leds = pdata->num_leds;
 		for (i = 0; i < priv->num_leds; i++) {
+            // 对每个 led 初始化私有数据,,, driver_data
 			const struct gpio_led *template = &pdata->leds[i];
 			struct gpio_led_data *led_dat = &priv->leds[i];
 
@@ -282,11 +301,13 @@ static int gpio_led_probe(struct platform_device *pdev)
 				return ret;
 		}
 	} else {
+        // 没有 led 信息
 		priv = gpio_leds_create(pdev);
 		if (IS_ERR(priv))
 			return PTR_ERR(priv);
 	}
 
+    // 私有数据设置到 driver_data
 	platform_set_drvdata(pdev, priv);
 
 	return 0;

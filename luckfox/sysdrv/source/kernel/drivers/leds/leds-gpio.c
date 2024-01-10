@@ -395,5 +395,12 @@ MODULE_ALIAS("platform:leds-gpio");
 // /driver/leds/led-triggers.c
 // /include/linux/leds.h
 // /driver/leds/leds-gpio.c （驱动）
+/**
+ * 这个文件是 leds 的驱动文件,,,
+ * 其他 触发器 调用 led-triggers.c 的接口注册了触发器,,,在 led-triggers.c 模块中维护
+ * 这个驱动文件调用 led-triggers.c 设置触发器
+ * led-class.c 有 init 段,,,会创建一个类 leds,,,,
+ * 这个驱动文件调用 led-class.c 的接口在 类 leds 中创建设备
+ */
 
 

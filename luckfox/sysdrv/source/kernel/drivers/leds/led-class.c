@@ -22,6 +22,8 @@
 #include <linux/of.h>
 #include "leds.h"
 
+// 模块内定义一个全局变量
+// 表示 leds 类定义
 static struct class *leds_class;
 
 static ssize_t brightness_show(struct device *dev,
@@ -63,6 +65,7 @@ unlock:
 	mutex_unlock(&led_cdev->led_access);
 	return ret;
 }
+// 定义属性1
 static DEVICE_ATTR_RW(brightness);
 
 static ssize_t max_brightness_show(struct device *dev,
@@ -72,6 +75,7 @@ static ssize_t max_brightness_show(struct device *dev,
 
 	return sprintf(buf, "%u\n", led_cdev->max_brightness);
 }
+// 定义属性2
 static DEVICE_ATTR_RO(max_brightness);
 
 #ifdef CONFIG_LEDS_TRIGGERS
@@ -86,6 +90,8 @@ static const struct attribute_group led_trigger_group = {
 #endif
 
 static struct attribute *led_class_attrs[] = {
+    // 给 leds 类添加了亮度和最大亮度的属性
+    // 所有属于这个类的设备/驱动都有这两个属性
 	&dev_attr_brightness.attr,
 	&dev_attr_max_brightness.attr,
 	NULL,
@@ -343,6 +349,8 @@ int led_classdev_register_ext(struct device *parent,
 	int ret;
 
 	if (init_data) {
+        // 这里是,如果 init_data 能拿到名字,使用 init_data 的名字
+        // 否则,,如果有 fwnode 能拿到名字
 		if (init_data->devname_mandatory && !init_data->devicename) {
 			dev_err(parent, "Mandatory device name is missing");
 			return -EINVAL;
@@ -365,6 +373,9 @@ int led_classdev_register_ext(struct device *parent,
 
 	mutex_init(&led_cdev->led_access);
 	mutex_lock(&led_cdev->led_access);
+    // 创建设备文件
+    // 最终会调用 device_create_groups_vargs
+    // device_create 最终也是调用 device_create_groups_vargs
 	led_cdev->dev = device_create_with_groups(leds_class, parent, 0,
 				led_cdev, led_cdev->groups, "%s", final_name);
 	if (IS_ERR(led_cdev->dev)) {
@@ -481,6 +492,7 @@ int devm_led_classdev_register_ext(struct device *parent,
 	struct led_classdev **dr;
 	int rc;
 
+    // 分配一个 led_classdev
 	dr = devres_alloc(devm_led_classdev_release, sizeof(*dr), GFP_KERNEL);
 	if (!dr)
 		return -ENOMEM;
@@ -522,12 +534,16 @@ void devm_led_classdev_unregister(struct device *dev,
 }
 EXPORT_SYMBOL_GPL(devm_led_classdev_unregister);
 
+// 内核启动将会在 init 段寻找 执行
 static int __init leds_init(void)
 {
+    // 创建一个 class,,, 这个类是 leds 类,,,将在 sysfs 中以目录方式体现
 	leds_class = class_create(THIS_MODULE, "leds");
 	if (IS_ERR(leds_class))
 		return PTR_ERR(leds_class);
+        // 给这个类赋值 通用的电源内管理操作集
 	leds_class->pm = &leds_class_dev_pm_ops;
+    // 给这个类赋值通用的 属性
 	leds_class->dev_groups = led_groups;
 	return 0;
 }
@@ -543,3 +559,10 @@ module_exit(leds_exit);
 MODULE_AUTHOR("John Lenz, Richard Purdie");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("LED Class Interface");
+
+/**
+ * https://zhuanlan.zhihu.com/p/501817318
+ * 设备启动 后,创建了一个类 leds 
+ * 定义了一个全局变量维护这个类 class
+ * 
+ */

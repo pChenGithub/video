@@ -3936,6 +3936,8 @@ struct device *device_create(struct class *class, struct device *parent,
 	struct device *dev;
 
 	va_start(vargs, fmt);
+    // device_create 是创建设备文件的接口,绑定到 class
+    // 最终调用 device_create_groups_vargs , 
 	dev = device_create_groups_vargs(class, parent, devt, drvdata, NULL,
 					  fmt, vargs);
 	va_end(vargs);

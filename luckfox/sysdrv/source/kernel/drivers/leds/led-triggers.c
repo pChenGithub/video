@@ -57,7 +57,9 @@ ssize_t led_trigger_write(struct file *filp, struct kobject *kobj,
 	down_read(&triggers_list_lock);
 	list_for_each_entry(trig, &trigger_list, next_trig) {
 		if (sysfs_streq(buf, trig->name) && trigger_relevant(led_cdev, trig)) {
+            // 比较触发器的名字和输入相同,且和当前触发器不同, 设置
 			down_write(&led_cdev->trigger_lock);
+            // 给 led 设置触发器
 			led_trigger_set(led_cdev, trig);
 			up_write(&led_cdev->trigger_lock);
 
@@ -98,14 +100,21 @@ static int led_trigger_format(char *buf, size_t size,
 	int len = led_trigger_snprintf(buf, size, "%s",
 				       led_cdev->trigger ? "none" : "[none]");
 
+    // 遍历 trigger_list 
+    // trigger_list 是全局变量,维护触发方式的全局变量
 	list_for_each_entry(trig, &trigger_list, next_trig) {
 		bool hit;
 
+        // 检查 trig 是否存在,是否已经是当前的 trig
+        // 不存在或当前相同,返回 false, 执行 continue
 		if (!trigger_relevant(led_cdev, trig))
 			continue;
 
+        // 如果 led 存在 trig , 而且当前 trig 名称相同,,, hit 为非 0
+        // 就判断是否有名字,是否和 trig 名字一样
 		hit = led_cdev->trigger && !strcmp(led_cdev->trigger->name, trig->name);
 
+        // 名字一样 [名字],,, 名字不一样 名字
 		len += led_trigger_snprintf(buf + len, size - len,
 					    " %s%s%s", hit ? "[" : "",
 					    trig->name, hit ? "]" : "");
@@ -122,18 +131,25 @@ static int led_trigger_format(char *buf, size_t size,
  * attribute, which is not limited by length. This is _not_ good design, do not
  * copy it.
  */
+// 读取触发器名称
 ssize_t led_trigger_read(struct file *filp, struct kobject *kobj,
 			struct bin_attribute *attr, char *buf,
 			loff_t pos, size_t count)
 {
 	struct device *dev = kobj_to_dev(kobj);
+    // 获取 驱动设备 私有数据,,,
+    // 这个设备的私有数据赋值成 led_classdev
 	struct led_classdev *led_cdev = dev_get_drvdata(dev);
 	void *data;
 	int len;
 
+    // 加锁
 	down_read(&triggers_list_lock);
 	down_read(&led_cdev->trigger_lock);
 
+    // 分配 data ,,, 
+    // 下面这段主要是格式化 led_cdev 的 trig 的名字
+    // 最终会 copy 到用户空间
 	len = led_trigger_format(NULL, 0, led_cdev);
 	data = kvmalloc(len + 1, GFP_KERNEL);
 	if (!data) {
@@ -143,9 +159,11 @@ ssize_t led_trigger_read(struct file *filp, struct kobject *kobj,
 	}
 	len = led_trigger_format(data, len + 1, led_cdev);
 
+    // 解锁
 	up_read(&led_cdev->trigger_lock);
 	up_read(&triggers_list_lock);
 
+    // 复制到用户空间
 	len = memory_read_from_buffer(buf, count, &pos, data, len);
 
 	kvfree(data);
@@ -155,6 +173,7 @@ ssize_t led_trigger_read(struct file *filp, struct kobject *kobj,
 EXPORT_SYMBOL_GPL(led_trigger_read);
 
 /* Caller must ensure led_cdev->trigger_lock held */
+// 给 led 设置一个触发器
 int led_trigger_set(struct led_classdev *led_cdev, struct led_trigger *trig)
 {
 	unsigned long flags;
@@ -235,6 +254,7 @@ err_activate:
 }
 EXPORT_SYMBOL_GPL(led_trigger_set);
 
+// 将 led 的触发器删掉
 void led_trigger_remove(struct led_classdev *led_cdev)
 {
 	down_write(&led_cdev->trigger_lock);
@@ -243,6 +263,7 @@ void led_trigger_remove(struct led_classdev *led_cdev)
 }
 EXPORT_SYMBOL_GPL(led_trigger_remove);
 
+// 设置 led 默认的触发器
 void led_trigger_set_default(struct led_classdev *led_cdev)
 {
 	struct led_trigger *trig;
@@ -362,6 +383,7 @@ int devm_led_trigger_register(struct device *dev,
 
 	*dr = trig;
 
+    // 注册
 	rc = led_trigger_register(trig);
 	if (rc)
 		devres_free(dr);
@@ -439,6 +461,7 @@ void led_trigger_register_simple(const char *name, struct led_trigger **tp)
 
 	if (trig) {
 		trig->name = name;
+        // 注册触发器
 		err = led_trigger_register(trig);
 		if (err < 0) {
 			kfree(trig);
@@ -461,3 +484,13 @@ void led_trigger_unregister_simple(struct led_trigger *trig)
 	kfree(trig);
 }
 EXPORT_SYMBOL_GPL(led_trigger_unregister_simple);
+
+/**
+ * 封装了一组api,对触发器全局变量 trigger_list 做操作
+ * 这个操作会涉及到锁操作
+ * static DECLARE_RWSEM(triggers_list_lock);
+ * LIST_HEAD(trigger_list);
+ * trigger_list 保存了所有的触发器类型,,,
+ * 驱动里面拿触发器也是通过调用这里的接口,操作 trigger_list 设置
+ */
+

@@ -71,6 +71,7 @@ static int gpio_blink_set(struct led_classdev *led_cdev,
 						delay_on, delay_off);
 }
 
+// blink_set 是 NULL
 static int create_gpio_led(const struct gpio_led *template,
 	struct gpio_led_data *led_dat, struct device *parent,
 	struct fwnode_handle *fwnode, gpio_blink_set_t blink_set)
@@ -78,13 +79,18 @@ static int create_gpio_led(const struct gpio_led *template,
 	struct led_init_data init_data = {};
 	int ret, state;
 
+    // 之前从设备数读取的参数放在 template,
+    // 这里将这些参数,初始化到每个灯的字符设备参数
+    // 触发方式
 	led_dat->cdev.default_trigger = template->default_trigger;
+    // 
 	led_dat->can_sleep = gpiod_cansleep(led_dat->gpiod);
 	if (!led_dat->can_sleep)
 		led_dat->cdev.brightness_set = gpio_led_set;
 	else
 		led_dat->cdev.brightness_set_blocking = gpio_led_set_blocking;
 	led_dat->blinking = 0;
+    // blink_set 是 NULL
 	if (blink_set) {
 		led_dat->platform_gpio_blink_set = blink_set;
 		led_dat->cdev.blink_set = gpio_blink_set;
@@ -104,14 +110,20 @@ static int create_gpio_led(const struct gpio_led *template,
 	if (template->retain_state_shutdown)
 		led_dat->cdev.flags |= LED_RETAIN_AT_SHUTDOWN;
 
+    // 设置 gpio 输出,,,根据状态输出高低电平
 	ret = gpiod_direction_output(led_dat->gpiod, state);
 	if (ret < 0)
 		return ret;
 
+    // 如果 平台设备 数据里面有 name ,
 	if (template->name) {
+        // 使用 平台设备数据 的 name
 		led_dat->cdev.name = template->name;
+        // 这个最终还是调用 devm_led_classdev_register_ext,,,  
+        // init_data 参数为 NULL
 		ret = devm_led_classdev_register(parent, &led_dat->cdev);
 	} else {
+        // 这里是用 fwnode ,替换了 name 的作用
 		init_data.fwnode = fwnode;
 		ret = devm_led_classdev_register_ext(parent, &led_dat->cdev,
 						     &init_data);
@@ -125,6 +137,9 @@ struct gpio_leds_priv {
 	struct gpio_led_data leds[];
 };
 
+// 创建 设备驱动 私有数据,
+// 遍历设备树配置的 leds ,,,读取设备树配置参数
+// 对每个 led , 创建 create_gpio_led
 static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
@@ -145,6 +160,7 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
     // 遍历设备 dev 子节点,,, 由 child 返回
     // dev 的子节点 ???
 	device_for_each_child_node(dev, child) {
+        // 取出一个 led 数据处理, gpio_led_data 是模块内定义的数据结构
 		struct gpio_led_data *led_dat = &priv->leds[priv->num_leds];
 		struct gpio_led led = {};
 		const char *state = NULL;
@@ -154,26 +170,35 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 		 * will be updated after LED class device is registered,
 		 * Only then the final LED name is known.
 		 */
+        // 从 child 获取到 gpio_desc 编号
+        // 但是这里是直接返回了一个错误
 		led.gpiod = devm_fwnode_get_gpiod_from_child(dev, NULL, child,
 							     GPIOD_ASIS,
 							     NULL);
 		if (IS_ERR(led.gpiod)) {
-			fwnode_handle_put(child);
-			return ERR_CAST(led.gpiod);
+            // 所以会走这里
+            // 这个 put 最终调用到 of_fwnode_put,,,释放???
+	    fwnode_handle_put(child);
+	    return ERR_CAST(led.gpiod);
 		}
 
 		led_dat->gpiod = led.gpiod;
 
+        // fwnode 函数族最终是调用 of 函数族
+        // 参考 https://blog.csdn.net/qq_23174771/article/details/130166675
+        // 这里读了设备树中参数,默认状态 default-state="on"
 		if (!fwnode_property_read_string(child, "default-state",
 						 &state)) {
 			if (!strcmp(state, "keep"))
 				led.default_state = LEDS_GPIO_DEFSTATE_KEEP;
 			else if (!strcmp(state, "on"))
+                // 设置为点亮
 				led.default_state = LEDS_GPIO_DEFSTATE_ON;
 			else
 				led.default_state = LEDS_GPIO_DEFSTATE_OFF;
 		}
 
+        // 这些 rv1106-luckfox-pico-pro-max-ipc.dtsi 没有指定
 		if (fwnode_property_present(child, "retain-state-suspended"))
 			led.retain_state_suspended = 1;
 		if (fwnode_property_present(child, "retain-state-shutdown"))
@@ -187,11 +212,14 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 			return ERR_PTR(ret);
 		}
 		/* Set gpiod label to match the corresponding LED name. */
+        // 将 gpio 的 label 替换成字符设备的名称
 		gpiod_set_consumer_name(led_dat->gpiod,
 					led_dat->cdev.dev->kobj.name);
+        // 序号自增
 		priv->num_leds++;
 	}
 
+    // 返回设备驱动私有数据
 	return priv;
 }
 
@@ -216,6 +244,7 @@ static struct gpio_desc *gpio_led_get_gpiod(struct device *dev, int idx,
 	 * device, this will hit the board file, if any and get
 	 * the GPIO from there.
 	 */
+    // 再次获取 gpio 描述,,,如果成功了 直接返回
 	gpiod = devm_gpiod_get_index(dev, NULL, idx, GPIOD_OUT_LOW);
 	if (!IS_ERR(gpiod)) {
 		gpiod_set_consumer_name(gpiod, template->name);
@@ -230,6 +259,7 @@ static struct gpio_desc *gpio_led_get_gpiod(struct device *dev, int idx,
 	 * rid of this block completely.
 	 */
 
+    // 如果还是没有获取到 gpio 描述,,,,那么根据 gpio 编号获取
 	/* skip leds that aren't available */
 	if (!gpio_is_valid(template->gpio))
 		return ERR_PTR(-ENOENT);
@@ -237,11 +267,13 @@ static struct gpio_desc *gpio_led_get_gpiod(struct device *dev, int idx,
 	if (template->active_low)
 		flags |= GPIOF_ACTIVE_LOW;
 
+    // 申请一个 gpio 资源
 	ret = devm_gpio_request_one(dev, template->gpio, flags,
 				    template->name);
 	if (ret < 0)
 		return ERR_PTR(ret);
 
+    // gpio 编号 转 描述
 	gpiod = gpio_to_desc(template->gpio);
 	if (!gpiod)
 		return ERR_PTR(-EINVAL);
@@ -262,11 +294,14 @@ static int gpio_led_probe(struct platform_device *pdev)
      * 说明:只能给 driver_data 赋值,,, platform_data 可能是设备树模块给赋值的???
      * platform_data 姑且理解和设备数配置关联
      */
+    // 获取平台设备私有数据
 	struct gpio_led_platform_data *pdata = dev_get_platdata(&pdev->dev);
+    // 这个数据i结构将会作为设备o 驱动私有数据
 	struct gpio_leds_priv *priv;
 	int i, ret = 0;
 
     // 判断是否有平台数据,或者平台数据是否配置了 led
+    // 这里是设备树是配置了
 	if (pdata && pdata->num_leds) {
         // 处理单个led,设备树可能会 配置多个
         // 分配私有数据,根据led数量
@@ -276,24 +311,32 @@ static int gpio_led_probe(struct platform_device *pdev)
 		if (!priv)
 			return -ENOMEM;
 
+        // led 灯的个数
 		priv->num_leds = pdata->num_leds;
 		for (i = 0; i < priv->num_leds; i++) {
             // 对每个 led 初始化私有数据,,, driver_data
+            // 获取平台设备一个 led 参数
 			const struct gpio_led *template = &pdata->leds[i];
+            // 获取设备驱动数据的 led 表示
 			struct gpio_led_data *led_dat = &priv->leds[i];
 
+            // 如果平台设备数据 gpio 描述不为空,,,把这个描述赋值到 驱动设备 私有数据
+            // 如果为空,,,,使用 gpio 的编号,来获取 描述
 			if (template->gpiod)
 				led_dat->gpiod = template->gpiod;
 			else
 				led_dat->gpiod =
 					gpio_led_get_gpiod(&pdev->dev,
 							   i, template);
+            // 如果 描述 错误,,,跳过 这条 数据
+            // 否则,创建 led 的 设备
 			if (IS_ERR(led_dat->gpiod)) {
 				dev_info(&pdev->dev, "Skipping unavailable LED gpio %d (%s)\n",
 					 template->gpio, template->name);
 				continue;
 			}
 
+            // 创建 led 设备  device_create
 			ret = create_gpio_led(template, led_dat,
 					      &pdev->dev, NULL,
 					      pdata->gpio_blink_set);
@@ -343,3 +386,14 @@ MODULE_AUTHOR("Raphael Assenat <raph@8d.com>, Trent Piepho <tpiepho@freescale.co
 MODULE_DESCRIPTION("GPIO LED driver");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:leds-gpio");
+
+// linux驱动leds子系统梳理
+// https://www.jianshu.com/p/22f86df17c90
+// 主要文件
+// /driver/leds/led-class.c
+// /driver/leds/led-core.c
+// /driver/leds/led-triggers.c
+// /include/linux/leds.h
+// /driver/leds/leds-gpio.c （驱动）
+
+

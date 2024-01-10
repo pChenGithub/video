@@ -520,6 +520,10 @@ struct gpio_led {
 	unsigned	default_state : 2;
 	unsigned	retain_state_shutdown : 1;
 	/* default_state should be one of LEDS_GPIO_DEFSTATE_(ON|OFF|KEEP) */
+    // https://blog.csdn.net/qq_23174771/article/details/130606416
+    // gpio_device 代表一个 bank,,,包含 gpio_chip 和 gpio_desc
+    // gpio_chip 代表一个 gpio
+    // gpio_desc 代表一个 gpio 描述符
 	struct gpio_desc *gpiod;
 };
 #define LEDS_GPIO_DEFSTATE_OFF		0

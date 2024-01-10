@@ -152,16 +152,20 @@ static void class_remove_groups(struct class *cls,
 
 int __class_register(struct class *cls, struct lock_class_key *key)
 {
+    // 引入子系统
+    // https://zhuanlan.zhihu.com/p/618450653
 	struct subsys_private *cp;
 	int error;
 
 	pr_debug("device class '%s': registering\n", cls->name);
 
+    // 分配一个 subsys_private,,, subsys_private 是 sys 子系统的实例???
 	cp = kzalloc(sizeof(*cp), GFP_KERNEL);
 	if (!cp)
 		return -ENOMEM;
 	klist_init(&cp->klist_devices, klist_class_dev_get, klist_class_dev_put);
 	INIT_LIST_HEAD(&cp->interfaces);
+    // 初始化 subsys_private 的kset
 	kset_init(&cp->glue_dirs);
 	__mutex_init(&cp->mutex, "subsys mutex", key);
 	error = kobject_set_name(&cp->subsys.kobj, "%s", cls->name);
@@ -182,6 +186,7 @@ int __class_register(struct class *cls, struct lock_class_key *key)
 	cp->subsys.kobj.kset = class_kset;
 #endif
 	cp->subsys.kobj.ktype = &class_ktype;
+    // class 和 subsys_private 相互关联
 	cp->class = cls;
 	cls->p = cp;
 
@@ -191,6 +196,7 @@ int __class_register(struct class *cls, struct lock_class_key *key)
 		return error;
 	}
 	error = class_add_groups(class_get(cls), cls->class_groups);
+    // 减少 class  的引用计数
 	class_put(cls);
 	return error;
 }
@@ -229,16 +235,21 @@ struct class *__class_create(struct module *owner, const char *name,
 	struct class *cls;
 	int retval;
 
+    // 分配一个 class 结构体
 	cls = kzalloc(sizeof(*cls), GFP_KERNEL);
 	if (!cls) {
 		retval = -ENOMEM;
 		goto error;
 	}
 
+    // 名称
 	cls->name = name;
+    // 
 	cls->owner = owner;
+    // 使用 class 模块内定义的销毁回调函数
 	cls->class_release = class_create_release;
 
+    // 注册一个 class
 	retval = __class_register(cls, key);
 	if (retval)
 		goto error;

@@ -50,6 +50,7 @@ static int __led_set_brightness(struct led_classdev *led_cdev,
 	return 0;
 }
 
+// 根据回调 brightness_set_blocking 来设置 led 亮度
 static int __led_set_brightness_blocking(struct led_classdev *led_cdev,
 					 enum led_brightness value)
 {
@@ -268,6 +269,7 @@ void led_set_brightness(struct led_classdev *led_cdev,
 }
 EXPORT_SYMBOL_GPL(led_set_brightness);
 
+// 异步设置 led 亮度接口
 void led_set_brightness_nopm(struct led_classdev *led_cdev,
 			      enum led_brightness value)
 {
@@ -276,7 +278,10 @@ void led_set_brightness_nopm(struct led_classdev *led_cdev,
 		return;
 
 	/* If brightness setting can sleep, delegate it to a work queue task */
+    // 设置延时设置 亮度值,,, delayed_set_value 是临时参数
 	led_cdev->delayed_set_value = value;
+    // set_brightness_work 是调度任务
+    // 这个任务一般在 led 驱动中会设置
 	schedule_work(&led_cdev->set_brightness_work);
 }
 EXPORT_SYMBOL_GPL(led_set_brightness_nopm);
@@ -293,6 +298,7 @@ void led_set_brightness_nosleep(struct led_classdev *led_cdev,
 }
 EXPORT_SYMBOL_GPL(led_set_brightness_nosleep);
 
+// 同步设置 led 亮度接口
 int led_set_brightness_sync(struct led_classdev *led_cdev,
 			    enum led_brightness value)
 {
@@ -303,11 +309,12 @@ int led_set_brightness_sync(struct led_classdev *led_cdev,
 
 	if (led_cdev->flags & LED_SUSPENDED)
 		return 0;
-
+    // 设置好值后,,,调用回调设置 亮度值
 	return __led_set_brightness_blocking(led_cdev, led_cdev->brightness);
 }
 EXPORT_SYMBOL_GPL(led_set_brightness_sync);
 
+// 根据回调 brightness_get 更新 led 的 brightness 值
 int led_update_brightness(struct led_classdev *led_cdev)
 {
 	int ret = 0;
@@ -349,6 +356,7 @@ u32 *led_get_default_pattern(struct led_classdev *led_cdev, unsigned int *size)
 }
 EXPORT_SYMBOL_GPL(led_get_default_pattern);
 
+// 设置 sysfs 的使能和禁用
 /* Caller must ensure led_cdev->led_access held */
 void led_sysfs_disable(struct led_classdev *led_cdev)
 {
@@ -367,6 +375,7 @@ void led_sysfs_enable(struct led_classdev *led_cdev)
 }
 EXPORT_SYMBOL_GPL(led_sysfs_enable);
 
+// 解析设备树参数
 static void led_parse_fwnode_props(struct device *dev,
 				   struct fwnode_handle *fwnode,
 				   struct led_properties *props)
@@ -418,6 +427,7 @@ static void led_parse_fwnode_props(struct device *dev,
 	}
 }
 
+// 这个函数主要就是根据 配置信息,对 led_classdev_name 做初始化
 int led_compose_name(struct device *dev, struct led_init_data *init_data,
 		     char *led_classdev_name)
 {
@@ -432,15 +442,19 @@ int led_compose_name(struct device *dev, struct led_init_data *init_data,
 	if (!led_classdev_name)
 		return -EINVAL;
 
+    // 获取设备树的配置,,,初始化到 props
 	led_parse_fwnode_props(dev, fwnode, &props);
 
 	if (props.label) {
+        // label不为空
 		/*
 		 * If init_data.devicename is NULL, then it indicates that
 		 * DT label should be used as-is for LED class device name.
 		 * Otherwise the label is prepended with devicename to compose
 		 * the final LED class device name.
 		 */
+        // devicename 为空 直接用 label 为名字
+        // 否则,用 devicename 和 label 组合起来做名字
 		if (!devicename) {
 			strscpy(led_classdev_name, props.label,
 				LED_MAX_NAME_SIZE);
@@ -483,3 +497,11 @@ int led_compose_name(struct device *dev, struct led_init_data *init_data,
 	return 0;
 }
 EXPORT_SYMBOL_GPL(led_compose_name);
+
+/**
+ * 维护了一个 leds_list 和锁
+ * 提供了很多 api 导出供外部调用
+ * DECLARE_RWSEM(leds_list_lock);
+ * LIST_HEAD(leds_list);
+ * 
+ */

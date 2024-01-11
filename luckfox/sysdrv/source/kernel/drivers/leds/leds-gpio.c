@@ -401,6 +401,9 @@ MODULE_ALIAS("platform:leds-gpio");
  * 这个驱动文件调用 led-triggers.c 设置触发器
  * led-class.c 有 init 段,,,会创建一个类 leds,,,,
  * 这个驱动文件调用 led-class.c 的接口在 类 leds 中创建设备
+ * 
+ * leds 模块没有创建字符设备???
+ * sysfs 和字符设备是分开的概念???
  */
 
 

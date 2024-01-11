@@ -410,6 +410,8 @@ int led_classdev_register_ext(struct device *parent,
 #endif
 	/* add to the list of leds */
 	down_write(&leds_list_lock);
+    // 把一个 led_classdev 放入链表 leds_list
+    // leds_list 是在 led-core.c 定义的一个全局链表变量
 	list_add_tail(&led_cdev->node, &leds_list);
 	up_write(&leds_list_lock);
 
@@ -492,7 +494,8 @@ int devm_led_classdev_register_ext(struct device *parent,
 	struct led_classdev **dr;
 	int rc;
 
-    // 分配一个 led_classdev
+    // devres 机制
+    // 分配一个 led_classdev* ???,保存地址???
 	dr = devres_alloc(devm_led_classdev_release, sizeof(*dr), GFP_KERNEL);
 	if (!dr)
 		return -ENOMEM;
@@ -503,7 +506,11 @@ int devm_led_classdev_register_ext(struct device *parent,
 		return rc;
 	}
 
+    // 把 led_cdev 保存到 dr指向的空间
 	*dr = led_cdev;
+    // devres 机制,,, 申请资源和 device 绑定
+    // https://www.cnblogs.com/sammei/p/3498052.html
+    // 将 dr 和 parent 绑定
 	devres_add(parent, dr);
 
 	return 0;

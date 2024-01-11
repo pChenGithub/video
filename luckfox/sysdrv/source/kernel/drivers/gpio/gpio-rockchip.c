@@ -570,14 +570,17 @@ static int rockchip_gpiolib_register(struct rockchip_pin_bank *bank)
 	struct gpio_chip *gc;
 	int ret;
 
+    // rockchip_gpiolib_chip 是 rk 定义的 gpio_chip,,,实现了具体的 gpio 控制器操作
 	bank->gpio_chip = rockchip_gpiolib_chip;
 
 	gc = &bank->gpio_chip;
+    // 硬件信息 赋值 到 gpio_chip
 	gc->base = bank->pin_base;
 	gc->ngpio = bank->nr_pins;
 	gc->label = bank->name;
 	gc->parent = bank->dev;
 
+    // 前面没有看到 这些参数有对 bank 赋值,,, 所以应该都是为空的,,,下面的 if 都会执行
 	if (!gc->base)
 		gc->base = GPIO_MAX_PINS * bank->bank_num;
 	if (!gc->ngpio)
@@ -588,6 +591,9 @@ static int rockchip_gpiolib_register(struct rockchip_pin_bank *bank)
 			return -ENOMEM;
 	}
 
+    // 这里应该是要 把 chip 加入到 gpio 模块了
+    // gpiochip_add_data 展开为 gpiochip_add_data_with_key
+    // gpiochip_add_data_with_key 是 gpio 模块的接口
 	ret = gpiochip_add_data(gc, bank);
 	if (ret) {
 		dev_err(bank->dev, "failed to add gpiochip %s, %d\n",
@@ -595,6 +601,7 @@ static int rockchip_gpiolib_register(struct rockchip_pin_bank *bank)
 		return ret;
 	}
 
+    // 注册 控制器 中断
 	ret = rockchip_interrupts_register(bank);
 	if (ret) {
 		dev_err(bank->dev, "failed to register interrupt, %d\n", ret);
@@ -687,12 +694,16 @@ static int rockchip_gpio_acpi_get_bank_id(struct device *dev)
 
 static int rockchip_gpio_probe(struct platform_device *pdev)
 {
+    // 获取 device
 	struct device *dev = &pdev->dev;
 	struct pinctrl_dev *pctldev = NULL;
+    // bank 是 这里是 rk 的定义数据
 	struct rockchip_pin_bank *bank = NULL;
 	int bank_id = 0;
 	int ret;
 
+    // CONFIG_ACPI 没有开启,所以,,,关于 CONFIG_ACPI 不会使用,,,包括 acpi 系列的api
+    // 2 次机会获取这个 gpio 控制器的编号
 	bank_id = rockchip_gpio_acpi_get_bank_id(dev);
 	if (bank_id < 0) {
 		bank_id = rockchip_gpio_of_get_bank_id(dev);
@@ -707,11 +718,14 @@ static int rockchip_gpio_probe(struct platform_device *pdev)
 		if (!pctldev)
 			return -EPROBE_DEFER;
 
+        // 找到 bank
 		bank = rockchip_gpio_find_bank(pctldev, bank_id);
 		if (!bank)
 			return -ENODEV;
 	}
 
+    // 这里 bank = NULL
+    // 会分配一个 bank
 	if (!bank) {
 		bank = devm_kzalloc(dev, sizeof(*bank), GFP_KERNEL);
 		if (!bank)
@@ -721,14 +735,17 @@ static int rockchip_gpio_probe(struct platform_device *pdev)
 	bank->bank_num = bank_id;
 	bank->dev = dev;
 
+    // 获取寄存器地址
 	bank->reg_base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(bank->reg_base))
 		return PTR_ERR(bank->reg_base);
-
+    
+    // 获取中断
 	bank->irq = platform_get_irq(pdev, 0);
 	if (bank->irq < 0)
 		return bank->irq;
 
+    // 初始化自旋锁
 	raw_spin_lock_init(&bank->slock);
 
 	if (!ACPI_COMPANION(dev)) {
@@ -760,12 +777,14 @@ static int rockchip_gpio_probe(struct platform_device *pdev)
 	 */
 	mutex_lock(&bank->deferred_lock);
 
+    // 注册一个 bank 到 gpio 模块
 	ret = rockchip_gpiolib_register(bank);
 	if (ret) {
 		dev_err(bank->dev, "Failed to register gpio %d\n", ret);
 		goto err_unlock;
 	}
 
+    // 对设备数参数 gpio-ranges 处理
 	if (!device_property_read_bool(bank->dev, "gpio-ranges") && pctldev) {
 		struct gpio_chip *gc = &bank->gpio_chip;
 
@@ -777,16 +796,20 @@ static int rockchip_gpio_probe(struct platform_device *pdev)
 		}
 	}
 
+    // 遍历 bank 所有的 gpio
 	while (!list_empty(&bank->deferred_pins)) {
 		struct rockchip_pin_deferred *cfg;
 
+        // 获取 deferred_pins 链表 的第一个 节点
 		cfg = list_first_entry(&bank->deferred_pins,
 				       struct rockchip_pin_deferred, head);
 		if (!cfg)
 			break;
 
+        // 出链表
 		list_del(&cfg->head);
 
+        // 根据参数 设置 gpio 的状态,,,输入输出,
 		switch (cfg->param) {
 		case PIN_CONFIG_OUTPUT:
 			ret = rockchip_gpio_direction_output(&bank->gpio_chip, cfg->pin, cfg->arg);
@@ -803,6 +826,7 @@ static int rockchip_gpio_probe(struct platform_device *pdev)
 
 	mutex_unlock(&bank->deferred_lock);
 
+    // bank 设置为 平台设备的 私有数据
 	platform_set_drvdata(pdev, bank);
 	dev_info(dev, "probed %pfw\n", dev_fwnode(dev));
 
@@ -827,12 +851,15 @@ static int rockchip_gpio_remove(struct platform_device *pdev)
 }
 
 static const struct of_device_id rockchip_gpio_match[] = {
+// 适配器 rockchip,gpio-bank 在设备使用,,,在这里匹配
 	{ .compatible = "rockchip,gpio-bank", },
 	{ .compatible = "rockchip,rk3188-gpio-bank0" },
 	{ },
 };
 
+// gpio 子系统驱动程序,,,用平台总线来匹配设备树和驱动
 static struct platform_driver rockchip_gpio_driver = {
+    // 跟设备树匹配之后 执行 probe
 	.probe		= rockchip_gpio_probe,
 	.remove		= rockchip_gpio_remove,
 	.driver		= {
@@ -857,3 +884,27 @@ MODULE_DESCRIPTION("Rockchip gpio driver");
 MODULE_ALIAS("platform:rockchip-gpio");
 MODULE_LICENSE("GPL v2");
 MODULE_DEVICE_TABLE(of, rockchip_gpio_match);
+
+/**
+ * 检查对照 rv1106.dtsi 比较
+ gpio4: gpio@ff560000 {
+ // 适配器
+			compatible = "rockchip,gpio-bank";
+            // 寄存器地址和长度
+			reg = <0xff560000 0x100>;
+            // 使用中断控制器
+			interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
+            // 使用时钟
+			clocks = <&cru PCLK_GPIO4>, <&cru DBCLK_GPIO4>;
+
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio-ranges = <&pinctrl 0 128 32>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+
+ * 
+ */
+

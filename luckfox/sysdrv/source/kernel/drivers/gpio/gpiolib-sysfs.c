@@ -465,14 +465,18 @@ static ssize_t export_store(struct class *class,
 	if (status < 0)
 		goto done;
 
+    // gpio 编号转 描述
 	desc = gpio_to_desc(gpio);
 	/* reject invalid GPIOs */
 	if (!desc) {
 		pr_warn("%s: invalid GPIO %ld\n", __func__, gpio);
 		return -EINVAL;
 	}
+    // 获取 gpio chip
 	gc = desc->gdev->chip;
+    // 计算 gpio 在chip 上的偏移
 	offset = gpio_chip_hwgpio(desc);
+    // 检查 偏移是否有效
 	if (!gpiochip_line_is_valid(gc, offset)) {
 		pr_warn("%s: GPIO %ld masked\n", __func__, gpio);
 		return -EINVAL;
@@ -492,6 +496,7 @@ static ssize_t export_store(struct class *class,
 
 	status = gpiod_set_transitory(desc, false);
 	if (!status) {
+        // gpio 导出
 		status = gpiod_export(desc, true);
 		if (status < 0)
 			gpiod_free(desc);
@@ -540,15 +545,49 @@ done:
 		pr_debug("%s: status %d\n", __func__, status);
 	return status ? : len;
 }
+
+/**
+ * 
+ #define CLASS_ATTR_WO(_name) \
+	struct class_attribute class_attr_##_name = __ATTR_WO(_name)
+
+
+     #define __ATTR_WO(_name) {						\
+	.attr	= { .name = __stringify(_name), .mode = 0200 },		\
+	.store	= _name##_store,					\
+}
+
+
+	struct class_attribute class_attr_unexport = {						\
+	.attr	= { .name = __stringify(unexport), .mode = 0200 },		\
+	.store	= unexport_store,					\
+}
+
+   
+}
+ */
 static CLASS_ATTR_WO(unexport);
 
+// gpio 模块 有 2 个属性,,,, export 和 unexport
 static struct attribute *gpio_class_attrs[] = {
 	&class_attr_export.attr,
+    // unexport 最终跟 unexport_store 绑定
 	&class_attr_unexport.attr,
 	NULL,
 };
+/**
+ * #define ATTRIBUTE_GROUPS(_name)					\
+static const struct attribute_group _name##_group = {		\
+	.attrs = _name##_attrs,					\
+};
+
+static const struct attribute_group gpio_class_group = {
+	.attrs = gpio_class_attrs,					
+};
+ */
 ATTRIBUTE_GROUPS(gpio_class);
 
+// 这是定义 class 下面的 gpio 模块
 static struct class gpio_class = {
 	.name =		"gpio",
 	.owner =	THIS_MODULE,
@@ -750,6 +789,7 @@ int gpiochip_sysfs_register(struct gpio_device *gdev)
 {
 	struct device	*dev;
 	struct device	*parent;
+    // 获取 这个 gpio_device 所属的 chip
 	struct gpio_chip *chip = gdev->chip;
 
 	/*
@@ -771,6 +811,9 @@ int gpiochip_sysfs_register(struct gpio_device *gdev)
 		parent = &gdev->dev;
 
 	/* use chip->base for the ID; it's already known to be unique */
+    // gpio_class 是 sysfs 中的 gpio,,,说明所有的 chip 都是被放在在 gpio 下面
+    // 这里是创建 chip ???
+    // #define GPIOCHIP_NAME	"gpiochip"
 	dev = device_create_with_groups(&gpio_class, parent, MKDEV(0, 0), chip,
 					gpiochip_groups, GPIOCHIP_NAME "%d",
 					chip->base);
@@ -808,12 +851,16 @@ void gpiochip_sysfs_unregister(struct gpio_device *gdev)
 	}
 }
 
+// gpio 模块的 class 部分,将在内核启动时执行 gpiolib_sysfs_init
 static int __init gpiolib_sysfs_init(void)
 {
 	int		status;
 	unsigned long	flags;
 	struct gpio_device *gdev;
 
+    // 注册了一个 class
+    // 这里注意 class_create 实际内部创建 class 并调用 class_register 注册到 sysfs 系统
+    // 这里是直接注册 全局变量 class ,,, 名称为 gpio
 	status = class_register(&gpio_class);
 	if (status < 0)
 		return status;
@@ -825,7 +872,10 @@ static int __init gpiolib_sysfs_init(void)
 	 * registered, and so arch_initcall() can always gpio_export().
 	 */
 	spin_lock_irqsave(&gpio_lock, flags);
+    // 这里是遍历 gpio 模块的全局链表 gpio_devices
+    // 对每个 gpio chip 执行 注册 sysfs
 	list_for_each_entry(gdev, &gpio_devices, list) {
+        // gdev->mockdev 在 gpiochip_sysfs_register 内部会被赋值为 dev,,,那么就不为 NULL
 		if (gdev->mockdev)
 			continue;
 
@@ -847,3 +897,11 @@ static int __init gpiolib_sysfs_init(void)
 	return status;
 }
 postcore_initcall(gpiolib_sysfs_init);
+
+/**
+ * gpio 的class 部分
+ * 提供了 创建和删除 class 和 device 的接口
+ * 维护了一个全局变量 gpio_class
+ * gpio_class 是 /sys/class/gpio 目录
+ * gpiochip_sysfs_register 是注册 gpiochip ???
+ */

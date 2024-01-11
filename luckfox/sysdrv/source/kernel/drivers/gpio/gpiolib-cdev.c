@@ -2339,10 +2339,14 @@ int gpiolib_cdev_register(struct gpio_device *gdev, dev_t devt)
 {
 	int ret;
 
+    // 初始化 cdev, 指定 fops
 	cdev_init(&gdev->chrdev, &gpio_fileops);
 	gdev->chrdev.owner = THIS_MODULE;
+    // 根据第一个设备号,,和 gpio 序号计算设备号
 	gdev->dev.devt = MKDEV(MAJOR(devt), gdev->id);
 
+    // 注册字符设备
+    // 和 cdev_add 一样,,, 只是 cdev_device_add 会以第二个参数为父节点
 	ret = cdev_device_add(&gdev->chrdev, &gdev->dev);
 	if (ret)
 		return ret;
@@ -2357,3 +2361,10 @@ void gpiolib_cdev_unregister(struct gpio_device *gdev)
 {
 	cdev_device_del(&gdev->chrdev, &gdev->dev);
 }
+
+/**
+ * gpio 模块关于 cdev 的封装接口
+ * 提供了 gpio 模块注册字符设备的接口,并且实现了默认的 fops
+ * 
+ */
+

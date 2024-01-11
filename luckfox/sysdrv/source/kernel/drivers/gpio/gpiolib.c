@@ -500,10 +500,13 @@ static int gpiochip_setup_dev(struct gpio_device *gdev)
 {
 	int ret;
 
+    // gpio_devt 是申请的 第一个设备号
+    // 这里应该是注册一个字符设备
 	ret = gcdev_register(gdev, gpio_devt);
 	if (ret)
 		return ret;
 
+    // 注册sysfs
 	ret = gpiochip_sysfs_register(gdev);
 	if (ret)
 		goto err_remove_device;
@@ -560,6 +563,7 @@ static void gpiochip_setup_devs(void)
 	struct gpio_device *gdev;
 	int ret;
 
+    // gpio_devices 是 gpio 模块定义个一个链表 维护 gpio_device
 	list_for_each_entry(gdev, &gpio_devices, list) {
 		ret = gpiochip_setup_dev(gdev);
 		if (ret)
@@ -584,23 +588,31 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	 * First: allocate and populate the internal stat container, and
 	 * set up the struct device.
 	 */
+     // 分配一个 gpio_device
 	gdev = kzalloc(sizeof(*gdev), GFP_KERNEL);
 	if (!gdev)
 		return -ENOMEM;
+    // 关联 gpio 总线
 	gdev->dev.bus = &gpio_bus_type;
+    // 绑定 chip
 	gdev->chip = gc;
+    // chip 关联 gpio_device
 	gc->gpiodev = gdev;
 	if (gc->parent) {
+        // chip 和 gpio_device 关联相同的 父对象
 		gdev->dev.parent = gc->parent;
+        // 绑定 设备树节点
 		gdev->dev.of_node = gc->parent->of_node;
 	}
 
+    // 这一步的目的是对 gdev->dev.fwnode 初始化
 	of_gpio_dev_init(gc, gdev);
 
 	/*
 	 * Assign fwnode depending on the result of the previous calls,
 	 * if none of them succeed, assign it to the parent's one.
 	 */
+    // fwnode 如果为 NULL,,,则使用 gpio_chip 父对象的 fwnode
 	gdev->dev.fwnode = dev_fwnode(&gdev->dev) ?: fwnode;
 
 	gdev->id = ida_alloc(&gpio_ida, GFP_KERNEL);
@@ -609,6 +621,7 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 		goto err_free_gdev;
 	}
 
+    // 设置 gpio_device 的名字 gpiochip(x)
 	ret = dev_set_name(&gdev->dev, GPIOCHIP_NAME "%d", gdev->id);
 	if (ret)
 		goto err_free_ida;
@@ -622,6 +635,8 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	else
 		gdev->owner = THIS_MODULE;
 
+    // 分配 gpio 描述,,,这里的描述是 根据 每个 bank 的 gpio 数量来分配的
+    // 根据这个情况,,,应该是能确定 全局链表 gpio_devices 是维护 gpiochip 的,,, 内部有所有的配置的 gpio 信息
 	gdev->descs = kcalloc(gc->ngpio, sizeof(gdev->descs[0]), GFP_KERNEL);
 	if (!gdev->descs) {
 		ret = -ENOMEM;
@@ -645,6 +660,7 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	}
 
 	gdev->ngpio = gc->ngpio;
+    // gpio_device 绑定 bank(data)
 	gdev->data = data;
 
 	spin_lock_irqsave(&gpio_lock, flags);
@@ -656,6 +672,7 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	 * it may be a pipe dream. It will not happen before we get rid
 	 * of the sysfs interface anyways.
 	 */
+     // 这里是获取 这个 bank 的基地址
 	if (base < 0) {
 		base = gpiochip_find_base(gc->ngpio);
 		if (base < 0) {
@@ -671,14 +688,17 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 		 */
 		gc->base = base;
 	}
+    // 把 这个 bank 的基地址,,,赋值到 gpio_device
 	gdev->base = base;
 
+    // 这一步,,,把 gpio_device 加入到,,,全局链表 gpio_devices
 	ret = gpiodev_add_to_list(gdev);
 	if (ret) {
 		spin_unlock_irqrestore(&gpio_lock, flags);
 		goto err_free_label;
 	}
 
+    // 遍历 这个 bank 的所有 gpio ,,, 把 gpio 的 描述 绑定 gpio_device
 	for (i = 0; i < gc->ngpio; i++)
 		gdev->descs[i].gdev = gdev;
 
@@ -701,6 +721,7 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	if (ret)
 		goto err_remove_from_list;
 
+    // 这个是 ???
 	ret = of_gpiochip_add(gc);
 	if (ret)
 		goto err_free_gpiochip_mask;
@@ -753,6 +774,7 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	 * Otherwise, defer until later.
 	 */
 	if (gpiolib_initialized) {
+        // 这里是创建 sysfs (gpiochip[x]),,,,和 字符设备,,,我门之前,,在模块的init处分析过
 		ret = gpiochip_setup_dev(gdev);
 		if (ret)
 			goto err_remove_irqchip;
@@ -4360,7 +4382,7 @@ void gpiod_put_array(struct gpio_descs *descs)
 }
 EXPORT_SYMBOL_GPL(gpiod_put_array);
 
-
+// gpio 总线的匹配方法
 static int gpio_bus_match(struct device *dev, struct device_driver *drv)
 {
 	/*
@@ -4395,17 +4417,20 @@ static struct device_driver gpio_stub_drv = {
 	.probe = gpio_stub_drv_probe,
 };
 
+// 内核启动,将会扫描 init 段执行 gpiolib_dev_init
 static int __init gpiolib_dev_init(void)
 {
 	int ret;
 
 	/* Register GPIO sysfs bus */
+    // 注册了一个总线类型 gpio_bus_type
 	ret = bus_register(&gpio_bus_type);
 	if (ret < 0) {
 		pr_err("gpiolib: could not register GPIO bus type\n");
 		return ret;
 	}
 
+    // 注册一个 gpio 总线设备驱动
 	ret = driver_register(&gpio_stub_drv);
 	if (ret < 0) {
 		pr_err("gpiolib: could not register GPIO stub driver\n");
@@ -4413,6 +4438,25 @@ static int __init gpiolib_dev_init(void)
 		return ret;
 	}
 
+    // https://zhuanlan.zhihu.com/p/506834783
+    /**
+     * https://zhuanlan.zhihu.com/p/194315629
+     * 初始化 cdev ,指定 fops
+     * void cdev_init(struct cdev *cdev, const struct file_operations *fops) 
+     * 注册一个范围的设备号
+     * int register_chrdev_region(dev_t from, unsigned count, const char *name)
+     * 自动申请 分配一个设备号
+     * int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name)
+     *
+     * 添加一个 cdev 到字符设备系统
+     * int cdev_add(struct cdev *p, dev_t dev, unsigned count)
+     * 
+     * static inline int register_chrdev(unsigned int major, const char *name, const struct file_operations *fops)
+     */
+    
+    // 申请一个设备号,这里将会自动分配,,gpio_devt 将会带回第一个设备号 GPIO_DEV_MAX 是指定的次设备号数量
+    // #define GPIO_DEV_MAX 256,,,,申请了 256 个次设备号
+    // 
 	ret = alloc_chrdev_region(&gpio_devt, 0, GPIO_DEV_MAX, GPIOCHIP_NAME);
 	if (ret < 0) {
 		pr_err("gpiolib: failed to allocate char dev region\n");
@@ -4560,3 +4604,15 @@ static int __init gpiolib_debugfs_init(void)
 subsys_initcall(gpiolib_debugfs_init);
 
 #endif	/* DEBUG_FS */
+
+/**
+ * 内核启动执行 gpiolib_dev_init,,, 在 init 段
+ * gpiolib_dev_init 中注册了一个 gpio 总线, 并注册了一个 总线驱动
+ * 然后 请求了 256 个设备号
+ * 随后 又遍历模块内的全局链表  gpio_devices ,,, 对每个节点,注册了一个 字符设备
+ * gpio_devices 这个链表是什么时候被加上去的???
+ * gpio 总线和 gpio 总线驱动是如何使用的???
+ * 
+ * gpio 的驱动需要自己实现,,, 基于 gpiolib.c 的 api 实现
+ * https://zhuanlan.zhihu.com/p/343334861
+ */

@@ -4046,6 +4046,7 @@ static int rk3308_soc_data_init(struct rockchip_pinctrl *info)
 static int rockchip_pinctrl_probe(struct platform_device *pdev)
 {
 	struct rockchip_pinctrl *info;
+    // 获取平台设备父对象 device
 	struct device *dev = &pdev->dev;
 	struct device_node *np = dev->of_node, *node;
 	struct rockchip_pin_ctrl *ctrl;
@@ -4053,13 +4054,16 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 	void __iomem *base;
 	int ret;
 
+    // dev node,,,不为空,,,设备树有配置
 	if (!dev->of_node)
 		return dev_err_probe(dev, -ENODEV, "device tree node not found\n");
 
+    // 分配了一个 rk  的关于描述 引脚复用的 信息  数据  rockchip_pinctrl
 	info = devm_kzalloc(dev, sizeof(*info), GFP_KERNEL);
 	if (!info)
 		return -ENOMEM;
 
+    // 将 rockchip_pinctrl 和平台设备绑定到同一个父对象
 	info->dev = dev;
 
 	ctrl = rockchip_pinctrl_get_soc_data(info, pdev);
@@ -4791,6 +4795,10 @@ static const struct of_device_id rockchip_pinctrl_dt_match[] = {
 		.data = &px30_pin_ctrl },
 #endif
 #ifdef CONFIG_CPU_RV1106
+    // 找到了 匹配 
+    // pinctrl: pinctrl {
+    //      compatible = "rockchip,rv1106-pinctrl";
+    // 执行 probe
 	{ .compatible = "rockchip,rv1106-pinctrl",
 		.data = &rv1106_pin_ctrl },
 #endif
@@ -4873,10 +4881,15 @@ static struct platform_driver rockchip_pinctrl_driver = {
 	.driver = {
 		.name	= "rockchip-pinctrl",
 		.pm = &rockchip_pinctrl_dev_pm_ops,
+        // rockchip_pinctrl_dt_match 中有 找到 rockchip,rv1106-pinctrl
 		.of_match_table = rockchip_pinctrl_dt_match,
 	},
 };
 
+// 内核启动, 执行 rockchip_pinctrl_drv_register
+// 这里注册了一个平台设备驱动,,,和设备树的 pinctrl 匹配
+// 我看的是 rv1106,,, 
+// compatible = "rockchip,rv1106-pinctrl";
 static int __init rockchip_pinctrl_drv_register(void)
 {
 	return platform_driver_register(&rockchip_pinctrl_driver);

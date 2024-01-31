@@ -473,6 +473,8 @@ int of_platform_populate(struct device_node *root,
 	struct device_node *child;
 	int rc = 0;
 
+    // root 不为空,从 root 中获取root, ??? 搞了个寂寞
+    // 如果 root 为空, 通过 跟节点 / 获取 root
 	root = root ? of_node_get(root) : of_find_node_by_path("/");
 	if (!root)
 		return -EINVAL;
@@ -481,6 +483,7 @@ int of_platform_populate(struct device_node *root,
 	pr_debug(" starting at: %pOF\n", root);
 
 	device_links_supplier_sync_state_pause();
+    // 遍历 root 下的所有节点,, 创建 platform 设备
 	for_each_child_of_node(root, child) {
 		rc = of_platform_bus_create(child, matches, lookup, parent, true);
 		if (rc) {

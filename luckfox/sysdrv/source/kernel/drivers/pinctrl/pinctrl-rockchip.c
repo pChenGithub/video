@@ -3839,25 +3839,33 @@ static struct rockchip_pin_ctrl *rockchip_pinctrl_get_soc_data(
 						struct rockchip_pinctrl *d,
 						struct platform_device *pdev)
 {
+    // 获取 device 和 device_node
 	struct device *dev = &pdev->dev;
 	struct device_node *node = dev->of_node;
+    // 
 	const struct of_device_id *match;
 	struct rockchip_pin_ctrl *ctrl;
 	struct rockchip_pin_bank *bank;
 	int grf_offs, pmu_offs, drv_grf_offs, drv_pmu_offs, i, j;
 
+	// 从 rockchip_pinctrl_dt_match 找出和 node 最匹配的,
+	// 返回最合适的,或者返回 NULL
+	// rockchip_pinctrl_dt_match 就是 设备树匹配的 of_device_id
 	match = of_match_node(rockchip_pinctrl_dt_match, node);
+	// 获取 of_device_id 的 data,, 在模块中定义的
 	ctrl = (struct rockchip_pin_ctrl *)match->data;
 	if (IS_ENABLED(CONFIG_CPU_RK3308) && soc_is_rk3308bs())
 		ctrl->pin_banks = rk3308bs_pin_banks;
 	if (IS_ENABLED(CONFIG_CPU_PX30) && soc_is_px30s())
 		ctrl->pin_banks = px30s_pin_banks;
 
+	// 拿到 matche data 的 ,也就是 ctrl 的各个域,,待会好操作
 	grf_offs = ctrl->grf_mux_offset;
 	pmu_offs = ctrl->pmu_mux_offset;
 	drv_pmu_offs = ctrl->pmu_drv_offset;
 	drv_grf_offs = ctrl->grf_drv_offset;
 	bank = ctrl->pin_banks;
+	// 这里对芯片的每个 bank 做初始化???
 	for (i = 0; i < ctrl->nr_banks; ++i, ++bank) {
 		int bank_pins = 0;
 
@@ -4047,14 +4055,16 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 {
 	struct rockchip_pinctrl *info;
     // 获取平台设备父对象 device
+    // 平台设备 platform_device 是在设备启动的时候解析设备树的对节点创建的
 	struct device *dev = &pdev->dev;
+    // 取出 device_node , 解析设备树的时候 device_node 挂载在 device 上
 	struct device_node *np = dev->of_node, *node;
 	struct rockchip_pin_ctrl *ctrl;
 	struct resource *res;
 	void __iomem *base;
 	int ret;
 
-    // dev node,,,不为空,,,设备树有配置
+    // dev node,,,不为空,,,设备树有配置, 所以不会为空
 	if (!dev->of_node)
 		return dev_err_probe(dev, -ENODEV, "device tree node not found\n");
 
@@ -4876,6 +4886,7 @@ static const struct of_device_id rockchip_pinctrl_dt_match[] = {
 };
 
 static struct platform_driver rockchip_pinctrl_driver = {
+    // 匹配到设备树的 pinctrl 节点, probe 将会执行
 	.probe		= rockchip_pinctrl_probe,
 	.remove		= rockchip_pinctrl_remove,
 	.driver = {

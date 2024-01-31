@@ -1375,6 +1375,9 @@
 		};
 	};
 
+    // 定义了 pinctrl 节点
+    // 适配器 rockchip,rv1106-pinctrl
+    // 驱动文件搜索在 pinctrl/pinctrl-rockchip.c 中存在
 	pinctrl: pinctrl {
 		compatible = "rockchip,rv1106-pinctrl";
 		rockchip,grf = <&ioc>;

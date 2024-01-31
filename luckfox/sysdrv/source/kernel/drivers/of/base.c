@@ -81,8 +81,10 @@ EXPORT_SYMBOL(of_node_name_prefix);
 
 static bool __of_node_is_type(const struct device_node *np, const char *type)
 {
+	// 获取 device_node 的 device_type 字段
 	const char *match = __of_get_property(np, "device_type", NULL);
 
+	// 比较 type 和 device_node 的 device_type 是否相同
 	return np && match && type && !strcmp(match, type);
 }
 
@@ -488,11 +490,18 @@ static int __of_device_is_compatible(const struct device_node *device,
 	const char *cp;
 	int index = 0, score = 0;
 
+	// 总结一下,
+	// 1 把 match 的 compatile 和 device_node 的 compatile 列表比较,相同返回一个分数
+	// 2 把 match 的 type 和 device_node 的 device_type 比较,相同也会返回一个分数
+	// 3 把 match 的 name 和 device_node 的 name 比较, 相同也会返回一个分数
+	// 优先级从上到下
 	/* Compatible match has highest priority */
 	if (compat && compat[0]) {
-		prop = __of_find_property(device, "compatible", NULL);
+		prop = __of_find_property(device, "compatile", NULL);
+		// 遍历 device_node 的 compatile
 		for (cp = of_prop_next_string(prop, NULL); cp;
 		     cp = of_prop_next_string(prop, cp), index++) {
+			// 比较,如果相等,返回一个分值,跳出循环
 			if (of_compat_cmp(cp, compat, strlen(compat)) == 0) {
 				score = INT_MAX/2 - (index << 2);
 				break;
@@ -1078,6 +1087,8 @@ out:
 }
 EXPORT_SYMBOL(of_find_node_with_property);
 
+// 验证 matches 和 node 的匹配,
+// 返回 NULL 或者 最匹配的 match
 static
 const struct of_device_id *__of_match_node(const struct of_device_id *matches,
 					   const struct device_node *node)
@@ -1088,9 +1099,11 @@ const struct of_device_id *__of_match_node(const struct of_device_id *matches,
 	if (!matches)
 		return NULL;
 
+	// 遍历传入的 matches , 寻找匹配的 node 
 	for (; matches->name[0] || matches->type[0] || matches->compatible[0]; matches++) {
 		score = __of_device_is_compatible(node, matches->compatible,
 						  matches->type, matches->name);
+		// 分数大于0,, 返回这个 match
 		if (score > best_score) {
 			best_match = matches;
 			best_score = score;
@@ -1107,6 +1120,8 @@ const struct of_device_id *__of_match_node(const struct of_device_id *matches,
  *
  *	Low level utility function used by device matching.
  */
+// 验证 matches 和 node 的匹配,
+// 返回 NULL 或者 最匹配的 match
 const struct of_device_id *of_match_node(const struct of_device_id *matches,
 					 const struct device_node *node)
 {
@@ -1114,6 +1129,7 @@ const struct of_device_id *of_match_node(const struct of_device_id *matches,
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&devtree_lock, flags);
+	// 再向下调用
 	match = __of_match_node(matches, node);
 	raw_spin_unlock_irqrestore(&devtree_lock, flags);
 	return match;

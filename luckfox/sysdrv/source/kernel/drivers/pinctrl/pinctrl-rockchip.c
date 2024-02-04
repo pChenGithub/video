@@ -3844,13 +3844,15 @@ static struct rockchip_pin_ctrl *rockchip_pinctrl_get_soc_data(
 	struct device_node *node = dev->of_node;
     // 
 	const struct of_device_id *match;
+	// ctrl 将会从 match 的 data 获取到
+	// rockchip_pin_ctrl 和 rockchip_pin_bank 都是板级 驱动模块自定义的数据结构体
 	struct rockchip_pin_ctrl *ctrl;
 	struct rockchip_pin_bank *bank;
 	int grf_offs, pmu_offs, drv_grf_offs, drv_pmu_offs, i, j;
 
 	// 从 rockchip_pinctrl_dt_match 找出和 node 最匹配的,
 	// 返回最合适的,或者返回 NULL
-	// rockchip_pinctrl_dt_match 就是 设备树匹配的 of_device_id
+	// rockchip_pinctrl_dt_match 就是和设备树匹配的 of_device_id
 	match = of_match_node(rockchip_pinctrl_dt_match, node);
 	// 获取 of_device_id 的 data,, 在模块中定义的
 	ctrl = (struct rockchip_pin_ctrl *)match->data;
@@ -3864,22 +3866,37 @@ static struct rockchip_pin_ctrl *rockchip_pinctrl_get_soc_data(
 	pmu_offs = ctrl->pmu_mux_offset;
 	drv_pmu_offs = ctrl->pmu_drv_offset;
 	drv_grf_offs = ctrl->grf_drv_offset;
+	// 指向 bank 的定义
 	bank = ctrl->pin_banks;
 	// 这里对芯片的每个 bank 做初始化???
+	// 遍历当前模块定义的 bank,,, rv1106 是结构体数组 rv1106_pin_banks 
 	for (i = 0; i < ctrl->nr_banks; ++i, ++bank) {
 		int bank_pins = 0;
 
 		raw_spin_lock_init(&bank->slock);
+		// 这里 rockchip_pin_bank 和 rockchip_pinctrl 关联了
 		bank->drvdata = d;
+		// 每个 bank 的 pin_base,, 是该 bank 的起始编号,
+		// 这里相当于:
+		// bank0 base=0
+		// bank1 base=32
+		// bank2 base=64
+		// ...
 		bank->pin_base = ctrl->nr_pins;
+		// ctrl 管理所有的 gpio ,, 所以,每个 bank 的 pin 脚个数 求和
 		ctrl->nr_pins += bank->nr_pins;
 
 		/* calculate iomux and drv offsets */
+		// 这里是 每个 bank 分成 4 组???
+		// A B C D
+		// 每组 8 个 gpio
 		for (j = 0; j < 4; j++) {
+			// 获取 bank 的 iom 和 drv
 			struct rockchip_iomux *iom = &bank->iomux[j];
 			struct rockchip_drv *drv = &bank->drv[j];
 			int inc;
 
+			// bank_pins 每次会自增 8,, 一般 bank->nr_pins 为 32
 			if (bank_pins >= bank->nr_pins)
 				break;
 
@@ -4076,11 +4093,16 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
     // 将 rockchip_pinctrl 和平台设备绑定到同一个父对象
 	info->dev = dev;
 
+	// 获取板级信息, 并返回 ctrl ,, 主要是 ctrl 和 bank 的参数赋值
+	// ctrl 是和 device_node 匹配获取的合适的 of_device_id 之后,,从而获取的额私有数据 data
 	ctrl = rockchip_pinctrl_get_soc_data(info, pdev);
 	if (!ctrl)
 		return dev_err_probe(dev, -EINVAL, "driver data not available\n");
+	// ctrl 挂载到 info 上
 	info->ctrl = ctrl;
 
+	// np 是 pinctrl 节点
+	// rockchip,grf = <&ioc>;
 	node = of_parse_phandle(np, "rockchip,grf", 0);
 	if (node) {
 		info->regmap_base = syscon_node_to_regmap(node);
@@ -4215,12 +4237,34 @@ static struct rockchip_pin_ctrl px30_pin_ctrl __maybe_unused = {
 		.slew_rate_calc_reg	= px30_calc_slew_rate_reg_and_bit,
 };
 
+// 这里定义了 rockchip 的 5 个 bank ,,,, 模块内自定义数据结构体
 static struct rockchip_pin_bank rv1106_pin_banks[] = {
+// PIN_BANK_IOMUX_FLAGS 参数说明
+// bank_num 片选号
+// nr_pins	pin脚数量
+// name		片选名称 gpio0, gpio1 ...
+// type0
+// type1
+// type2
+// type3
+// 跟 PIN_BANK_IOMUX_FLAGS_OFFSET 区别,,默认 offset 为1
 	PIN_BANK_IOMUX_FLAGS(0, 32, "gpio0",
 			     IOMUX_WIDTH_4BIT | IOMUX_SOURCE_PMU,
 			     IOMUX_WIDTH_4BIT | IOMUX_SOURCE_PMU,
 			     IOMUX_WIDTH_4BIT | IOMUX_SOURCE_PMU,
 			     IOMUX_WIDTH_4BIT | IOMUX_SOURCE_PMU),
+// PIN_BANK_IOMUX_FLAGS_OFFSET 参数说明
+// bank_num 片选号
+// nr_pins	pin脚数量
+// name		片选名称 gpio0, gpio1 ...
+// type0
+// type1
+// type2
+// type3
+// offset0
+// offset1
+// offset2
+// offset3
 	PIN_BANK_IOMUX_FLAGS_OFFSET(1, 32, "gpio1",
 				    IOMUX_WIDTH_4BIT,
 				    IOMUX_WIDTH_4BIT,
@@ -4247,6 +4291,8 @@ static struct rockchip_pin_bank rv1106_pin_banks[] = {
 				    0x30000, 0x30008, 0x30010, 0),
 };
 
+// 定义了 rv1106 的 of_device_id 的私有数据,,,
+// 这个数据里面有 关于 板级信息 bank 的定义 
 static struct rockchip_pin_ctrl rv1106_pin_ctrl __maybe_unused = {
 	.pin_banks		= rv1106_pin_banks,
 	.nr_banks		= ARRAY_SIZE(rv1106_pin_banks),
@@ -4810,6 +4856,7 @@ static const struct of_device_id rockchip_pinctrl_dt_match[] = {
     //      compatible = "rockchip,rv1106-pinctrl";
     // 执行 probe
 	{ .compatible = "rockchip,rv1106-pinctrl",
+		// rv1106_pin_ctrl 有关于 bank 的一些定义,与板级有关
 		.data = &rv1106_pin_ctrl },
 #endif
 #ifdef CONFIG_CPU_RV1108
@@ -5014,3 +5061,16 @@ MODULE_DESCRIPTION("ROCKCHIP Pin Controller Driver");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:pinctrl-rockchip");
 MODULE_DEVICE_TABLE(of, rockchip_pinctrl_dt_match);
+
+// 模块中定义的几个重要结构体
+// 他们之间的关系是:
+// 1 1106_pin_ctrl 是挂载在 of_device_id 的 data 上
+// 2 106_pin_banks 是挂载在 1106_pin_ctrl 的 banks 上 
+// static struct rockchip_pin_ctrl rv1106_pin_ctrl __maybe_unused = {
+// static struct rockchip_pin_bank rv1106_pin_banks[] = {
+
+
+
+
+
+

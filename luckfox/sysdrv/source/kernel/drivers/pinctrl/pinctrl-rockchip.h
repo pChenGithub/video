@@ -389,9 +389,12 @@ struct rockchip_mux_route_data {
 };
 
 struct rockchip_pin_ctrl {
+	// pin_banks 将会指向一个数组,将会放置 描述每个 bank 的结构体
+	// nr_banks 表示当前有多少个 bank
 	struct rockchip_pin_bank	*pin_banks;
 	u32				nr_banks;
 	u32				nr_pins;
+	// label 指向 bank 的名称
 	char				*label;
 	enum rockchip_pinctrl_type	type;
 	int				grf_mux_offset;
@@ -402,6 +405,7 @@ struct rockchip_pin_ctrl {
 	u32				niomux_recalced;
 	struct rockchip_mux_route_data *iomux_routes;
 	u32				niomux_routes;
+	// 包括了一些回调函数
 	int	(*pull_calc_reg)(struct rockchip_pin_bank *bank,
 				 int pin_num, struct regmap **regmap,
 				 int *reg, u8 *bit);

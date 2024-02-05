@@ -100,6 +100,7 @@ int of_bus_n_addr_cells(struct device_node *np)
 	return OF_ROOT_NODE_ADDR_CELLS_DEFAULT;
 }
 
+// 一直向上(父节点)找,直到找到 #address-cells ,返回其数值
 int of_n_addr_cells(struct device_node *np)
 {
 	if (np->parent)
@@ -121,6 +122,7 @@ int of_bus_n_size_cells(struct device_node *np)
 	return OF_ROOT_NODE_SIZE_CELLS_DEFAULT;
 }
 
+// 一直向上(父节点)找,直到找到 #size-cells ,返回其数值
 int of_n_size_cells(struct device_node *np)
 {
 	if (np->parent)
@@ -190,6 +192,8 @@ void __init of_core_init(void)
 		proc_symlink("device-tree", NULL, "/sys/firmware/devicetree/base");
 }
 
+// 在节点 np 按名称找到指定 属性节点
+// 返回结构化后的 属性 property 以及 属性值的长度(这里的长度仅仅指值的长度,没有其他意义)
 static struct property *__of_find_property(const struct device_node *np,
 					   const char *name, int *lenp)
 {
@@ -198,6 +202,7 @@ static struct property *__of_find_property(const struct device_node *np,
 	if (!np)
 		return NULL;
 
+	// 遍历 节点 np 内所有的属性,,,找到名字匹配的
 	for (pp = np->properties; pp; pp = pp->next) {
 		if (of_prop_cmp(pp->name, name) == 0) {
 			if (lenp)
@@ -279,11 +284,16 @@ const void *__of_get_property(const struct device_node *np,
  * Find a property with a given name for a given node
  * and return the value.
  */
+// 在节点 np 按名称找到指定 属性节点
+// 返回结构化后的 属性 property 以及 属性值的长度(这里的长度仅仅指值的长度,没有其他意义)
+// name 一般是 reg
 const void *of_get_property(const struct device_node *np, const char *name,
 			    int *lenp)
 {
 	struct property *pp = of_find_property(np, name, lenp);
 
+	// 直接返回这个 属性 reg 的值,
+	// reg 节点是在内核启动的时候就被解析成了 property
 	return pp ? pp->value : NULL;
 }
 EXPORT_SYMBOL(of_get_property);

@@ -26,6 +26,8 @@
 static struct platform_driver syscon_driver;
 
 static DEFINE_SPINLOCK(syscon_list_slock);
+// syscon 这个模块定义了一个全局链表头
+// 
 static LIST_HEAD(syscon_list);
 
 struct syscon {
@@ -42,6 +44,7 @@ static const struct regmap_config syscon_regmap_config = {
 
 static struct syscon *of_syscon_register(struct device_node *np, bool check_clk)
 {
+	// 本次阅读, check_clk 为 ture
 	struct clk *clk;
 	struct syscon *syscon;
 	struct regmap *regmap;
@@ -51,15 +54,20 @@ static struct syscon *of_syscon_register(struct device_node *np, bool check_clk)
 	struct regmap_config syscon_config = syscon_regmap_config;
 	struct resource res;
 
+	// 创建一个新的 syscon
 	syscon = kzalloc(sizeof(*syscon), GFP_KERNEL);
 	if (!syscon)
 		return ERR_PTR(-ENOMEM);
 
+	// 把设备树节点,定义的 reg 节点,,转成 resource
+	// np 节点
+	// 0  获取第几个 地址资源 reg = <xxx, xxx>
 	if (of_address_to_resource(np, 0, &res)) {
 		ret = -ENOMEM;
 		goto err_map;
 	}
 
+	// 内存虚拟映射
 	base = ioremap(res.start, resource_size(&res));
 	if (!base) {
 		ret = -ENOMEM;
@@ -150,6 +158,7 @@ err_map:
 	return ERR_PTR(ret);
 }
 
+// 获取指定节点的 寄存器,然后 remap ,,返回 regmap 结构体
 static struct regmap *device_node_get_regmap(struct device_node *np,
 					     bool check_clk)
 {
@@ -157,6 +166,8 @@ static struct regmap *device_node_get_regmap(struct device_node *np,
 
 	spin_lock(&syscon_list_slock);
 
+	// 遍历 全局变量 syscon_list 是否已经存在该节点
+	// 如果存在 跳出 循环
 	list_for_each_entry(entry, &syscon_list, list)
 		if (entry->np == np) {
 			syscon = entry;
@@ -165,12 +176,17 @@ static struct regmap *device_node_get_regmap(struct device_node *np,
 
 	spin_unlock(&syscon_list_slock);
 
+	// 如果 遍历全局链表,,没有找到 这个节点 np ,,, 
+	// 根据传入的节点 np , 构造 一个 链表元素,,放入全局链表
+	// 并返回这个 元素的指针
 	if (!syscon)
 		syscon = of_syscon_register(np, check_clk);
 
 	if (IS_ERR(syscon))
 		return ERR_CAST(syscon);
 
+	// 返回 从全局链表找到的元素,,,返回其中的 regmap
+	// regmap 是解析 node 然后完成的 寄存器 remap
 	return syscon->regmap;
 }
 
@@ -182,6 +198,7 @@ EXPORT_SYMBOL_GPL(device_node_to_regmap);
 
 struct regmap *syscon_node_to_regmap(struct device_node *np)
 {
+	// 判断适配器是否有 syscon
 	if (!of_device_is_compatible(np, "syscon"))
 		return ERR_PTR(-EINVAL);
 

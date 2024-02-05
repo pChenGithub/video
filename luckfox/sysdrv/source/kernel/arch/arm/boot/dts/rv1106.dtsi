@@ -999,7 +999,7 @@
 	};
 
 	ioc: syscon@ff538000 {
-		compatible = "rockchip,rv1106-ioc", "syscon";
+		compatible = "rockchip,rv1106-oc", "syscon";
 		reg = <0xff538000 0x40000>;
 	};
 

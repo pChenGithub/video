@@ -4104,6 +4104,7 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 	// np 是 pinctrl 节点
 	// rockchip,grf = <&ioc>;
 	node = of_parse_phandle(np, "rockchip,grf", 0);
+	// 这里 node 不为空
 	if (node) {
 		info->regmap_base = syscon_node_to_regmap(node);
 		of_node_put(node);

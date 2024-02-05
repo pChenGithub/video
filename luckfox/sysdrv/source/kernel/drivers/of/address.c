@@ -58,11 +58,16 @@ struct of_bus {
  * Default translator (generic bus)
  */
 
+// dev 		设备树节点
+// addrc 	返回地址数量
+// sizec	返回地址大小数量
 static void of_bus_default_count_cells(struct device_node *dev,
 				       int *addrc, int *sizec)
 {
+	// 一直向上(父节点)找,直到找到 #address-cells ,返回其数值
 	if (addrc)
 		*addrc = of_n_addr_cells(dev);
+	// 一直向上(父节点)找,直到找到 #size-cells ,返回其数值
 	if (sizec)
 		*sizec = of_n_size_cells(dev);
 }
@@ -149,6 +154,12 @@ static int of_bus_pci_match(struct device_node *np)
 	 * If none of the device_type match, and that the node name is
 	 * "pcie", accept the device as PCI (with a warning).
 	 */
+	// 举例 pci 的 node 匹配方法
+	// 1 属于 pci 类型
+	// 2 属于 pciex 了性
+	// 3 属于 vci 类型
+	// 4 属于 ht 类型
+	// 5 是 pcie
 	return of_node_is_type(np, "pci") || of_node_is_type(np, "pciex") ||
 		of_node_is_type(np, "vci") || of_node_is_type(np, "ht") ||
 		of_node_is_pcie(np);
@@ -407,11 +418,16 @@ static struct of_bus of_busses[] = {
 	},
 };
 
+// 按 bus 定义的匹配规则,,,查找 np 匹配的 bus 并返回这个 bus
 static struct of_bus *of_match_bus(struct device_node *np)
 {
 	int i;
 
+	// 遍历全局数组 of_busses ,,
+	// of_busses 是 of 模块维护的全局数组
 	for (i = 0; i < ARRAY_SIZE(of_busses); i++)
+		// 匹配规则
+		// bus 存在 match ,,, 执行 match 验证匹配
 		if (!of_busses[i].match || of_busses[i].match(np))
 			return &of_busses[i];
 	BUG();
@@ -680,24 +696,44 @@ const __be32 *of_get_address(struct device_node *dev, int index, u64 *size,
 	struct of_bus *bus;
 	int onesize, i, na, ns;
 
+	// 这个几点必须需要有父节点???
+	// 理解是,必须要使用才会去获取这个寄存器地址
 	/* Get parent & match bus type */
 	parent = of_get_parent(dev);
 	if (parent == NULL)
 		return NULL;
+	
+	// 获取父节点的 #address-cells = <1>; 和 #size-cells = <1>;
+
+	// 获取父节点属于哪个 bus
+	// 有具体指定的 bus 和 默认的bus 
 	bus = of_match_bus(parent);
+	// 这里是获取 #address-cells = <1>; 和 #size-cells = <1>;
+	// na 地址数量
+	// ns 地址大小数量
 	bus->count_cells(dev, &na, &ns);
 	of_node_put(parent);
 	if (!OF_CHECK_ADDR_COUNT(na))
 		return NULL;
 
 	/* Get "reg" or "assigned-addresses" property */
+	// 获取 dev 的 reg 寄存器的内容,,放在一个数组里面,并且返回数组大小
+	// .addresses = "reg",
+	// psize 是字节数???
 	prop = of_get_property(dev, bus->addresses, &psize);
 	if (prop == NULL)
 		return NULL;
+	// 转成数值 数量,,按 int 算
+	// psize 至此,就表示 有几个数值了
 	psize /= 4;
 
+	// 根据获取的 #address-cells = <1>; 和 #size-cells = <1>;
+	// 得知 一组 寄存器 的大小
+	// 然后 把 上面获取的寄存器地址信息 prop 按 onesize 分组
 	onesize = na + ns;
+	// 遍历 把 prop(读出来的属性值) 按 每组 onesize 个数值,,一组一组拿出来
 	for (i = 0; psize >= onesize; psize -= onesize, prop += onesize, i++)
+		// 找到指定序号,才处理参数返回
 		if (i == index) {
 			if (size)
 				*size = of_read_number(prop + na, ns);
@@ -871,6 +907,7 @@ int of_address_to_resource(struct device_node *dev, int index,
 	unsigned int	flags;
 	const char	*name = NULL;
 
+	// 
 	addrp = of_get_address(dev, index, &size, &flags);
 	if (addrp == NULL)
 		return -EINVAL;

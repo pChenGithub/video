@@ -42,6 +42,14 @@ static const struct regmap_config syscon_regmap_config = {
 	.reg_stride = 4,
 };
 
+// syscon 系列函数
+// 作用是 将指定节点的 reg 子节点映射出来
+// 转成 syscon 结构体，并将这个结构体 放入全局链表 syscon_list
+// 根据传参 check_clk 决定是否检查 该节点 使用 clk
+// syscon_list 是 syscon 模块维护的一个全局链表头
+// 
+// 在开机的时候，syscon 模块会去查询 有 syscon 配置的节点完成这项工作
+// 理论上 开机后 所有的节点都已经完成了映射了
 static struct syscon *of_syscon_register(struct device_node *np, bool check_clk)
 {
 	// 本次阅读, check_clk 为 ture
@@ -123,6 +131,7 @@ static struct syscon *of_syscon_register(struct device_node *np, bool check_clk)
 		goto err_regmap;
 	}
 
+	// 如果设置了 true 需要检查时钟
 	if (check_clk) {
 		clk = of_clk_get(np, 0);
 		if (IS_ERR(clk)) {
@@ -196,12 +205,16 @@ struct regmap *device_node_to_regmap(struct device_node *np)
 }
 EXPORT_SYMBOL_GPL(device_node_to_regmap);
 
+// syscon 系列接口，需要配置了 syscon 的节点才会成功调用
+// 功能是 将 指定节点的 reg 子节点，，里面放着 寄存器物理地址
+// 映射成虚拟地址，，，由 regmap 结构体返回结果
 struct regmap *syscon_node_to_regmap(struct device_node *np)
 {
 	// 判断适配器是否有 syscon
 	if (!of_device_is_compatible(np, "syscon"))
 		return ERR_PTR(-EINVAL);
 
+	// true 决定是否需要 检查该节点的时钟
 	return device_node_get_regmap(np, true);
 }
 EXPORT_SYMBOL_GPL(syscon_node_to_regmap);

@@ -541,6 +541,9 @@ static int __of_device_is_compatible(const struct device_node *device,
 /** Checks if the given "compat" string matches one of the strings in
  * the device's "compatible" property
  */
+// of 函数族
+// 检查 指定的节点，，适配器中是否含有指定的 名称
+// 适配器 即  compatile
 int of_device_is_compatible(const struct device_node *device,
 		const char *compat)
 {
@@ -1460,6 +1463,11 @@ static int __of_parse_phandle_with_args(const struct device_node *np,
  * Returns the device_node pointer with refcount incremented.  Use
  * of_node_put() on it when done.
  */
+// of 函数族
+// 从指定节点查找 指定名称的 子节点，，，获取第 index（0开始） 个
+// 返回这个子节点 引用的节点
+//
+// 返回指定节点，指定名称子节点，引用的节点
 struct device_node *of_parse_phandle(const struct device_node *np,
 				     const char *phandle_name, int index)
 {

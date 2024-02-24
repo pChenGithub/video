@@ -3767,6 +3767,8 @@ static int rockchip_pinctrl_parse_dt(struct platform_device *pdev,
 
 	i = 0;
 
+	// 遍历 pinctrl 下的所有 节点
+	// 比如 gpio0， gpio1， 等等...
 	for_each_child_of_node(np, child) {
 		if (of_match_node(rockchip_bank_match, child))
 			continue;
@@ -3785,7 +3787,9 @@ static int rockchip_pinctrl_parse_dt(struct platform_device *pdev,
 static int rockchip_pinctrl_register(struct platform_device *pdev,
 					struct rockchip_pinctrl *info)
 {
+	// pinctrl 描述符
 	struct pinctrl_desc *ctrldesc = &info->pctl;
+	// 引脚描述符
 	struct pinctrl_pin_desc *pindesc, *pdesc;
 	struct rockchip_pin_bank *pin_bank;
 	struct device *dev = &pdev->dev;
@@ -3798,14 +3802,18 @@ static int rockchip_pinctrl_register(struct platform_device *pdev,
 	ctrldesc->pmxops = &rockchip_pmx_ops;
 	ctrldesc->confops = &rockchip_pinconf_ops;
 
+	// 分配引脚描述符的结构体，，，分配 引脚个数个
 	pindesc = devm_kcalloc(dev, info->ctrl->nr_pins, sizeof(*pindesc), GFP_KERNEL);
 	if (!pindesc)
 		return -ENOMEM;
 
+	// 设置引脚和引脚复用的关系，指定引脚描述符和引脚个数
 	ctrldesc->pins = pindesc;
 	ctrldesc->npins = info->ctrl->nr_pins;
 
 	pdesc = pindesc;
+	// 这里按 bank 和 bank 所有的 pin 脚数量
+	// 遍历对 引脚描述符初始化 编号 和 名字
 	for (bank = 0, k = 0; bank < info->ctrl->nr_banks; bank++) {
 		pin_bank = &info->ctrl->pin_banks[bank];
 		for (pin = 0; pin < pin_bank->nr_pins; pin++, k++) {
@@ -4104,8 +4112,11 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 	// np 是 pinctrl 节点
 	// rockchip,grf = <&ioc>;
 	node = of_parse_phandle(np, "rockchip,grf", 0);
-	// 这里 node 不为空
+	// 这里 node 不为空,, rv1106 的 pinctrl 有这个节点
 	if (node) {
+		// 这里完成了 寄存器的映射，获取到了 寄存器的虚拟内存地址
+		// 这里映射的是 ioc 节点的 reg 子节点
+		// rockchip,grf = <&ioc>;
 		info->regmap_base = syscon_node_to_regmap(node);
 		of_node_put(node);
 		if (IS_ERR(info->regmap_base))
@@ -4137,6 +4148,9 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 	}
 
 	/* try to find the optional reference to the pmu syscon */
+	// 这里有 node 返回
+	// rockchip,pmu = <&pmuioc>;
+	// 同样是获取映射后的虚拟地址
 	node = of_parse_phandle(np, "rockchip,pmu", 0);
 	if (node) {
 		info->regmap_pmu = syscon_node_to_regmap(node);
@@ -5069,6 +5083,13 @@ MODULE_DEVICE_TABLE(of, rockchip_pinctrl_dt_match);
 // 2 106_pin_banks 是挂载在 1106_pin_ctrl 的 banks 上 
 // static struct rockchip_pin_ctrl rv1106_pin_ctrl __maybe_unused = {
 // static struct rockchip_pin_bank rv1106_pin_banks[] = {
+// 3 struct rockchip_pinctrl *info 是在 probe 里分配的一块内存 
+// info = devm_kzalloc(dev, sizeof(*info), GFP_KERNEL);
+// info 维护了 ctrl结构体， info->ctrl = ctrl;
+// 最后 info 设置为平台设备驱动的私有数据 platform_set_drvdata(pdev, info);
+// info 内含有重要数据 引脚复用描述符 struct pinctrl_desc *ctrldesc = &info->pctl;
+// 引脚复用描述符内含，所有的引脚描述符
+// 引脚复用描述符将会，，调用 pinctrl 子模块接口，注册到内核
 
 
 

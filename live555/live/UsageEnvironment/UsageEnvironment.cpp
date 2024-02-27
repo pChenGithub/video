@@ -19,6 +19,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #include "UsageEnvironment.hh"
 
+// 销毁自己
+// 需要liveMediaPriv和groupsockPriv为空才会销毁成功
 Boolean UsageEnvironment::reclaim() {
   // We delete ourselves only if we have no remainining state:
   if (liveMediaPriv == NULL && groupsockPriv == NULL) {
@@ -30,6 +32,7 @@ Boolean UsageEnvironment::reclaim() {
 }
 
 UsageEnvironment::UsageEnvironment(TaskScheduler& scheduler)
+	// 初始化变量
   : liveMediaPriv(NULL), groupsockPriv(NULL), fScheduler(scheduler) {
 }
 

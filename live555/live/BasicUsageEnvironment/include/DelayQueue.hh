@@ -101,6 +101,7 @@ class DelayInterval operator-(Timeval const& arg1, Timeval const& arg2);
 
 ///// DelayInterval /////
 
+// Timeval 里面有一个属性 struct timeval,,,实际就是把时间用秒和微妙表示,,,DelayInterval也一样
 class DelayInterval: public Timeval {
 public:
   DelayInterval(time_base_seconds seconds, time_base_seconds useconds)
@@ -144,24 +145,29 @@ public:
   }
 
 protected: // abstract base class
+	// 延时任务队列节点,实例化参数,,,延时时间,,,token
   DelayQueueEntry(DelayInterval delay, intptr_t token);
 
+	// 执行时间到达后执行的方法,,是一个虚函数,可能被子类重写
   virtual void handleTimeout();
 
 private:
+	// 友元 子类 DelayQueue 可以访问 DelayQueueEntry 的私有数据
   friend class DelayQueue;
 	// 双向循环队列的前指和后指
   DelayQueueEntry* fNext;
   DelayQueueEntry* fPrev;
-	// 定时时间
+	// 定时时间,,, 用秒和微秒表示的时间
+	// 以前一个节点为基准,跟前一个节点相差的时间
   DelayInterval fDeltaTimeRemaining;
 
+	// token 是一个数字
   intptr_t fToken;
 };
 
 ///// DelayQueue /////
 
-// 这个类实现一个队列头
+// 这个类实现一个队列头,,,队列头内也含有一个节点,,,并且是 节点父类的友元
 // 实现队列节点的添加,删除,更新
 // 实现一个定时器,检查队列上的节点,到时执行
 class DelayQueue: public DelayQueueEntry {
@@ -169,21 +175,27 @@ public:
   DelayQueue();
   virtual ~DelayQueue();
 
+	// 节点操作,增删改查
   void addEntry(DelayQueueEntry* newEntry); // returns a token for the entry
   void updateEntry(DelayQueueEntry* entry, DelayInterval newDelay);
   void updateEntry(intptr_t tokenToFind, DelayInterval newDelay);
   void removeEntry(DelayQueueEntry* entry); // but doesn't delete it
   DelayQueueEntry* removeEntry(intptr_t tokenToFind); // but doesn't delete it
 
+	// 下一次节点时间到达时间,,,为0表示已经触发
   DelayInterval const& timeToNextAlarm();
+	// 获取一个已经触发的节点,执行节点的 handleTimeout 方法
   void handleAlarm();
 
 private:
+	// 获取下一个节点,对于队列头来说,,,即是第一个有效节点
   DelayQueueEntry* head() { return fNext; }
   DelayQueueEntry* findEntryByToken(intptr_t token);
+	// 更队列时间,,,因为时间一直会往前走,,这个方法就是以当前时间为基准,,,,
+	// 标记队列中已经触发的节点,,,以及更新时间基准
   void synchronize(); // bring the 'time remaining' fields up-to-date
 
-	// 上次同步的时间
+	// 上次同步的时间,,,队列标记触发,,,队列任务的时间更新都是以这个时间为基准的
   _EventTime fLastSyncTime;
 };
 

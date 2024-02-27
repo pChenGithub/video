@@ -50,12 +50,19 @@ class TaskScheduler; // forward
 
 // An abstract base class, subclassed for each use of the library
 
+// 这个类有很多全虚函数,,除了全虚函数,还有如下内容
+// TaskScheduler& 引用,,,
+// void* liveMediaPriv;
+// void* groupsockPriv;
+// 操作方法,销毁自己,,,异常退出,,,换回调度器
 class UsageEnvironment {
 public:
+	// 销毁实例
   Boolean reclaim();
       // returns True iff we were actually able to delete our object
 
   // task scheduler:
+	// 返回任务调度实例
   TaskScheduler& taskScheduler() const {return fScheduler;}
 
   // result message handling:
@@ -74,6 +81,7 @@ public:
 	// used to report a (previously set) error message within
 	// a background event
 
+	// 内部错误,会异常退出
   virtual void internalError(); // used to 'handle' a 'should not occur'-type error condition within the library.
 
   // 'errno'
@@ -91,6 +99,7 @@ public:
   void* groupsockPriv;
 
 protected:
+	// 构造函数
   UsageEnvironment(TaskScheduler& scheduler); // abstract base class
   virtual ~UsageEnvironment(); // we are deleted only by reclaim()
 

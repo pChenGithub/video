@@ -24,12 +24,15 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "BasicUsageEnvironment0.hh"
 #endif
 
+// 这个类里面的内容比较简单,就一个构造方法,和静态构造方法,
+// 获取错误码接口,,,<< 操作符重写,,,
 class BasicUsageEnvironment: public BasicUsageEnvironment0 {
 public:
 	// 静态方法,创建 BasicUsageEnvironment 实例
   static BasicUsageEnvironment* createNew(TaskScheduler& taskScheduler);
 
   // redefined virtual functions:
+	// 返回错误码 errno
   virtual int getErrno() const;
 
   virtual UsageEnvironment& operator<<(char const* str);
@@ -61,21 +64,33 @@ protected:
   BasicTaskScheduler(unsigned maxSchedulerGranularity);
       // called only by "createNew()"
 
+	// 这2个函数配合,结果是 schedulerTickTask 会定时执行
+	// 静态方法,传入参数是 BasicTaskScheduler 实例,,,最终调用 schedulerTickTask()方法
   static void schedulerTickTask(void* clientData);
+	// 
   void schedulerTickTask();
 
 protected:
   // Redefined virtual functions:
+	// 来自父类的虚函数,,,这个函数在事件循环中被调用
+	// 在最终子类 BasicTaskScheduler 实现
+	// 这个函数主要,处理
+	// 1 监听 socket
+	// 2 监听触发器
+	// 3 轮询定时任务
   virtual void SingleStep(unsigned maxDelayTime);
 
   virtual void setBackgroundHandling(int socketNum, int conditionSet, BackgroundHandlerProc* handlerProc, void* clientData);
   virtual void moveSocketHandling(int oldSocketNum, int newSocketNum);
 
 protected:
+	// 定时任务延时时间
   unsigned fMaxSchedulerGranularity;
 
   // To implement background operations:
+	// 最大socket数量
   int fMaxNumSockets;
+	// select 使用的读,写,错误监听
   fd_set fReadSet;
   fd_set fWriteSet;
   fd_set fExceptionSet;

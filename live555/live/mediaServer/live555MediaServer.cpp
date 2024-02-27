@@ -25,9 +25,14 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 int main(int argc, char** argv) {
   // Begin by setting up our usage environment:
 	// BasicTaskScheduler  是 TaskScheduler的子类
+	// 创建了一个任务调度类,这个类里面有一个任务队列维护,提交的延时任务
+	// 但是没有看到哪里启动延时任务队列的轮寻
   TaskScheduler* scheduler = BasicTaskScheduler::createNew();
+	// UsageEnvironment 是 BasicUsageEnvironment 的父类
+	// 这里创建了一个运行环境,并把任务调度类传到这个环境里
   UsageEnvironment* env = BasicUsageEnvironment::createNew(*scheduler);
 
+	// 这段是权限控制的,,,暂时不去研究!!!
   UserAuthenticationDatabase* authDB = NULL;
 #ifdef ACCESS_CONTROL
   // To implement client access control to the RTSP server, do the following:
@@ -39,7 +44,9 @@ int main(int argc, char** argv) {
 
   // Create the RTSP server.  Try first with the default port number (554),
   // and then with the alternative port number (8554):
+	// 尝试使用端口号 554 或者 8554 创建 rtsp服务
   RTSPServer* rtspServer;
+// typedef u_int16_t portNumBits;
   portNumBits rtspServerPortNum = 554;
   rtspServer = DynamicRTSPServer::createNew(*env, rtspServerPortNum, authDB);
   if (rtspServer == NULL) {
@@ -99,6 +106,7 @@ int main(int argc, char** argv) {
     *env << "(RTSP-over-HTTP tunneling is not available.)\n";
   }
 
+	// 之前创建的运行环境实例,和调度器实例,这里用上了
   env->taskScheduler().doEventLoop(); // does not return
 
   return 0; // only to prevent compiler warning

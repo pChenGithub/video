@@ -26,10 +26,17 @@ int main(int argc, char** argv) {
   // Begin by setting up our usage environment:
 	// BasicTaskScheduler  是 TaskScheduler的子类
 	// 创建了一个任务调度类,这个类里面有一个任务队列维护,提交的延时任务
-	// 但是没有看到哪里启动延时任务队列的轮寻
+	// 但是没有看到哪里启动延时任务队列的轮寻???
+	// 在main的最后调用了 BasicTaskScheduler 的事件循环 .doEventLoop
+	// 然后调用了 BasicTaskScheduler 的 SingleStep,,,在SingleStep里面实现了对 BasicTaskScheduler0 内部队列的轮寻
   TaskScheduler* scheduler = BasicTaskScheduler::createNew();
 	// UsageEnvironment 是 BasicUsageEnvironment 的父类
 	// 这里创建了一个运行环境,并把任务调度类传到这个环境里
+	// 这个类里面有 几个属性
+	// TaskScheduler
+	// 消息缓存数组
+	// void* liveMediaPriv;
+	// void* groupsockPriv;
   UsageEnvironment* env = BasicUsageEnvironment::createNew(*scheduler);
 
 	// 这段是权限控制的,,,暂时不去研究!!!

@@ -30,6 +30,7 @@ DynamicRTSPServer::createNew(UsageEnvironment& env, Port ourPort,
   int ourSocketIPv6 = setUpOurSocket(env, ourPort, AF_INET6);
   if (ourSocketIPv4 < 0 && ourSocketIPv6 < 0) return NULL;
 
+	// 实例化服务
   return new DynamicRTSPServer(env, ourSocketIPv4, ourSocketIPv6, ourPort,
 			       authDatabase, reclamationTestSeconds);
 }

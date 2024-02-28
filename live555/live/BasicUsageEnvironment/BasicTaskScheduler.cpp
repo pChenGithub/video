@@ -214,16 +214,20 @@ void BasicTaskScheduler::SingleStep(unsigned maxDelayTime) {
 
   // Also handle any newly-triggered event (Note that we do this *after* calling a socket handler,
   // in case the triggered event handler modifies The set of readable sockets.)
+	// 如果事件触发器被使用???
+	// 添加触发器后,,这个个变量会被置位true
   if (fEventTriggersAreBeingUsed) {
     // Look for an event trigger that needs handling (making sure that we make forward progress through all possible triggers):
     unsigned i = fLastUsedTriggerNum;
     EventTriggerId mask = fLastUsedTriggerMask;
 
     do {
+	// 下标和掩码右移
       i = (i+1)%MAX_NUM_EVENT_TRIGGERS;
       mask >>= 1;
       if (mask == 0) mask = EVENT_TRIGGER_ID_HIGH_BIT;
 
+// 这里是检查触发器是否触发
 #ifndef NO_STD_LIB
       if (fTriggersAwaitingHandling[i].test()) {
 	fTriggersAwaitingHandling[i].clear();
@@ -231,14 +235,18 @@ void BasicTaskScheduler::SingleStep(unsigned maxDelayTime) {
       if (fTriggersAwaitingHandling[i]) {
 	fTriggersAwaitingHandling[i] = False;
 #endif
+	// 如果是有效的触发器,,,执行触发器的回调函数
 	if (fTriggeredEventHandlers[i] != NULL) {
 	  (*fTriggeredEventHandlers[i])(fTriggeredEventClientDatas[i]);
 	}
 
+	// 执行完一个触发器,,更新下标后跳出循环
+	// 每次执行只检查一个触发器
 	fLastUsedTriggerMask = mask;
 	fLastUsedTriggerNum = i;
 	break;
       }
+	// 遍历从 fLastUsedTriggerNum+1开始,,,fLastUsedTriggerNum结束
     } while (i != fLastUsedTriggerNum);
   }
 

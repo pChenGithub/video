@@ -189,6 +189,7 @@ int GenericMediaServer::setUpOurSocket(UsageEnvironment& env, Port& ourPort, int
 #endif
     
     // 创建socket
+	// 里面还设置了不少的属性配置,这里先不关注???
     ourSocket = setupStreamSocket(env, ourPort, domain, True, True);
     if (ourSocket < 0) break;
     

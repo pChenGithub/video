@@ -92,6 +92,13 @@ class HandlerSet; // forward
 // An abstract base class, useful for subclassing
 // (e.g., to redefine the implementation of socket event handling)
 // TaskScheduler 父类的构造函数没有做任何事情
+// 集合,,队列,,触发器都在这个类实现
+// 实现了队列任务,触发器的操作接口
+// 实现了事件循环处理
+//********************************************
+// 触发器,添加触发器后,触发一次执行一次
+// 延时队列,添加一个延时任务,时间到达后执行,,执行后会出队销毁
+// socket描述符集合,监听到有读写错误信息,做相应操作
 class BasicTaskScheduler0: public TaskScheduler {
 public:
   virtual ~BasicTaskScheduler0();
@@ -114,6 +121,7 @@ public:
 	// 在 BasicTaskScheduler0 中实现,,,调用了 SingleStep
   virtual void doEventLoop(char volatile* watchVariable);
 
+	// 触发器操作接口
   virtual EventTriggerId createEventTrigger(TaskFunc* eventHandlerProc);
   virtual void deleteEventTrigger(EventTriggerId eventTriggerId);
   virtual void triggerEvent(EventTriggerId eventTriggerId, void* clientData = NULL);
@@ -146,11 +154,13 @@ protected:
 	// 标记哪个触发器在使用???,最多32个
   u_int32_t fLastUsedTriggerMask; // implemented as a 32-bit bitmap
 	// 触发器的回调函数
+// #define MAX_NUM_EVENT_TRIGGERS 32
   TaskFunc* fTriggeredEventHandlers[MAX_NUM_EVENT_TRIGGERS];
 	// 触发器的回调函数参数
   void* fTriggeredEventClientDatas[MAX_NUM_EVENT_TRIGGERS];
 	// 最后一个触发器下标
   unsigned fLastUsedTriggerNum; // in the range [0,MAX_NUM_EVENT_TRIGGERS)
+	// 是否启用触发器
   Boolean fEventTriggersAreBeingUsed;
 };
 

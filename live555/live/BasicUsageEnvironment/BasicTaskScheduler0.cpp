@@ -113,14 +113,27 @@ void BasicTaskScheduler0::doEventLoop(char volatile* watchVariable) {
 
 // 直译:创建一个事件触发器
 EventTriggerId BasicTaskScheduler0::createEventTrigger(TaskFunc* eventHandlerProc) {
+	// 获取最后一个触发器下标
   unsigned i = fLastUsedTriggerNum;
+	// fLastUsedTriggerMask 设初始化为1
   u_int32_t mask = fLastUsedTriggerMask;
 
   do {
+	// 如果超过最大触发器个数,从0下标重新开始
+	// 添加触发器的时候,下标从最后一个下标,的后面一个下标开始添加
     i = (i+1)%MAX_NUM_EVENT_TRIGGERS;
+	// 每次右移,,,不太清楚为什么
     mask >>= 1;
+// #define EVENT_TRIGGER_ID_HIGH_BIT (1 << (MAX_NUM_EVENT_TRIGGERS-1))
+	// 为0x80000000最高位为1
+	// 这里相当于是循环右移
+	// 理解:mask是第一个空闲触发器的下标标记位置
     if (mask == 0) mask = EVENT_TRIGGER_ID_HIGH_BIT;
 
+	// 这里判断回调函数是否为空,,,如果不为空,说明已经有触发器占用,,,
+	// 尝试下一个下标,,,直到下标再次变成 fLastUsedTriggerNum
+	// 如果,是空闲的,,,填充数组元素,,,移动fLastUsedTriggerNum到此
+	// 添加触发器后设置 调度器的触发器使能
     if (fTriggeredEventHandlers[i] == NULL) {
       // This trigger number is free; use it:
       fTriggeredEventHandlers[i] = eventHandlerProc;
@@ -132,28 +145,39 @@ EventTriggerId BasicTaskScheduler0::createEventTrigger(TaskFunc* eventHandlerPro
 
       return mask;
     }
+	// i是fLastUsedTriggerNum+1开始的,fLastUsedTriggerNum结束
   } while (i != fLastUsedTriggerNum);
 
   // All available event triggers are allocated; return 0 instead:
   return 0;
 }
 
+// 删除一个触发器
+// 删除触发器,,,下标信息不会变化,,,下次添加还是从,下标信息后一个开始
+// 所以经过增删过程,,,有效的触发器在数组中不是连续的
 void BasicTaskScheduler0::deleteEventTrigger(EventTriggerId eventTriggerId) {
   // "eventTriggerId" should have just one bit set.
   // However, we do the reasonable thing if the user happened to 'or' together two or more "EventTriggerId"s:
+	// 0x80000000
   EventTriggerId mask = EVENT_TRIGGER_ID_HIGH_BIT;
   Boolean eventTriggersAreBeingUsed = False;
 
   for (unsigned i = 0; i < MAX_NUM_EVENT_TRIGGERS; ++i) {
+	// 找到eventTriggerId对应的下标的触发器
+	// 回调函数,和参数置位NULL
     if ((eventTriggerId&mask) != 0) {
+	// 清除触发器触发标记
 #ifndef NO_STD_LIB
       fTriggersAwaitingHandling[i].clear();
 #else
       fTriggersAwaitingHandling[i] = False;
 #endif
+	// 回调函数和参数设置为空
       fTriggeredEventHandlers[i] = NULL;
       fTriggeredEventClientDatas[i] = NULL;
     } else if (fTriggeredEventHandlers[i] != NULL) {
+	// 如果其他有触发器,回调函数不为空
+	// 标记触发器使能
       eventTriggersAreBeingUsed = True;
     }
     mask >>= 1;
@@ -162,12 +186,17 @@ void BasicTaskScheduler0::deleteEventTrigger(EventTriggerId eventTriggerId) {
   fEventTriggersAreBeingUsed = eventTriggersAreBeingUsed;
 }
 
+// 触发器的触发
 void BasicTaskScheduler0::triggerEvent(EventTriggerId eventTriggerId, void* clientData) {
   // First, record the "clientData".  (Note that we allow "eventTriggerId" to be a combination of bits for multiple events.)
   EventTriggerId mask = EVENT_TRIGGER_ID_HIGH_BIT;
+	// 遍历触发器
   for (unsigned i = 0; i < MAX_NUM_EVENT_TRIGGERS; ++i) {
+	// 找到指定下标的触发器
     if ((eventTriggerId&mask) != 0) {
+	// 给回调参数赋值,,,之前添加触发器的时候,并没有给回调函数参数赋值
       fTriggeredEventClientDatas[i] = clientData;
+	// 标记触发器被触发
 #ifndef NO_STD_LIB
       (void)fTriggersAwaitingHandling[i].test_and_set();
 #else

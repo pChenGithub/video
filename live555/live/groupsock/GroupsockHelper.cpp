@@ -68,6 +68,7 @@ NoReuse::~NoReuse() {
 }
 
 
+// 如果运行环境有groupsockPriv,,,直接返回,,,,没有,创建一个再返回,,,且初始化 运行环境的 groupsockPriv
 _groupsockPriv* groupsockPriv(UsageEnvironment& env) {
   if (env.groupsockPriv == NULL) { // We need to create it
     _groupsockPriv* result = new _groupsockPriv;
@@ -303,6 +304,7 @@ int setupStreamSocket(UsageEnvironment& env, Port port, int domain,
     return newSocket;
   }
 
+	// 	
   int reuseFlag = groupsockPriv(env)->reuseFlag;
   reclaimGroupsockPriv(env);
   if (setsockopt(newSocket, SOL_SOCKET, SO_REUSEADDR,

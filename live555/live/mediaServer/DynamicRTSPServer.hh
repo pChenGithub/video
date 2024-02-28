@@ -27,17 +27,20 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 class DynamicRTSPServer: public RTSPServer {
 public:
+	// 实例化函数
   static DynamicRTSPServer* createNew(UsageEnvironment& env, Port ourPort,
 				      UserAuthenticationDatabase* authDatabase,
 				      unsigned reclamationTestSeconds = 65);
 
 protected:
+	// 构造函数
   DynamicRTSPServer(UsageEnvironment& env, int ourSocketIPv4, int ourSocketIPv6, Port ourPort,
 		    UserAuthenticationDatabase* authDatabase, unsigned reclamationTestSeconds);
   // called only by createNew();
   virtual ~DynamicRTSPServer();
 
 protected: // redefined virtual functions
+	// 查找ServerMediaSession???
   virtual void lookupServerMediaSession(char const* streamName,
 					lookupServerMediaSessionCompletionFunc* completionFunc,
 					void* completionClientData,

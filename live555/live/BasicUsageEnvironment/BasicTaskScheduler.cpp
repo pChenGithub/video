@@ -257,25 +257,33 @@ void BasicTaskScheduler::SingleStep(unsigned maxDelayTime) {
   fDelayQueue.handleAlarm();
 }
 
+// 设置一个socket的 读写，错误到到集合，加入监听
+// conditionSet是读写，错误标记
 void BasicTaskScheduler
   ::setBackgroundHandling(int socketNum, int conditionSet, BackgroundHandlerProc* handlerProc, void* clientData) {
   if (socketNum < 0) return;
 #if !defined(__WIN32__) && !defined(_WIN32) && defined(FD_SETSIZE)
   if (socketNum >= (int)(FD_SETSIZE)) return;
 #endif
+	// 如果原来已经加入了 这个 socket监听，清除
   FD_CLR((unsigned)socketNum, &fReadSet);
   FD_CLR((unsigned)socketNum, &fWriteSet);
   FD_CLR((unsigned)socketNum, &fExceptionSet);
+	// 如果没有设置读写还是错误位,从集合中清除这个socket，
+	// 如果 是当前监听最大的socket，那么fMaxNumSockets 得减去1
   if (conditionSet == 0) {
     fHandlers->clearHandler(socketNum);
     if (socketNum+1 == fMaxNumSockets) {
       --fMaxNumSockets;
     }
   } else {
+	// 设置了读写或者错误条件，将这个socket加入集合，监听
+	// 如果socket+1大于 fMaxNumSockets，修改 fMaxNumSockets
     fHandlers->assignHandler(socketNum, conditionSet, handlerProc, clientData);
     if (socketNum+1 > fMaxNumSockets) {
       fMaxNumSockets = socketNum+1;
     }
+	// 根据监听条件，加入不同类别的监听 
     if (conditionSet&SOCKET_READABLE) FD_SET((unsigned)socketNum, &fReadSet);
     if (conditionSet&SOCKET_WRITABLE) FD_SET((unsigned)socketNum, &fWriteSet);
     if (conditionSet&SOCKET_EXCEPTION) FD_SET((unsigned)socketNum, &fExceptionSet);

@@ -145,6 +145,7 @@ public:
     #define SOCKET_WRITABLE    (1<<2)
     #define SOCKET_EXCEPTION   (1<<3)
   virtual void setBackgroundHandling(int socketNum, int conditionSet, BackgroundHandlerProc* handlerProc, void* clientData) = 0;
+	// 移除也是调用的 加入集合接口，，条件参数设置为0，，可以移除
   void disableBackgroundHandling(int socketNum) { setBackgroundHandling(socketNum, 0, NULL, NULL); }
   virtual void moveSocketHandling(int oldSocketNum, int newSocketNum) = 0;
         // Changes any socket handling for "oldSocketNum" so that occurs with "newSocketNum" instead.
@@ -170,10 +171,12 @@ public:
       // it should not be called again with the same 'event trigger id' until after its event
       // has been handled.)
 
+	// 设置一个socket的 读到到集合，加入监听
   // The following two functions are deprecated, and are provided for backwards-compatibility only:
   void turnOnBackgroundReadHandling(int socketNum, BackgroundHandlerProc* handlerProc, void* clientData) {
     setBackgroundHandling(socketNum, SOCKET_READABLE, handlerProc, clientData);
   }
+	// 移除集合，移除监听
   void turnOffBackgroundReadHandling(int socketNum) { disableBackgroundHandling(socketNum); }
 
   virtual void internalError(); // used to 'handle' a 'should not occur'-type error condition within the library.

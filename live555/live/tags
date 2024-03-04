@@ -52,7 +52,7 @@ AMRDeinterleaver	liveMedia/AMRAudioRTPSource.cpp	/^class AMRDeinterleaver: publi
 AMRDeinterleavingBuffer	liveMedia/AMRAudioRTPSource.cpp	/^::AMRDeinterleavingBuffer(unsigned numChannels, unsigned maxInterleaveGroupSize)$/;"	f	class:AMRDeinterleavingBuffer
 AMRDeinterleavingBuffer	liveMedia/AMRAudioRTPSource.cpp	/^class AMRDeinterleavingBuffer {$/;"	c	file:
 AMR_MAX_FRAME_SIZE	liveMedia/AMRAudioRTPSource.cpp	378;"	d	file:
-ANDROID_OLD_NDK	groupsock/GroupsockHelper.cpp	1097;"	d	file:
+ANDROID_OLD_NDK	groupsock/GroupsockHelper.cpp	1099;"	d	file:
 ANDROID_OLD_NDK	groupsock/GroupsockHelper.cpp	34;"	d	file:
 AUDIO	liveMedia/MPEG2TransportStreamParser.hh	/^  enum dataType { AUDIO, VIDEO, DATA, TEXT, UNKNOWN } dataType;$/;"	e	enum:StreamType::dataType
 AUHeader	liveMedia/MPEG4GenericRTPSource.cpp	/^struct AUHeader {$/;"	s	file:
@@ -73,11 +73,11 @@ AVIIndexRecord	liveMedia/AVIFileSink.cpp	/^class AVIIndexRecord {$/;"	c	file:
 AVISubsessionIOState	liveMedia/AVIFileSink.cpp	/^AVISubsessionIOState::AVISubsessionIOState(AVIFileSink& sink,$/;"	f	class:AVISubsessionIOState
 AVISubsessionIOState	liveMedia/AVIFileSink.cpp	/^class AVISubsessionIOState {$/;"	c	file:
 AVI_MASTER_INDEX_SIZE	liveMedia/AVIFileSink.cpp	767;"	d	file:
-AWAITING_DOLLAR	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon3	file:
-AWAITING_PACKET_DATA	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon3	file:
-AWAITING_SIZE1	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon3	file:
-AWAITING_SIZE2	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon3	file:
-AWAITING_STREAM_CHANNEL_ID	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon3	file:
+AWAITING_DOLLAR	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon1	file:
+AWAITING_PACKET_DATA	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon1	file:
+AWAITING_SIZE1	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon1	file:
+AWAITING_SIZE2	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon1	file:
+AWAITING_STREAM_CHANNEL_ID	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	e	enum:SocketDescriptor::__anon1	file:
 Add	BasicUsageEnvironment/BasicHashTable.cpp	/^void* BasicHashTable::Add(char const* key, void* value) {$/;"	f	class:BasicHashTable
 Add	groupsock/NetAddress.cpp	/^void* AddressPortLookupTable::Add(struct sockaddr_storage const& address1,$/;"	f	class:AddressPortLookupTable
 Add	groupsock/include/NetAddress.hh	/^  void* Add(struct sockaddr_storage const& address1,$/;"	f	class:AddressPortLookupTable
@@ -215,7 +215,7 @@ DELAY_USECS_AFTER_REGISTER_RESPONSE	liveMedia/RTSPServerRegister.cpp	223;"	d	fil
 DELIVERING_FRAME_BYTES	liveMedia/MatroskaFileParser.hh	/^  DELIVERING_FRAME_BYTES$/;"	e	enum:MatroskaParseState
 DELIVERING_FRAME_WITHIN_BLOCK	liveMedia/MatroskaFileParser.hh	/^  DELIVERING_FRAME_WITHIN_BLOCK,$/;"	e	enum:MatroskaParseState
 DELIVERING_PACKET_WITHIN_PAGE	liveMedia/OggFileParser.hh	/^  DELIVERING_PACKET_WITHIN_PAGE$/;"	e	enum:OggParseState
-DELIVERING_SAVED_FRAME	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^    DELIVERING_SAVED_FRAME,$/;"	e	enum:MPEG2TransportStreamTrickModeFilter::__anon9
+DELIVERING_SAVED_FRAME	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^    DELIVERING_SAVED_FRAME,$/;"	e	enum:MPEG2TransportStreamTrickModeFilter::__anon2
 DESCRIBELookupCompletionFunction	liveMedia/RTSPServer.cpp	/^::DESCRIBELookupCompletionFunction(void* clientData, ServerMediaSession* sessionLookedUp) {$/;"	f	class:RTSPServer::RTSPClientConnection
 DH	liveMedia/MIKEY.cpp	/^		       DH = 3,$/;"	e	enum:MIKEYPayloadType	file:
 DIGEST_SIZE_AS_STRING	liveMedia/ourMD5.cpp	28;"	d	file:
@@ -294,7 +294,7 @@ EINTR	groupsock/include/NetCommon.h	51;"	d
 ERR	liveMedia/MIKEY.cpp	/^		       ERR = 12,$/;"	e	enum:MIKEYPayloadType	file:
 EVENT_BYE	liveMedia/rtcp_from_spec.h	49;"	d
 EVENT_REPORT	liveMedia/rtcp_from_spec.h	48;"	d
-EVENT_TRIGGER_ID_HIGH_BIT	BasicUsageEnvironment/include/BasicUsageEnvironment0.hh	81;"	d
+EVENT_TRIGGER_ID_HIGH_BIT	BasicUsageEnvironment/include/BasicUsageEnvironment0.hh	90;"	d
 EVENT_UNKNOWN	liveMedia/rtcp_from_spec.h	47;"	d
 EWOULDBLOCK	groupsock/include/NetCommon.h	37;"	d
 EWOULDBLOCK	groupsock/include/NetCommon.h	48;"	d
@@ -457,10 +457,10 @@ INCLUDES	WindowsAudioInputDevice/WindowsAudioInputDevice.mak	/^INCLUDES = -I..\/
 INDEX_RECORD_SIZE	liveMedia/include/MPEG2TransportStreamIndexFile.hh	31;"	d
 INPUT_BUFFER_SIZE	liveMedia/MPEG2TransportStreamFromESSource.cpp	25;"	d	file:
 INT_MAX	BasicUsageEnvironment/DelayQueue.cpp	82;"	d	file:
-IP_ADD_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	666;"	d	file:
-IP_ADD_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	669;"	d	file:
-IP_DROP_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	667;"	d	file:
-IP_DROP_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	670;"	d	file:
+IP_ADD_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	668;"	d	file:
+IP_ADD_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	671;"	d	file:
+IP_DROP_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	669;"	d	file:
+IP_DROP_SOURCE_MEMBERSHIP	groupsock/GroupsockHelper.cpp	672;"	d	file:
 IP_UDP_HDR_SIZE	liveMedia/RTCP.cpp	/^static unsigned const IP_UDP_HDR_SIZE = 28;$/;"	v	file:
 IndexRecord	liveMedia/MPEG2IndexFromTransportStream.cpp	/^IndexRecord::IndexRecord(u_int8_t startOffset, u_int8_t size,$/;"	f	class:IndexRecord
 IndexRecord	liveMedia/MPEG2IndexFromTransportStream.cpp	/^class IndexRecord {$/;"	c	file:
@@ -549,16 +549,16 @@ Lookup	groupsock/NetAddress.cpp	/^void* AddressPortLookupTable::Lookup(struct so
 Lookup	groupsock/include/NetAddress.hh	/^  void* Lookup(struct sockaddr_storage const& address1,$/;"	f	class:AddressPortLookupTable
 MAKE_SOCKADDR_IN	groupsock/include/GroupsockHelper.hh	112;"	d
 MAKE_SOCKADDR_IN6	groupsock/include/GroupsockHelper.hh	118;"	d
-MARKER_APP_FIRST	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_APP_FIRST	= 0xe0,$/;"	e	enum:__anon14	file:
-MARKER_APP_LAST	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_APP_LAST		= 0xef,$/;"	e	enum:__anon14	file:
-MARKER_COMMENT	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_COMMENT		= 0xfe,$/;"	e	enum:__anon14	file:
-MARKER_DHT	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_DHT  = 0xc4,		\/\/ huffman tables$/;"	e	enum:__anon14	file:
-MARKER_DQT	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_DQT	= 0xdb,		\/\/ define quantization tables$/;"	e	enum:__anon14	file:
-MARKER_DRI	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_DRI	= 0xdd,		\/\/ restart interval$/;"	e	enum:__anon14	file:
-MARKER_EOI	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_EOI	= 0xd9,		\/\/ end of image$/;"	e	enum:__anon14	file:
-MARKER_SOF0	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_SOF0	= 0xc0,		\/\/ start-of-frame, baseline scan$/;"	e	enum:__anon14	file:
-MARKER_SOI	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_SOI	= 0xd8,		\/\/ start of image$/;"	e	enum:__anon14	file:
-MARKER_SOS	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_SOS	= 0xda,		\/\/ start of scan$/;"	e	enum:__anon14	file:
+MARKER_APP_FIRST	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_APP_FIRST	= 0xe0,$/;"	e	enum:__anon8	file:
+MARKER_APP_LAST	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_APP_LAST		= 0xef,$/;"	e	enum:__anon8	file:
+MARKER_COMMENT	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_COMMENT		= 0xfe,$/;"	e	enum:__anon8	file:
+MARKER_DHT	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_DHT  = 0xc4,		\/\/ huffman tables$/;"	e	enum:__anon8	file:
+MARKER_DQT	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_DQT	= 0xdb,		\/\/ define quantization tables$/;"	e	enum:__anon8	file:
+MARKER_DRI	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_DRI	= 0xdd,		\/\/ restart interval$/;"	e	enum:__anon8	file:
+MARKER_EOI	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_EOI	= 0xd9,		\/\/ end of image$/;"	e	enum:__anon8	file:
+MARKER_SOF0	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_SOF0	= 0xc0,		\/\/ start-of-frame, baseline scan$/;"	e	enum:__anon8	file:
+MARKER_SOI	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_SOI	= 0xd8,		\/\/ start of image$/;"	e	enum:__anon8	file:
+MARKER_SOS	liveMedia/JPEGVideoRTPSource.cpp	/^	MARKER_SOS	= 0xda,		\/\/ start of scan$/;"	e	enum:__anon8	file:
 MATROSKA_ID_ATTACHED_FILE	liveMedia/EBMLNumber.hh	110;"	d
 MATROSKA_ID_ATTACHMENTS	liveMedia/EBMLNumber.hh	109;"	d
 MATROSKA_ID_AUDIO	liveMedia/EBMLNumber.hh	98;"	d
@@ -655,7 +655,7 @@ MAX_LENGTH	liveMedia/BitVector.cpp	41;"	d	file:
 MAX_LINES_IN_PACKET	liveMedia/RawVideoRTPSink.cpp	144;"	d	file:
 MAX_MP3_FRAME_SIZE	liveMedia/MP3Internals.hh	64;"	d
 MAX_NUM_CHANNELS	liveMedia/AMRAudioRTPSource.cpp	109;"	d	file:
-MAX_NUM_EVENT_TRIGGERS	BasicUsageEnvironment/include/BasicUsageEnvironment0.hh	79;"	d
+MAX_NUM_EVENT_TRIGGERS	BasicUsageEnvironment/include/BasicUsageEnvironment0.hh	88;"	d
 MAX_PACKET_SIZE	liveMedia/MultiFramedRTPSource.cpp	352;"	d	file:
 MAX_PES_PACKET_SIZE	liveMedia/MPEG2TransportStreamFromPESSource.cpp	23;"	d	file:
 MAX_PES_PACKET_SIZE	liveMedia/include/MPEG2IndexFromTransportStream.hh	33;"	d
@@ -677,7 +677,7 @@ MIKEYPayloadType	liveMedia/MIKEY.cpp	/^enum MIKEYPayloadType {$/;"	g	file:
 MIKEYState	liveMedia/MIKEY.cpp	/^MIKEYState::MIKEYState(Boolean useEncryption)$/;"	f	class:MIKEYState
 MIKEYState	liveMedia/MIKEY.cpp	/^MIKEYState::MIKEYState(u_int8_t const* messageToParse, unsigned messageSize, Boolean& parsedOK)$/;"	f	class:MIKEYState
 MIKEYState	liveMedia/include/MIKEY.hh	/^class MIKEYState {$/;"	c
-MILLION	BasicUsageEnvironment/BasicTaskScheduler.cpp	63;"	d	file:
+MILLION	BasicUsageEnvironment/BasicTaskScheduler.cpp	76;"	d	file:
 MILLION	BasicUsageEnvironment/DelayQueue.cpp	/^static const int MILLION = 1000000;$/;"	v	file:
 MILLION	liveMedia/AC3AudioStreamFramer.cpp	127;"	d	file:
 MILLION	liveMedia/DVVideoStreamFramer.cpp	152;"	d	file:
@@ -894,7 +894,7 @@ MultiFramedRTPSource	liveMedia/include/MultiFramedRTPSource.hh	/^class MultiFram
 NEWLOCALE_NOT_USED	liveMedia/include/Locale.hh	40;"	d
 NEWLOCALE_NOT_USED	liveMedia/include/Locale.hh	43;"	d
 NEW_DURATION_WEIGHT	liveMedia/MPEG2TransportStreamFramer.cpp	31;"	d	file:
-NEW_SMS	mediaServer/DynamicRTSPServer.cpp	115;"	d	file:
+NEW_SMS	mediaServer/DynamicRTSPServer.cpp	117;"	d	file:
 NODEBUG	WindowsAudioInputDevice/WindowsAudioInputDevice.mak	/^NODEBUG=1$/;"	m
 NO_MORE_BUFFERED_INPUT	liveMedia/StreamParser.cpp	119;"	d	file:
 NO_STRSTREAM	groupsock/include/NetCommon.h	54;"	d
@@ -1229,7 +1229,7 @@ S41	liveMedia/ourMD5.cpp	202;"	d	file:
 S42	liveMedia/ourMD5.cpp	203;"	d	file:
 S43	liveMedia/ourMD5.cpp	204;"	d	file:
 S44	liveMedia/ourMD5.cpp	205;"	d	file:
-SAVING_AND_DELIVERING_FRAME	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^    SAVING_AND_DELIVERING_FRAME$/;"	e	enum:MPEG2TransportStreamTrickModeFilter::__anon9
+SAVING_AND_DELIVERING_FRAME	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^    SAVING_AND_DELIVERING_FRAME$/;"	e	enum:MPEG2TransportStreamTrickModeFilter::__anon2
 SBLIMIT	liveMedia/MP3Internals.hh	63;"	d
 SCR	liveMedia/MPEG1or2Demux.cpp	/^MPEG1or2Demux::SCR::SCR()$/;"	f	class:MPEG1or2Demux::SCR
 SCR	liveMedia/include/MPEG1or2Demux.hh	/^  class SCR {$/;"	c	class:MPEG1or2Demux
@@ -1258,12 +1258,12 @@ SIMPLE_PES_HEADER_SIZE	liveMedia/MPEG2TransportStreamFromESSource.cpp	24;"	d	fil
 SIPClient	liveMedia/SIPClient.cpp	/^SIPClient::SIPClient(UsageEnvironment& env,$/;"	f	class:SIPClient
 SIPClient	liveMedia/include/SIPClient.hh	/^class SIPClient: public Medium {$/;"	c
 SIZEOF_HUFFBITS	liveMedia/MP3InternalsHuffman.cpp	318;"	d	file:
-SKIPPING_FRAME	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^    SKIPPING_FRAME,$/;"	e	enum:MPEG2TransportStreamTrickModeFilter::__anon9
+SKIPPING_FRAME	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^    SKIPPING_FRAME,$/;"	e	enum:MPEG2TransportStreamTrickModeFilter::__anon2
 SKIP_WHITESPACE	liveMedia/RTSPServer.cpp	1021;"	d	file:
 SMALL_HASH_TABLE_SIZE	BasicUsageEnvironment/include/BasicHashTable.hh	33;"	d
-SOCKET_EXCEPTION	UsageEnvironment/include/UsageEnvironment.hh	137;"	d
-SOCKET_READABLE	UsageEnvironment/include/UsageEnvironment.hh	135;"	d
-SOCKET_WRITABLE	UsageEnvironment/include/UsageEnvironment.hh	136;"	d
+SOCKET_EXCEPTION	UsageEnvironment/include/UsageEnvironment.hh	146;"	d
+SOCKET_READABLE	UsageEnvironment/include/UsageEnvironment.hh	144;"	d
+SOCKET_WRITABLE	UsageEnvironment/include/UsageEnvironment.hh	145;"	d
 SOCKLEN_T	groupsock/include/NetCommon.h	123;"	d
 SP	liveMedia/MIKEY.cpp	/^		       SP = 10,$/;"	e	enum:MIKEYPayloadType	file:
 SPECIAL_HEADER_BUFFER_SIZE	liveMedia/include/H263plusVideoRTPSource.hh	28;"	d
@@ -1271,7 +1271,7 @@ SPS_MAX_SIZE	liveMedia/H264or5VideoStreamFramer.cpp	109;"	d	file:
 SPropRecord	liveMedia/include/H264VideoRTPSource.hh	/^class SPropRecord {$/;"	c
 SRTPCryptographicContext	liveMedia/SRTPCryptographicContext.cpp	/^::SRTPCryptographicContext(MIKEYState const& mikeyState)$/;"	f	class:SRTPCryptographicContext
 SRTPCryptographicContext	liveMedia/include/SRTPCryptographicContext.hh	/^class SRTPCryptographicContext {$/;"	c
-SRTPKeyDerivationLabel	liveMedia/include/SRTPCryptographicContext.hh	/^  } SRTPKeyDerivationLabel;$/;"	t	class:SRTPCryptographicContext	typeref:enum:SRTPCryptographicContext::__anon5
+SRTPKeyDerivationLabel	liveMedia/include/SRTPCryptographicContext.hh	/^  } SRTPKeyDerivationLabel;$/;"	t	class:SRTPCryptographicContext	typeref:enum:SRTPCryptographicContext::__anon7
 SRTPPolicyParamTypeExplanation	testProgs/mikeyParse.cpp	/^static char const* SRTPPolicyParamTypeExplanation[] = {$/;"	v	file:
 SRTP_AUTH_KEY_LENGTH	liveMedia/include/SRTPCryptographicContext.hh	57;"	d
 SRTP_AUTH_TAG_LENGTH	liveMedia/include/SRTPCryptographicContext.hh	58;"	d
@@ -1380,7 +1380,7 @@ TRUE	liveMedia/rtcp_from_spec.h	73;"	d
 TRUNC_FAIRLY	liveMedia/MP3Internals.cpp	234;"	d	file:
 TRUNC_FAVORa	liveMedia/MP3InternalsHuffman.cpp	43;"	d	file:
 TS_FROM_ES_LOW_WATER_MARK	liveMedia/MPEG2TransportStreamFromESSource.cpp	27;"	d	file:
-TTL_TYPE	groupsock/GroupsockHelper.cpp	432;"	d	file:
+TTL_TYPE	groupsock/GroupsockHelper.cpp	434;"	d	file:
 TWO_BYTE_DESCR_FLAG	liveMedia/MP3ADUdescriptor.cpp	27;"	d	file:
 TYPE_0	groupsock/inet.c	116;"	d	file:
 TYPE_1	groupsock/inet.c	121;"	d	file:
@@ -1464,12 +1464,12 @@ WAVAudioFileServerMediaSubsession	liveMedia/WAVAudioFileServerMediaSubsession.cp
 WAVAudioFileServerMediaSubsession	liveMedia/include/WAVAudioFileServerMediaSubsession.hh	/^class WAVAudioFileServerMediaSubsession: public FileServerMediaSubsession{$/;"	c
 WAVAudioFileSource	liveMedia/WAVAudioFileSource.cpp	/^WAVAudioFileSource::WAVAudioFileSource(UsageEnvironment& env, FILE* fid)$/;"	f	class:WAVAudioFileSource
 WAVAudioFileSource	liveMedia/include/WAVAudioFileSource.hh	/^class WAVAudioFileSource: public AudioInputDevice {$/;"	c
-WAV_AUDIO_FORMAT	liveMedia/include/WAVAudioFileSource.hh	/^} WAV_AUDIO_FORMAT;$/;"	t	typeref:enum:__anon4
-WA_IMA_ADPCM	liveMedia/include/WAVAudioFileSource.hh	/^  WA_IMA_ADPCM = 0x11,$/;"	e	enum:__anon4
-WA_PCM	liveMedia/include/WAVAudioFileSource.hh	/^  WA_PCM = 0x01,$/;"	e	enum:__anon4
-WA_PCMA	liveMedia/include/WAVAudioFileSource.hh	/^  WA_PCMA = 0x06,$/;"	e	enum:__anon4
-WA_PCMU	liveMedia/include/WAVAudioFileSource.hh	/^  WA_PCMU = 0x07,$/;"	e	enum:__anon4
-WA_UNKNOWN	liveMedia/include/WAVAudioFileSource.hh	/^  WA_UNKNOWN$/;"	e	enum:__anon4
+WAV_AUDIO_FORMAT	liveMedia/include/WAVAudioFileSource.hh	/^} WAV_AUDIO_FORMAT;$/;"	t	typeref:enum:__anon6
+WA_IMA_ADPCM	liveMedia/include/WAVAudioFileSource.hh	/^  WA_IMA_ADPCM = 0x11,$/;"	e	enum:__anon6
+WA_PCM	liveMedia/include/WAVAudioFileSource.hh	/^  WA_PCM = 0x01,$/;"	e	enum:__anon6
+WA_PCMA	liveMedia/include/WAVAudioFileSource.hh	/^  WA_PCMA = 0x06,$/;"	e	enum:__anon6
+WA_PCMU	liveMedia/include/WAVAudioFileSource.hh	/^  WA_PCMU = 0x07,$/;"	e	enum:__anon6
+WA_UNKNOWN	liveMedia/include/WAVAudioFileSource.hh	/^  WA_UNKNOWN$/;"	e	enum:__anon6
 WINDOWSAUDIOINPUTDEVICE_MIXER_LIB	WindowsAudioInputDevice/WindowsAudioInputDevice.mak	/^WINDOWSAUDIOINPUTDEVICE_MIXER_LIB = libWindowsAudioInputDevice_mixer.$(LIB_SUFFIX)$/;"	m
 WINDOWSAUDIOINPUTDEVICE_MIXER_LIB_OBJS	WindowsAudioInputDevice/WindowsAudioInputDevice.mak	/^WINDOWSAUDIOINPUTDEVICE_MIXER_LIB_OBJS = WindowsAudioInputDevice_common.$(OBJ) WindowsAudioInputDevice_mixer.$(OBJ)$/;"	m
 WINDOWSAUDIOINPUTDEVICE_NOMIXER_LIB	WindowsAudioInputDevice/WindowsAudioInputDevice.mak	/^WINDOWSAUDIOINPUTDEVICE_NOMIXER_LIB = libWindowsAudioInputDevice_noMixer.$(LIB_SUFFIX)$/;"	m
@@ -1727,7 +1727,7 @@ _strncasecmp	liveMedia/include/RTSPCommon.hh	33;"	d
 _strncasecmp	liveMedia/include/RTSPCommon.hh	36;"	d
 _strnicmp	liveMedia/include/Media.hh	44;"	d
 _vtoHdrs	liveMedia/include/OggFile.hh	/^  struct _vtoHdrs {$/;"	s	class:OggTrack
-_weHaveAnIPv4Address	groupsock/GroupsockHelper.cpp	808;"	d	file:
+_weHaveAnIPv4Address	groupsock/GroupsockHelper.cpp	810;"	d	file:
 _weHaveAnIPv6Address	groupsock/GroupsockHelper.cpp	/^static Boolean _weHaveAnIPv6Address = False;$/;"	v	file:
 absEndTime	liveMedia/MediaSession.cpp	/^char* MediaSession::absEndTime() const {$/;"	f	class:MediaSession
 absEndTime	liveMedia/MediaSession.cpp	/^char* MediaSubsession::absEndTime() const {$/;"	f	class:MediaSubsession
@@ -2059,7 +2059,7 @@ bytesUsedAtReadHead	WindowsAudioInputDevice/WindowsAudioInputDevice_common.cpp	/
 bytesUsedAtReadHead	WindowsAudioInputDevice/WindowsAudioInputDevice_common.hh	/^  static DWORD bytesUsedAtReadHead; \/\/ number of bytes that have already been read at head$/;"	m	class:WindowsAudioInputDevice_common
 calculateCRC	liveMedia/MPEG2TransportStreamMultiplexor.cpp	/^u_int32_t calculateCRC(u_int8_t const* data, unsigned dataLength, u_int32_t initialValue) {$/;"	f
 canDeliverNewFrameImmediately	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^  Boolean canDeliverNewFrameImmediately() const { return fInputBufferBytesUsed < fInputBufferSize; }$/;"	f	class:MPEG2TransportStreamMultiplexor
-ch	liveMedia/MP3Internals.hh	/^  } ch[2];$/;"	m	struct:MP3SideInfo	typeref:struct:MP3SideInfo::__anon11
+ch	liveMedia/MP3Internals.hh	/^  } ch[2];$/;"	m	struct:MP3SideInfo	typeref:struct:MP3SideInfo::__anon9
 changeClientInputSocket	liveMedia/RTSPServer.cpp	/^::changeClientInputSocket(int newSocketNum, ServerTLSState const* newTLSState,$/;"	f	class:RTSPServer::RTSPClientConnection
 changeDestinationParameters	groupsock/Groupsock.cpp	/^Groupsock::changeDestinationParameters(struct sockaddr_storage const& newDestAddr,$/;"	f	class:Groupsock
 changeInputSource	liveMedia/include/MPEG2TransportStreamFramer.hh	/^  void changeInputSource(FramedSource* newInputSource) { fInputSource = newInputSource; }$/;"	f	class:MPEG2TransportStreamFramer
@@ -2223,7 +2223,7 @@ copyUsernameOrPasswordStringFromURL	liveMedia/RTSPClient.cpp	/^static void copyU
 copyright	liveMedia/MP3Internals.hh	/^  Boolean copyright;$/;"	m	class:MP3FrameParams
 count1table_select	liveMedia/MP3Internals.hh	/^    unsigned count1table_select;$/;"	m	struct:MP3SideInfo::gr_info_s
 countPacket	groupsock/NetInterface.cpp	/^void NetInterfaceTrafficStats::countPacket(unsigned packetSize) {$/;"	f	class:NetInterfaceTrafficStats
-counter	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^    unsigned counter;$/;"	m	struct:MPEG2TransportStreamMultiplexor::__anon6
+counter	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^    unsigned counter;$/;"	m	struct:MPEG2TransportStreamMultiplexor::__anon4
 cpb_removal_delay_length_minus1	liveMedia/H264or5VideoStreamFramer.cpp	/^  unsigned cpb_removal_delay_length_minus1, dpb_output_delay_length_minus1;$/;"	m	class:H264or5VideoStreamParser	file:
 create	BasicUsageEnvironment/BasicHashTable.cpp	/^HashTable* HashTable::create(int keyType) {$/;"	f	class:HashTable
 create	BasicUsageEnvironment/BasicHashTable.cpp	/^HashTable::Iterator* HashTable::Iterator::create(HashTable const& hashTable) {$/;"	f	class:HashTable::Iterator
@@ -2579,7 +2579,7 @@ descriptorSize	liveMedia/MP3ADU.cpp	/^  unsigned descriptorSize;$/;"	m	class:Seg
 desiredAudioRTPPayloadFormat	testProgs/playCommon.cpp	/^unsigned char desiredAudioRTPPayloadFormat = 0;$/;"	v
 desiredMaxIncomingPacketSize	liveMedia/include/RTSPClient.hh	/^  u_int16_t desiredMaxIncomingPacketSize;$/;"	m	class:RTSPClient
 desiredPortNum	testProgs/playCommon.cpp	/^unsigned short desiredPortNum = 0;$/;"	v
-destFileOffset	liveMedia/QuickTimeFileSink.cpp	/^    int64_t destFileOffset; \/\/ used for non-hint tracks only$/;"	m	struct:SubsessionIOState::__anon13	file:
+destFileOffset	liveMedia/QuickTimeFileSink.cpp	/^    int64_t destFileOffset; \/\/ used for non-hint tracks only$/;"	m	struct:SubsessionIOState::__anon12	file:
 destRecord	groupsock/Groupsock.cpp	/^::destRecord(struct sockaddr_storage const& addr, Port const& port, u_int8_t ttl, unsigned sessionId,$/;"	f	class:destRecord
 destRecord	groupsock/include/Groupsock.hh	/^class destRecord {$/;"	c
 destinationAddress	testProgs/testMKVStreamer.cpp	/^struct sockaddr_storage destinationAddress;$/;"	v	typeref:struct:sockaddr_storage
@@ -3788,7 +3788,7 @@ fPCR_PID	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^  u_int16_t fPCR
 fPID	liveMedia/MPEG2TransportStreamDemuxedTrack.hh	/^  u_int16_t fPID;$/;"	m	class:MPEG2TransportStreamDemuxedTrack
 fPID	liveMedia/MPEG2TransportStreamFromESSource.cpp	/^  int16_t fPID;$/;"	m	class:InputESSourceRecord	file:
 fPIDState	liveMedia/MPEG2TransportStreamParser.hh	/^  PIDState** fPIDState;$/;"	m	class:MPEG2TransportStreamParser
-fPIDState	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^  } fPIDState[PID_TABLE_SIZE];$/;"	m	class:MPEG2TransportStreamMultiplexor	typeref:struct:MPEG2TransportStreamMultiplexor::__anon6
+fPIDState	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^  } fPIDState[PID_TABLE_SIZE];$/;"	m	class:MPEG2TransportStreamMultiplexor	typeref:struct:MPEG2TransportStreamMultiplexor::__anon4
 fPIDStatusTable	liveMedia/include/MPEG2TransportStreamFramer.hh	/^  HashTable* fPIDStatusTable;$/;"	m	class:MPEG2TransportStreamFramer
 fPMT_PID	liveMedia/include/MPEG2IndexFromTransportStream.hh	/^  u_int16_t fPMT_PID, fVideo_PID;$/;"	m	class:MPEG2IFrameIndexFromTransportStream
 fPOSTSocketTLS	liveMedia/include/RTSPClient.hh	/^  ClientTLSState fPOSTSocketTLS; \/\/ used only for RTSP-over-HTTPS$/;"	m	class:RTSPClient
@@ -3841,7 +3841,7 @@ fPictureCount	liveMedia/include/H263plusVideoStreamFramer.hh	/^  unsigned fPictu
 fPictureCount	liveMedia/include/MPEGVideoStreamFramer.hh	/^  unsigned fPictureCount; \/\/ hack used to implement doGetNextFrame()$/;"	m	class:MPEGVideoStreamFramer
 fPictureEndMarker	liveMedia/include/H263plusVideoStreamFramer.hh	/^  Boolean  fPictureEndMarker;$/;"	m	class:H263plusVideoStreamFramer
 fPictureEndMarker	liveMedia/include/MPEGVideoStreamFramer.hh	/^  Boolean fPictureEndMarker;$/;"	m	class:MPEGVideoStreamFramer
-fPictureState	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^  } fPictureState;$/;"	m	class:MPEG1or2VideoRTPSink	typeref:struct:MPEG1or2VideoRTPSink::__anon8
+fPictureState	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^  } fPictureState;$/;"	m	class:MPEG1or2VideoRTPSink	typeref:struct:MPEG1or2VideoRTPSink::__anon3
 fPictureTimeBase	liveMedia/include/MPEGVideoStreamFramer.hh	/^  double fPictureTimeBase;$/;"	m	class:MPEGVideoStreamFramer
 fPicturesAdjustment	liveMedia/include/MPEGVideoStreamFramer.hh	/^  unsigned fPicturesAdjustment;$/;"	m	class:MPEGVideoStreamFramer
 fPicturesSinceLastGOP	liveMedia/MPEG1or2VideoStreamFramer.cpp	/^  unsigned fPicturesSinceLastGOP;$/;"	m	class:MPEG1or2VideoStreamParser	file:
@@ -3874,7 +3874,7 @@ fPrev	BasicUsageEnvironment/include/DelayQueue.hh	/^  DelayQueueEntry* fPrev;$/;
 fPrev	liveMedia/MPEG2IndexFromTransportStream.cpp	/^  IndexRecord* fPrev;$/;"	m	class:IndexRecord	file:
 fPrevBuffer	liveMedia/AVIFileSink.cpp	/^  SubsessionBuffer *fBuffer, *fPrevBuffer;$/;"	m	class:AVISubsessionIOState	file:
 fPrevBuffer	liveMedia/QuickTimeFileSink.cpp	/^  SubsessionBuffer *fBuffer, *fPrevBuffer;$/;"	m	class:SubsessionIOState	file:
-fPrevFrameState	liveMedia/QuickTimeFileSink.cpp	/^  } fPrevFrameState;$/;"	m	class:SubsessionIOState	typeref:struct:SubsessionIOState::__anon13	file:
+fPrevFrameState	liveMedia/QuickTimeFileSink.cpp	/^  } fPrevFrameState;$/;"	m	class:SubsessionIOState	typeref:struct:SubsessionIOState::__anon12	file:
 fPrevGOPTimeCode	liveMedia/include/MPEGVideoStreamFramer.hh	/^  TimeCode fCurGOPTimeCode, fPrevGOPTimeCode;$/;"	m	class:MPEGVideoStreamFramer
 fPrevHandler	BasicUsageEnvironment/include/HandlerSet.hh	/^  HandlerDescriptor* fPrevHandler;$/;"	m	class:HandlerDescriptor
 fPrevLocale	liveMedia/include/Locale.hh	/^  char* fPrevLocale;$/;"	m	class:Locale
@@ -4127,7 +4127,7 @@ fStartOfFrame	liveMedia/MPEGVideoStreamParser.hh	/^  unsigned char* fStartOfFram
 fStartOffset	liveMedia/MPEG2IndexFromTransportStream.cpp	/^  u_int8_t fStartOffset; \/\/ within the Transport Stream packet$/;"	m	class:IndexRecord	file:
 fStartTime	liveMedia/include/AVIFileSink.hh	/^  struct timeval fStartTime;$/;"	m	class:AVIFileSink	typeref:struct:AVIFileSink::timeval
 fStartTime	liveMedia/include/QuickTimeFileSink.hh	/^  struct timeval fStartTime;$/;"	m	class:QuickTimeFileSink	typeref:struct:QuickTimeFileSink::timeval
-fState	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^  } fState;$/;"	m	class:MPEG2TransportStreamTrickModeFilter	typeref:enum:MPEG2TransportStreamTrickModeFilter::__anon9
+fState	liveMedia/include/MPEG2TransportStreamTrickModeFilter.hh	/^  } fState;$/;"	m	class:MPEG2TransportStreamTrickModeFilter	typeref:enum:MPEG2TransportStreamTrickModeFilter::__anon2
 fState	liveMedia/ourMD5.cpp	/^  u_int32_t fState[4]; \/\/ ABCD$/;"	m	class:MD5Context	file:
 fStates	liveMedia/H263plusVideoStreamParser.hh	/^   char           fStates[3][256];$/;"	m	class:H263plusVideoStreamParser
 fStaticBuckets	BasicUsageEnvironment/include/BasicHashTable.hh	/^  TableEntry* fStaticBuckets[SMALL_HASH_TABLE_SIZE];\/\/ used for small tables$/;"	m	class:BasicHashTable
@@ -4164,7 +4164,7 @@ fSyncTime	liveMedia/include/RTPSource.hh	/^  struct timeval fSyncTime;$/;"	m	cla
 fSyncTimestamp	liveMedia/include/RTPSource.hh	/^  u_int32_t fSyncTimestamp;$/;"	m	class:RTPReceptionStats
 fSyncWithInputSource	liveMedia/include/MPEG1or2AudioStreamFramer.hh	/^  Boolean fSyncWithInputSource;$/;"	m	class:MPEG1or2AudioStreamFramer
 fT1	liveMedia/include/SIPClient.hh	/^  unsigned const fT1; \/\/ in microseconds$/;"	m	class:SIPClient
-fTCPReadingState	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	m	class:SocketDescriptor	typeref:enum:SocketDescriptor::__anon3	file:
+fTCPReadingState	liveMedia/RTPInterface.cpp	/^  enum { AWAITING_DOLLAR, AWAITING_STREAM_CHANNEL_ID, AWAITING_SIZE1, AWAITING_SIZE2, AWAITING_PACKET_DATA } fTCPReadingState;$/;"	m	class:SocketDescriptor	typeref:enum:SocketDescriptor::__anon1	file:
 fTCPStreamIdCount	liveMedia/include/RTSPClient.hh	/^  unsigned char fTCPStreamIdCount; \/\/ used for (optional) RTP\/TCP$/;"	m	class:RTSPClient
 fTCPStreamIdCount	liveMedia/include/RTSPServer.hh	/^    unsigned char fTCPStreamIdCount; \/\/ used for (optional) RTP\/TCP$/;"	m	class:RTSPServer::RTSPClientSession
 fTCPStreamingDatabase	liveMedia/include/RTSPServer.hh	/^  HashTable* fTCPStreamingDatabase;$/;"	m	class:RTSPServer
@@ -4435,7 +4435,7 @@ frameSize	liveMedia/MPEG2TransportStreamDemuxedTrack.hh	/^  unsigned& frameSize(
 frameSize	liveMedia/MatroskaDemuxedTrack.hh	/^  unsigned& frameSize() { return fFrameSize; }$/;"	f	class:MatroskaDemuxedTrack
 frameSize	liveMedia/OggDemuxedTrack.hh	/^  unsigned& frameSize() { return fFrameSize; }$/;"	f	class:OggDemuxedTrack
 frameSize	liveMedia/QCELPAudioRTPSource.cpp	/^    unsigned frameSize;$/;"	m	class:QCELPDeinterleavingBuffer::FrameDescriptor	file:
-frameSize	liveMedia/QuickTimeFileSink.cpp	/^    unsigned frameSize;$/;"	m	struct:SubsessionIOState::__anon13	file:
+frameSize	liveMedia/QuickTimeFileSink.cpp	/^    unsigned frameSize;$/;"	m	struct:SubsessionIOState::__anon12	file:
 frameSize	liveMedia/include/MPEG1or2Demux.hh	/^    unsigned frameSize; struct timeval presentationTime;$/;"	m	struct:MPEG1or2Demux::OutputDescriptor
 frameSize	liveMedia/include/RawVideoFrameParameters.hh	/^  u_int32_t frameSize; \/\/ in octets$/;"	m	class:RawVideoFrameParameters
 frameSizeWideband	liveMedia/AMRAudioFileSource.cpp	/^static unsigned short const frameSizeWideband[16] = {$/;"	v	file:
@@ -4585,7 +4585,7 @@ gettimeofday	groupsock/GroupsockHelper.cpp	/^int gettimeofday(struct timeval* tp
 global_gain	liveMedia/MP3Internals.hh	/^    unsigned global_gain;$/;"	m	struct:MP3SideInfo::gr_info_s
 gmhd	liveMedia/QuickTimeFileSink.cpp	/^addAtom(gmhd);$/;"	v
 gmin	liveMedia/QuickTimeFileSink.cpp	/^addAtom(gmin);$/;"	v
-gr	liveMedia/MP3Internals.hh	/^    gr_info_s_t gr[2];$/;"	m	struct:MP3SideInfo::__anon11
+gr	liveMedia/MP3Internals.hh	/^    gr_info_s_t gr[2];$/;"	m	struct:MP3SideInfo::__anon9
 gr_info_s	liveMedia/MP3Internals.hh	/^  typedef struct gr_info_s {$/;"	s	struct:MP3SideInfo
 gr_info_s_t	liveMedia/MP3Internals.hh	/^  } gr_info_s_t;$/;"	t	struct:MP3SideInfo	typeref:struct:MP3SideInfo::gr_info_s
 grabConnection	liveMedia/RTSPRegisterSender.cpp	/^void RTSPRegisterSender::grabConnection(int& sock, struct sockaddr_storage& remoteAddress) {$/;"	f	class:RTSPRegisterSender
@@ -4769,7 +4769,7 @@ incrementReferenceCount	liveMedia/include/ServerMediaSession.hh	/^  void increme
 index	WindowsAudioInputDevice/WindowsAudioInputDevice_mixer.cpp	/^  unsigned index;$/;"	m	class:Mixer	file:
 index	WindowsAudioInputDevice/WindowsAudioInputDevice_noMixer.cpp	/^  int index;$/;"	m	class:AudioInputPort	file:
 index	liveMedia/MPEG4GenericRTPSource.cpp	/^  unsigned index; \/\/ indexDelta for the 2nd & subsequent headers$/;"	m	struct:AUHeader	file:
-infoIsNew	liveMedia/include/MediaSession.hh	/^    Boolean infoIsNew; \/\/ not part of the RTSP header; instead, set whenever this struct is filled in$/;"	m	struct:MediaSubsession::__anon7
+infoIsNew	liveMedia/include/MediaSession.hh	/^    Boolean infoIsNew; \/\/ not part of the RTSP header; instead, set whenever this struct is filled in$/;"	m	struct:MediaSubsession::__anon5
 init	groupsock/GroupEId.cpp	/^void GroupEId::init(struct sockaddr_storage const& groupAddr,$/;"	f	class:GroupEId
 init	groupsock/NetAddress.cpp	/^void AddressString::init(ipv4AddressBits const& addr) {$/;"	f	class:AddressString
 init	groupsock/NetAddress.cpp	/^void AddressString::init(ipv6AddressBits const& addr) {$/;"	f	class:AddressString
@@ -4975,12 +4975,12 @@ key	BasicUsageEnvironment/include/BasicHashTable.hh	/^    char const* key;$/;"	m
 keyData	liveMedia/include/MIKEY.hh	/^  u_int8_t const* keyData() const { return fKeyData; }$/;"	f	class:MIKEYState
 keyMatches	BasicUsageEnvironment/BasicHashTable.cpp	/^::keyMatches(char const* key1, char const* key2) const {$/;"	f	class:BasicHashTable
 keyMgmtLine	liveMedia/RTPSink.cpp	/^char* RTPSink::keyMgmtLine() {$/;"	f	class:RTPSink
-label_srtcp_encryption	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtcp_encryption = 0x03,$/;"	e	enum:SRTPCryptographicContext::__anon5
-label_srtcp_msg_auth	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtcp_msg_auth   = 0x04,$/;"	e	enum:SRTPCryptographicContext::__anon5
-label_srtcp_salt	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtcp_salt       = 0x05$/;"	e	enum:SRTPCryptographicContext::__anon5
-label_srtp_encryption	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtp_encryption  = 0x00,$/;"	e	enum:SRTPCryptographicContext::__anon5
-label_srtp_msg_auth	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtp_msg_auth    = 0x01,$/;"	e	enum:SRTPCryptographicContext::__anon5
-label_srtp_salt	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtp_salt        = 0x02,$/;"	e	enum:SRTPCryptographicContext::__anon5
+label_srtcp_encryption	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtcp_encryption = 0x03,$/;"	e	enum:SRTPCryptographicContext::__anon7
+label_srtcp_msg_auth	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtcp_msg_auth   = 0x04,$/;"	e	enum:SRTPCryptographicContext::__anon7
+label_srtcp_salt	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtcp_salt       = 0x05$/;"	e	enum:SRTPCryptographicContext::__anon7
+label_srtp_encryption	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtp_encryption  = 0x00,$/;"	e	enum:SRTPCryptographicContext::__anon7
+label_srtp_msg_auth	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtp_msg_auth    = 0x01,$/;"	e	enum:SRTPCryptographicContext::__anon7
+label_srtp_salt	liveMedia/include/SRTPCryptographicContext.hh	/^		label_srtp_salt        = 0x02,$/;"	e	enum:SRTPCryptographicContext::__anon7
 language	liveMedia/include/MatroskaFile.hh	/^  char* language;$/;"	m	class:MatroskaTrack
 lastClock	liveMedia/MPEG2TransportStreamFramer.cpp	/^  double firstClock, lastClock, firstRealTime, lastRealTime;$/;"	m	class:PIDStatus	file:
 lastFragmentCompletedNALUnit	liveMedia/H264or5VideoRTPSink.cpp	/^  Boolean lastFragmentCompletedNALUnit() const { return fLastFragmentCompletedNALUnit; }$/;"	f	class:H264or5Fragmenter
@@ -5333,7 +5333,7 @@ numReceivers	liveMedia/include/RTPSink.hh	/^  unsigned numReceivers() const { re
 numReplicas	liveMedia/include/StreamReplicator.hh	/^  unsigned numReplicas() const { return fNumReplicas; }$/;"	f	class:StreamReplicator
 numSamples	liveMedia/MP3InternalsHuffman.hh	/^  unsigned numSamples;$/;"	m	class:MP3HuffmanEncodingInfo
 numSamplesByLayer	liveMedia/MPEG1or2AudioStreamFramer.cpp	/^static unsigned const numSamplesByLayer[4] = {0, 384, 1152, 1152};$/;"	v	file:
-numSpecialHeaders	liveMedia/QuickTimeFileSink.cpp	/^    unsigned char numSpecialHeaders; \/\/ used when our RTP source has special headers$/;"	m	struct:SubsessionIOState::__anon13	file:
+numSpecialHeaders	liveMedia/QuickTimeFileSink.cpp	/^    unsigned char numSpecialHeaders; \/\/ used when our RTP source has special headers$/;"	m	struct:SubsessionIOState::__anon12	file:
 numSubsessions	liveMedia/include/ServerMediaSession.hh	/^  unsigned numSubsessions() const { return fSubsessionCounter; }$/;"	f	class:ServerMediaSession
 numTracks	liveMedia/MatroskaFile.cpp	/^unsigned MatroskaTrackTable::numTracks() const { return fTable->numEntries(); }$/;"	f	class:MatroskaTrackTable
 numTracks	liveMedia/OggFile.cpp	/^unsigned OggFile::numTracks() const {$/;"	f	class:OggFile
@@ -5517,7 +5517,7 @@ packetIsUsableInJitterCalculation	liveMedia/MPEG1or2VideoRTPSource.cpp	/^::packe
 packetIsUsableInJitterCalculation	liveMedia/MultiFramedRTPSource.cpp	/^::packetIsUsableInJitterCalculation(unsigned char* \/*packet*\/,$/;"	f	class:MultiFramedRTPSource
 packetLossCompensate	testProgs/playCommon.cpp	/^Boolean packetLossCompensate = False;$/;"	v
 packetLossRatio	liveMedia/include/RTPSink.hh	/^  u_int8_t packetLossRatio() const { return fPacketLossRatio; }$/;"	f	class:RTPTransmissionStats
-packetSizes	liveMedia/QuickTimeFileSink.cpp	/^    unsigned packetSizes[256];$/;"	m	struct:SubsessionIOState::__anon13	file:
+packetSizes	liveMedia/QuickTimeFileSink.cpp	/^    unsigned packetSizes[256];$/;"	m	struct:SubsessionIOState::__anon12	file:
 packetType	liveMedia/include/RTCP.hh	/^  int packetType() {return fTypeOfPacket;}$/;"	f	class:RTCPInstance
 packet_loss_fraction_max	testProgs/playCommon.cpp	/^  double packet_loss_fraction_min, packet_loss_fraction_max;$/;"	m	class:qosMeasurementRecord	file:
 packet_loss_fraction_min	testProgs/playCommon.cpp	/^  double packet_loss_fraction_min, packet_loss_fraction_max;$/;"	m	class:qosMeasurementRecord	file:
@@ -5671,7 +5671,7 @@ pgroupSize	liveMedia/include/RawVideoFrameParameters.hh	/^  u_int16_t pgroupSize
 pic_struct_present_flag	liveMedia/H264or5VideoStreamFramer.cpp	/^  Boolean CpbDpbDelaysPresentFlag, pic_struct_present_flag;$/;"	m	class:H264or5VideoStreamParser	file:
 pictureEndMarker	liveMedia/include/H263plusVideoStreamFramer.hh	/^  Boolean& pictureEndMarker() { return fPictureEndMarker; }    \/\/ a hack for implementing the RTP 'M' bit$/;"	f	class:H263plusVideoStreamFramer
 pictureEndMarker	liveMedia/include/MPEGVideoStreamFramer.hh	/^  Boolean& pictureEndMarker() { return fPictureEndMarker; }$/;"	f	class:MPEGVideoStreamFramer
-picture_coding_type	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^    unsigned char picture_coding_type;$/;"	m	struct:MPEG1or2VideoRTPSink::__anon8
+picture_coding_type	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^    unsigned char picture_coding_type;$/;"	m	struct:MPEG1or2VideoRTPSink::__anon3
 pictures	liveMedia/include/MPEGVideoStreamFramer.hh	/^  unsigned days, hours, minutes, seconds, pictures;$/;"	m	class:TimeCode
 pixelHeight	liveMedia/include/MatroskaFile.hh	/^  unsigned pixelHeight;$/;"	m	class:MatroskaTrack
 pixelWidth	liveMedia/include/MatroskaFile.hh	/^  unsigned pixelWidth;$/;"	m	class:MatroskaTrack
@@ -5715,7 +5715,7 @@ presentationTime	liveMedia/MPEG2TransportStreamDemuxedTrack.hh	/^  struct timeva
 presentationTime	liveMedia/MatroskaDemuxedTrack.hh	/^  struct timeval& presentationTime() { return fPresentationTime; }$/;"	f	class:MatroskaDemuxedTrack
 presentationTime	liveMedia/OggDemuxedTrack.hh	/^  struct timeval& presentationTime() { return fPresentationTime; }$/;"	f	class:OggDemuxedTrack
 presentationTime	liveMedia/QCELPAudioRTPSource.cpp	/^    struct timeval presentationTime;$/;"	m	class:QCELPDeinterleavingBuffer::FrameDescriptor	typeref:struct:QCELPDeinterleavingBuffer::FrameDescriptor::timeval	file:
-presentationTime	liveMedia/QuickTimeFileSink.cpp	/^    struct timeval presentationTime;$/;"	m	struct:SubsessionIOState::__anon13	typeref:struct:SubsessionIOState::__anon13::timeval	file:
+presentationTime	liveMedia/QuickTimeFileSink.cpp	/^    struct timeval presentationTime;$/;"	m	struct:SubsessionIOState::__anon12	typeref:struct:SubsessionIOState::__anon12::timeval	file:
 presentationTime	liveMedia/QuickTimeFileSink.cpp	/^  struct timeval const& presentationTime() const {return fPresentationTime;}$/;"	f	class:SubsessionBuffer
 presentationTime	liveMedia/include/MPEG1or2Demux.hh	/^    unsigned frameSize; struct timeval presentationTime;$/;"	m	struct:MPEG1or2Demux::OutputDescriptor	typeref:struct:MPEG1or2Demux::OutputDescriptor::timeval
 presetNextTimestamp	liveMedia/RTPSink.cpp	/^u_int32_t RTPSink::presetNextTimestamp() {$/;"	f	class:RTPSink
@@ -5977,7 +5977,7 @@ rsf_ht	liveMedia/MP3InternalsHuffman.cpp	/^static struct huffcodetab rsf_ht[HTN]
 rsf_huffman_decoder	liveMedia/MP3InternalsHuffman.cpp	/^static int rsf_huffman_decoder(BitVector& bv,$/;"	f	file:
 rsf_huffman_encoder	liveMedia/MP3InternalsHuffman.cpp	/^static void rsf_huffman_encoder(BitVector& bv,$/;"	f	file:
 rsfscanf	liveMedia/MP3InternalsHuffman.cpp	/^static void rsfscanf(unsigned char **fi, unsigned int* v) {$/;"	f	file:
-rtcp	testProgs/testMKVStreamer.cpp	/^  RTCPInstance* rtcp;$/;"	m	struct:__anon2	file:
+rtcp	testProgs/testMKVStreamer.cpp	/^  RTCPInstance* rtcp;$/;"	m	struct:__anon13	file:
 rtcp	testProgs/testOggStreamer.cpp	/^  RTCPInstance* rtcp;$/;"	m	struct:TrackState	file:
 rtcpChannelId	liveMedia/include/MediaSession.hh	/^  unsigned char rtpChannelId, rtcpChannelId; \/\/ used by RTSP (for RTP\/TCP)$/;"	m	class:MediaSubsession
 rtcpChannelId	liveMedia/include/OnDemandServerMediaSubsession.hh	/^  unsigned char rtpChannelId, rtcpChannelId;$/;"	m	class:Destinations
@@ -6005,9 +6005,9 @@ rtpGroupsock	testProgs/testMP3Streamer.cpp	/^  Groupsock* rtpGroupsock;$/;"	m	st
 rtpGroupsock	testProgs/testWAVAudioStreamer.cpp	/^  Groupsock* rtpGroupsock;$/;"	m	struct:sessionState_t	file:
 rtpGroupsockAudio	testProgs/vobStreamer.cpp	/^Groupsock* rtpGroupsockAudio;$/;"	v
 rtpGroupsockVideo	testProgs/vobStreamer.cpp	/^Groupsock* rtpGroupsockVideo;$/;"	v
-rtpHeader	liveMedia/QuickTimeFileSink.cpp	/^    unsigned rtpHeader;$/;"	m	struct:SubsessionIOState::__anon13	file:
+rtpHeader	liveMedia/QuickTimeFileSink.cpp	/^    unsigned rtpHeader;$/;"	m	struct:SubsessionIOState::__anon12	file:
 rtpHeaderSize	liveMedia/MultiFramedRTPSink.cpp	/^static unsigned const rtpHeaderSize = 12;$/;"	v	file:
-rtpInfo	liveMedia/include/MediaSession.hh	/^  } rtpInfo;$/;"	m	class:MediaSubsession	typeref:struct:MediaSubsession::__anon7
+rtpInfo	liveMedia/include/MediaSession.hh	/^  } rtpInfo;$/;"	m	class:MediaSubsession	typeref:struct:MediaSubsession::__anon5
 rtpMarkerBit	liveMedia/include/MultiFramedRTPSource.hh	/^  Boolean rtpMarkerBit() const { return fRTPMarkerBit; }$/;"	f	class:BufferedPacket
 rtpPayloadFormat	liveMedia/include/MediaSession.hh	/^  unsigned char rtpPayloadFormat() const { return fRTPPayloadFormat; }$/;"	f	class:MediaSubsession
 rtpPayloadFormat	liveMedia/include/RTPSource.hh	/^  unsigned char rtpPayloadFormat() const { return fRTPPayloadFormat; }$/;"	f	class:RTPSource
@@ -6167,8 +6167,8 @@ sendTeardownCommand	liveMedia/RTSPClient.cpp	/^unsigned RTSPClient::sendTeardown
 sendTeardownCommand	liveMedia/RTSPClient.cpp	/^unsigned RTSPClient::sendTeardownCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator) {$/;"	f	class:RTSPClient
 sentPacketSize	liveMedia/include/RTCP.hh	/^  int sentPacketSize() {return fLastSentSize;}$/;"	f	class:RTCPInstance
 seps	groupsock/inet.c	/^static int const seps [MAX_TYPES] = { SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 };$/;"	v	file:
-seqNum	liveMedia/QuickTimeFileSink.cpp	/^    unsigned short seqNum;$/;"	m	struct:SubsessionIOState::__anon13	file:
-seqNum	liveMedia/include/MediaSession.hh	/^    u_int16_t seqNum;$/;"	m	struct:MediaSubsession::__anon7
+seqNum	liveMedia/QuickTimeFileSink.cpp	/^    unsigned short seqNum;$/;"	m	struct:SubsessionIOState::__anon12	file:
+seqNum	liveMedia/include/MediaSession.hh	/^    u_int16_t seqNum;$/;"	m	struct:MediaSubsession::__anon5
 seqNumLT	liveMedia/RTPSource.cpp	/^Boolean seqNumLT(u_int16_t s1, u_int16_t s2) {$/;"	f
 sequenceCount	liveMedia/DVVideoStreamFramer.cpp	/^  unsigned sequenceCount;$/;"	m	struct:DVVideoProfile	file:
 serverPortNum	liveMedia/include/MediaSession.hh	/^  unsigned short serverPortNum; \/\/ in host byte order (used by RTSP)$/;"	m	class:MediaSubsession
@@ -6369,8 +6369,8 @@ singleBitMask	liveMedia/BitVector.cpp	/^static unsigned char const singleBitMask
 singleMedium	testProgs/playCommon.cpp	/^char const* singleMedium = NULL;$/;"	v
 sink	liveMedia/include/MediaSession.hh	/^  MediaSink* sink; \/\/ callers can use this to keep track of who's playing us$/;"	m	class:MediaSubsession
 sink	testProgs/testGSMStreamer.cpp	/^  RTPSink* sink;$/;"	m	struct:sessionState_t	file:
-sink	testProgs/testMKVSplitter.cpp	/^  FileSink* sink;$/;"	m	struct:__anon1	file:
-sink	testProgs/testMKVStreamer.cpp	/^  RTPSink* sink;$/;"	m	struct:__anon2	file:
+sink	testProgs/testMKVSplitter.cpp	/^  FileSink* sink;$/;"	m	struct:__anon14	file:
+sink	testProgs/testMKVStreamer.cpp	/^  RTPSink* sink;$/;"	m	struct:__anon13	file:
 sink	testProgs/testMP3Receiver.cpp	/^  FileSink* sink;$/;"	m	struct:sessionState_t	file:
 sink	testProgs/testMP3Streamer.cpp	/^  RTPSink* sink;$/;"	m	struct:sessionState_t	file:
 sink	testProgs/testMPEG1or2VideoReceiver.cpp	/^  MediaSink* sink;$/;"	m	struct:sessionState_t	file:
@@ -6418,8 +6418,8 @@ socketTable	groupsock/include/GroupsockHelper.hh	/^  HashTable* socketTable;$/;"
 socketTable	liveMedia/include/Media.hh	/^  void* socketTable;$/;"	m	class:_Tables
 source	liveMedia/include/MediaSink.hh	/^  FramedSource* source() const {return fSource;}$/;"	f	class:MediaSink
 source	testProgs/testGSMStreamer.cpp	/^  FramedSource* source;$/;"	m	struct:sessionState_t	file:
-source	testProgs/testMKVSplitter.cpp	/^  FramedSource* source;$/;"	m	struct:__anon1	file:
-source	testProgs/testMKVStreamer.cpp	/^  FramedSource* source;$/;"	m	struct:__anon2	file:
+source	testProgs/testMKVSplitter.cpp	/^  FramedSource* source;$/;"	m	struct:__anon14	file:
+source	testProgs/testMKVStreamer.cpp	/^  FramedSource* source;$/;"	m	struct:__anon13	file:
 source	testProgs/testMP3Receiver.cpp	/^  FramedSource* source;$/;"	m	struct:sessionState_t	file:
 source	testProgs/testMP3Streamer.cpp	/^  FramedSource* source;$/;"	m	struct:sessionState_t	file:
 source	testProgs/testMPEG1or2VideoReceiver.cpp	/^  RTPSource* source;$/;"	m	struct:sessionState_t	file:
@@ -6445,8 +6445,8 @@ sourcePortNum	groupsock/include/Groupsock.hh	/^  portNumBits sourcePortNum() con
 specialClientAccessCheck	liveMedia/RTSPServer.cpp	/^Boolean RTSPServer::specialClientAccessCheck(int \/*clientSocket*\/,$/;"	f	class:RTSPServer
 specialClientUserAccessCheck	liveMedia/RTSPServer.cpp	/^Boolean RTSPServer::specialClientUserAccessCheck(int \/*clientSocket*\/,$/;"	f	class:RTSPServer
 specialHandlingOfAuthenticationFailure	liveMedia/RTSPServer.cpp	/^::specialHandlingOfAuthenticationFailure(int \/*clientSocket*\/,$/;"	f	class:RTSPServer
-specialHeaderBytes	liveMedia/QuickTimeFileSink.cpp	/^    unsigned char specialHeaderBytes[SPECIAL_HEADER_BUFFER_SIZE]; \/\/ ditto$/;"	m	struct:SubsessionIOState::__anon13	file:
-specialHeaderBytesLength	liveMedia/QuickTimeFileSink.cpp	/^    unsigned specialHeaderBytesLength; \/\/ ditto$/;"	m	struct:SubsessionIOState::__anon13	file:
+specialHeaderBytes	liveMedia/QuickTimeFileSink.cpp	/^    unsigned char specialHeaderBytes[SPECIAL_HEADER_BUFFER_SIZE]; \/\/ ditto$/;"	m	struct:SubsessionIOState::__anon12	file:
+specialHeaderBytesLength	liveMedia/QuickTimeFileSink.cpp	/^    unsigned specialHeaderBytesLength; \/\/ ditto$/;"	m	struct:SubsessionIOState::__anon12	file:
 specialHeaderSize	liveMedia/AC3AudioRTPSink.cpp	/^unsigned AC3AudioRTPSink::specialHeaderSize() const {$/;"	f	class:AC3AudioRTPSink
 specialHeaderSize	liveMedia/AMRAudioRTPSink.cpp	/^unsigned AMRAudioRTPSink::specialHeaderSize() const {$/;"	f	class:AMRAudioRTPSink
 specialHeaderSize	liveMedia/H263plusVideoRTPSink.cpp	/^unsigned H263plusVideoRTPSink::specialHeaderSize() const {$/;"	f	class:H263plusVideoRTPSink
@@ -6486,7 +6486,7 @@ startPlayingSession	testProgs/playSIP.cpp	/^void startPlayingSession(MediaSessio
 startPlayingSession	testProgs/playSIP.cpp	/^void startPlayingSession(MediaSession* \/*session*\/, double \/*start*\/, double \/*end*\/, float \/*scale*\/, RTSPClient::responseHandler* afterFunc) {$/;"	f
 startReplicaFileSink	testProgs/testReplicator.cpp	/^void startReplicaFileSink(StreamReplicator* replicator, char const* outputFileName) {$/;"	f
 startReplicaUDPSink	testProgs/testReplicator.cpp	/^void startReplicaUDPSink(StreamReplicator* replicator, char const* outputAddressStr, portNumBits outputPortNum) {$/;"	f
-startSampleNumber	liveMedia/QuickTimeFileSink.cpp	/^    unsigned startSampleNumber;$/;"	m	struct:SubsessionIOState::__anon13	file:
+startSampleNumber	liveMedia/QuickTimeFileSink.cpp	/^    unsigned startSampleNumber;$/;"	m	struct:SubsessionIOState::__anon12	file:
 startStream	liveMedia/MPEG2TransportFileServerMediaSubsession.cpp	/^::startStream(unsigned clientSessionId, void* streamToken, TaskFunc* rtcpRRHandler,$/;"	f	class:MPEG2TransportFileServerMediaSubsession
 startStream	liveMedia/OnDemandServerMediaSubsession.cpp	/^void OnDemandServerMediaSubsession::startStream(unsigned clientSessionId,$/;"	f	class:OnDemandServerMediaSubsession
 startStream	liveMedia/PassiveServerMediaSubsession.cpp	/^void PassiveServerMediaSubsession::startStream(unsigned clientSessionId,$/;"	f	class:PassiveServerMediaSubsession
@@ -6523,7 +6523,7 @@ streamState	liveMedia/include/RTSPServer.hh	/^    struct streamState {$/;"	s	cla
 streamTimerHandler	testProgs/testRTSPClient.cpp	/^void streamTimerHandler(void* clientData) {$/;"	f
 streamTimerTask	testProgs/testRTSPClient.cpp	/^  TaskToken streamTimerTask;$/;"	m	class:StreamClientState	file:
 streamToken	liveMedia/include/RTSPServer.hh	/^      void* streamToken;$/;"	m	struct:RTSPServer::RTSPClientSession::streamState
-streamType	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^    u_int8_t streamType; \/\/ for use in Program Maps$/;"	m	struct:MPEG2TransportStreamMultiplexor::__anon6
+streamType	liveMedia/include/MPEG2TransportStreamMultiplexor.hh	/^    u_int8_t streamType; \/\/ for use in Program Maps$/;"	m	struct:MPEG2TransportStreamMultiplexor::__anon4
 streamURL	testProgs/playCommon.cpp	/^char const* streamURL = NULL;$/;"	v
 streamUsingTCP	hlsProxy/live555HLSProxy.cpp	/^Boolean streamUsingTCP = False;$/;"	v
 streamUsingTCP	testProgs/playCommon.cpp	/^Boolean streamUsingTCP = False;$/;"	v
@@ -6574,7 +6574,7 @@ tcpStreamRecord	liveMedia/RTPInterface.cpp	/^::tcpStreamRecord(int streamSocketN
 tcpStreamRecord	liveMedia/RTPInterface.cpp	/^class tcpStreamRecord {$/;"	c	file:
 tearDownSession	testProgs/openRTSP.cpp	/^void tearDownSession(MediaSession* session, RTSPClient::responseHandler* afterFunc) {$/;"	f
 tearDownSession	testProgs/playSIP.cpp	/^void tearDownSession(MediaSession* \/*session*\/, RTSPClient::responseHandler* afterFunc) {$/;"	f
-temporal_reference	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^    unsigned temporal_reference;$/;"	m	struct:MPEG1or2VideoRTPSink::__anon8
+temporal_reference	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^    unsigned temporal_reference;$/;"	m	struct:MPEG1or2VideoRTPSink::__anon3
 test1Byte	liveMedia/StreamParser.hh	/^  u_int8_t test1Byte() { \/\/ as above, but doesn't advance ptr$/;"	f	class:StreamParser
 test2Bytes	liveMedia/StreamParser.hh	/^  u_int16_t test2Bytes() {$/;"	f	class:StreamParser
 test4Bytes	liveMedia/StreamParser.hh	/^  u_int32_t test4Bytes() { \/\/ as above, but doesn't advance ptr$/;"	f	class:StreamParser
@@ -6602,7 +6602,7 @@ timerBHandler	liveMedia/SIPClient.cpp	/^void SIPClient::timerBHandler(void* clie
 timerDFires	liveMedia/SIPClient.cpp	/^unsigned const timerDFires = 0xDDDDDDDD;$/;"	v
 timerDHandler	liveMedia/SIPClient.cpp	/^void SIPClient::timerDHandler(void* clientData) {$/;"	f	class:SIPClient
 timescale	liveMedia/include/QuickTimeGenericRTPSource.hh	/^    unsigned timescale;$/;"	m	struct:QuickTimeGenericRTPSource::QTState
-timestamp	liveMedia/include/MediaSession.hh	/^    u_int32_t timestamp;$/;"	m	struct:MediaSubsession::__anon7
+timestamp	liveMedia/include/MediaSession.hh	/^    u_int32_t timestamp;$/;"	m	struct:MediaSubsession::__anon5
 timestampFrequency	liveMedia/include/RTPSource.hh	/^  unsigned timestampFrequency() const {return fTimestampFrequency;}$/;"	f	class:RTPSource
 timestampString	groupsock/GroupsockHelper.cpp	/^char const* timestampString() {$/;"	f
 timevalGE	liveMedia/QuickTimeFileSink.cpp	/^static Boolean timevalGE(struct timeval const& tv1,$/;"	f	file:
@@ -6645,11 +6645,11 @@ trackNumber	liveMedia/MatroskaFile.cpp	/^  unsigned trackNumber;$/;"	m	class:Tra
 trackNumber	liveMedia/include/MatroskaFile.hh	/^  unsigned trackNumber;$/;"	m	class:MatroskaTrack
 trackNumber	liveMedia/include/OggFile.hh	/^  u_int32_t trackNumber; \/\/ bitstream serial number$/;"	m	class:OggTrack
 trackNumber	liveMedia/include/ServerMediaSession.hh	/^  unsigned trackNumber() const { return fTrackNumber; }$/;"	f	class:ServerMediaSubsession
-trackNumber	testProgs/testMKVSplitter.cpp	/^  unsigned trackNumber;$/;"	m	struct:__anon1	file:
-trackNumber	testProgs/testMKVStreamer.cpp	/^  unsigned trackNumber;$/;"	m	struct:__anon2	file:
+trackNumber	testProgs/testMKVSplitter.cpp	/^  unsigned trackNumber;$/;"	m	struct:__anon14	file:
+trackNumber	testProgs/testMKVStreamer.cpp	/^  unsigned trackNumber;$/;"	m	struct:__anon13	file:
 trackNumber	testProgs/testOggStreamer.cpp	/^  u_int32_t trackNumber;$/;"	m	struct:TrackState	file:
-trackState	testProgs/testMKVSplitter.cpp	/^} trackState[3];$/;"	v	typeref:struct:__anon1	file:
-trackState	testProgs/testMKVStreamer.cpp	/^} trackState[3];$/;"	v	typeref:struct:__anon2	file:
+trackState	testProgs/testMKVSplitter.cpp	/^} trackState[3];$/;"	v	typeref:struct:__anon14	file:
+trackState	testProgs/testMKVStreamer.cpp	/^} trackState[3];$/;"	v	typeref:struct:__anon13	file:
 trackState	testProgs/testOggStreamer.cpp	/^TrackState* trackState;$/;"	v
 trackTable	liveMedia/include/OggFile.hh	/^  class OggTrackTable& trackTable() { return *fTrackTable; }$/;"	f	class:OggFile
 trackType	liveMedia/MatroskaFile.cpp	/^  u_int8_t trackType;$/;"	m	class:TrackChoiceRecord	file:
@@ -6759,7 +6759,7 @@ validateCommentHeader	liveMedia/OggFileParser.cpp	/^static Boolean validateComme
 validateHeader	liveMedia/OggFileParser.cpp	/^Boolean OggFileParser::validateHeader(OggTrack* track, u_int8_t const* p, unsigned headerSize) {$/;"	f	class:OggFileParser
 value	BasicUsageEnvironment/include/BasicHashTable.hh	/^    void* value;$/;"	m	class:BasicHashTable::TableEntry
 valueIsHexadecimal	liveMedia/MediaSession.cpp	/^  Boolean valueIsHexadecimal() const { return fValueIsHexadecimal; }$/;"	f	class:SDPAttribute
-vector_code_bits	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^    unsigned char vector_code_bits; \/\/ FBV,BFC,FFV,FFC from RFC 2250, sec. 3.4$/;"	m	struct:MPEG1or2VideoRTPSink::__anon8
+vector_code_bits	liveMedia/include/MPEG1or2VideoRTPSink.hh	/^    unsigned char vector_code_bits; \/\/ FBV,BFC,FFV,FFC from RFC 2250, sec. 3.4$/;"	m	struct:MPEG1or2VideoRTPSink::__anon3
 verbosityLevel	liveMedia/ProxyServerMediaSession.cpp	/^  int verbosityLevel() const { return ((ProxyServerMediaSession*)fParentSession)->fVerbosityLevel; }$/;"	f	class:ProxyServerMediaSubsession	file:
 verbosityLevel	proxyServer/live555ProxyServer.cpp	/^int verbosityLevel = 0;$/;"	v
 verbosityLevel	testProgs/playCommon.cpp	/^int verbosityLevel = 1; \/\/ by default, print verbose output$/;"	v

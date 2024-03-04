@@ -39,6 +39,7 @@ DynamicRTSPServer::createNew(UsageEnvironment& env, Port ourPort,
 DynamicRTSPServer::DynamicRTSPServer(UsageEnvironment& env, int ourSocketIPv4, int ourSocketIPv6,
 				     Port ourPort,
 				     UserAuthenticationDatabase* authDatabase, unsigned reclamationTestSeconds)
+	// 调用的父类的构造函数		
   : RTSPServer(env, ourSocketIPv4, ourSocketIPv6, ourPort, authDatabase, reclamationTestSeconds) {
 }
 

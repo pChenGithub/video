@@ -201,11 +201,19 @@ static void pinctrl_free_pindescs(struct pinctrl_dev *pctldev,
 	}
 }
 
+// 内核提供api注册一个引脚
+// 最终就是往pinctrl_dev 中 的 pin_desc_tree, 插入了 pin_desc
+// pin_desc 的初始化由 参数 pinctrl_pin_desc 来完成
+
+// 下面2个参数, 引脚控制设备和 引脚描述符
+// pinctrl_dev
+// pinctrl_pin_desc
 static int pinctrl_register_one_pin(struct pinctrl_dev *pctldev,
 				    const struct pinctrl_pin_desc *pin)
 {
 	struct pin_desc *pindesc;
 
+	// 查询引脚,如果存在,说明已经注册,报错返回
 	pindesc = pin_desc_get(pctldev, pin->number);
 	if (pindesc) {
 		dev_err(pctldev->dev, "pin %d already registered\n",
@@ -213,11 +221,13 @@ static int pinctrl_register_one_pin(struct pinctrl_dev *pctldev,
 		return -EINVAL;
 	}
 
+	// 如果没有找到这个编号的引脚,创建一个引脚描述符
 	pindesc = kzalloc(sizeof(*pindesc), GFP_KERNEL);
 	if (!pindesc)
 		return -ENOMEM;
 
 	/* Set owner */
+	// 设置这个引脚描述符,所属的 pinctrl_dev
 	pindesc->pctldev = pctldev;
 
 	/* Copy basic pin info */
@@ -234,6 +244,7 @@ static int pinctrl_register_one_pin(struct pinctrl_dev *pctldev,
 
 	pindesc->drv_data = pin->drv_data;
 
+	// 将引脚描述符插入到 pin_desc_tree,
 	radix_tree_insert(&pctldev->pin_desc_tree, pin->number, pindesc);
 	pr_debug("registered pin %d (%s) on %s\n",
 		 pin->number, pindesc->name, pctldev->desc->name);
@@ -247,7 +258,9 @@ static int pinctrl_register_pins(struct pinctrl_dev *pctldev,
 	unsigned i;
 	int ret = 0;
 
+	// 遍历每个引脚
 	for (i = 0; i < num_descs; i++) {
+		// 注册一个引脚
 		ret = pinctrl_register_one_pin(pctldev, &pins[i]);
 		if (ret)
 			return ret;
@@ -1942,6 +1955,7 @@ static void pinctrl_remove_device_debugfs(struct pinctrl_dev *pctldev)
 
 #endif
 
+// 检查操作集以及有些回调函数是否初始化
 static int pinctrl_check_ops(struct pinctrl_dev *pctldev)
 {
 	const struct pinctrl_ops *ops = pctldev->desc->pctlops;
@@ -1960,6 +1974,8 @@ static int pinctrl_check_ops(struct pinctrl_dev *pctldev)
  * @dev: parent device for this pin controller
  * @driver_data: private pin controller data for this pin controller
  */
+// 创建一个 pinctrl_dev,并将 pinctrl_desc ,中的所有 引脚 注册
+// 引脚最终加入到 pinctrl_dev的 pin_desc_tree 中维护
 static struct pinctrl_dev *
 pinctrl_init_controller(struct pinctrl_desc *pctldesc, struct device *dev,
 			void *driver_data)
@@ -1972,12 +1988,14 @@ pinctrl_init_controller(struct pinctrl_desc *pctldesc, struct device *dev,
 	if (!pctldesc->name)
 		return ERR_PTR(-EINVAL);
 
+	// 分配一个pinctrl_dev
 	pctldev = kzalloc(sizeof(*pctldev), GFP_KERNEL);
 	if (!pctldev)
 		return ERR_PTR(-ENOMEM);
 
 	/* Initialize pin control device struct */
 	pctldev->owner = pctldesc->owner;
+	// 初始化 pinctrl_dev ,,,引脚描述符,驱动私有数据
 	pctldev->desc = pctldesc;
 	pctldev->driver_data = driver_data;
 	INIT_RADIX_TREE(&pctldev->pin_desc_tree, GFP_KERNEL);
@@ -1989,9 +2007,12 @@ pinctrl_init_controller(struct pinctrl_desc *pctldesc, struct device *dev,
 #endif
 	INIT_LIST_HEAD(&pctldev->gpio_ranges);
 	INIT_LIST_HEAD(&pctldev->node);
+	// 设置父类对象
 	pctldev->dev = dev;
+	// 初始化互斥锁
 	mutex_init(&pctldev->mutex);
 
+	// 检查操作集以及操作函数是否存在
 	/* check core ops for sanity */
 	ret = pinctrl_check_ops(pctldev);
 	if (ret) {
@@ -2000,6 +2021,7 @@ pinctrl_init_controller(struct pinctrl_desc *pctldesc, struct device *dev,
 	}
 
 	/* If we're implementing pinmuxing, check the ops for sanity */
+	// 也是检查一些操作函数是否存在
 	if (pctldesc->pmxops) {
 		ret = pinmux_check_ops(pctldev);
 		if (ret)
@@ -2015,6 +2037,10 @@ pinctrl_init_controller(struct pinctrl_desc *pctldesc, struct device *dev,
 
 	/* Register all the pins */
 	dev_dbg(dev, "try to register %d pins ...\n",  pctldesc->npins);
+	// 注册所有的 引脚到内核
+	// pinctrl_dev 
+	// 模块提供给外部使用的引脚描述 pinctrl_pin_desc,,参数是一个数组
+	// 引脚个数,数组长度
 	ret = pinctrl_register_pins(pctldev, pctldesc->pins, pctldesc->npins);
 	if (ret) {
 		dev_err(dev, "error during pin registration\n");
@@ -2086,6 +2112,7 @@ int pinctrl_enable(struct pinctrl_dev *pctldev)
 	}
 
 	mutex_lock(&pinctrldev_list_mutex);
+	// 将这个新建的 pinctrl_dev 插入到全局链表 &pinctrldev_list
 	list_add_tail(&pctldev->node, &pinctrldev_list);
 	mutex_unlock(&pinctrldev_list_mutex);
 
@@ -2112,10 +2139,12 @@ struct pinctrl_dev *pinctrl_register(struct pinctrl_desc *pctldesc,
 	struct pinctrl_dev *pctldev;
 	int error;
 
+	// 初始化控制器
 	pctldev = pinctrl_init_controller(pctldesc, dev, driver_data);
 	if (IS_ERR(pctldev))
 		return pctldev;
 
+	// 
 	error = pinctrl_enable(pctldev);
 	if (error)
 		return ERR_PTR(error);
@@ -2224,6 +2253,8 @@ static int devm_pinctrl_dev_match(struct device *dev, void *res, void *data)
  *
  * The pinctrl device will be automatically released when the device is unbound.
  */
+// devm 类型函数,,, 和 pinctrl_register 的区别就是,
+// 注册的内容 这里是 pinctrl_desc 会随所属的 dev 销毁而清理内存
 struct pinctrl_dev *devm_pinctrl_register(struct device *dev,
 					  struct pinctrl_desc *pctldesc,
 					  void *driver_data)

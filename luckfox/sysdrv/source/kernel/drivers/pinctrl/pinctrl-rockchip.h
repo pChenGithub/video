@@ -20,6 +20,7 @@
 
 #include <linux/gpio/driver.h>
 
+// 这里的宏定义,定义了引脚定义对应的编号
 #define RK_GPIO0_A0	0
 #define RK_GPIO0_A1	1
 #define RK_GPIO0_A2	2
@@ -185,6 +186,7 @@
 #define RK_GPIO4_D6	158
 #define RK_GPIO4_D7	159
 
+// 这里定义了rk支持的引脚类型
 enum rockchip_pinctrl_type {
 	PX30,
 	RV1106,
@@ -222,6 +224,7 @@ enum rockchip_pinctrl_type {
  * @ext_port: port data from external
  * @version_id: controller version register
  */
+// 这个结构体将gpio的寄存器分布定义出来,参考数据手册,的寄存器分布
 struct rockchip_gpio_regs {
 	u32 port_dr;
 	u32 port_ddr;

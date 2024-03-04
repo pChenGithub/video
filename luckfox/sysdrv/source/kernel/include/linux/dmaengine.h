@@ -49,6 +49,7 @@ enum dma_status {
  * Note: The DMA_ASYNC_TX capability is not to be set by drivers.  It is
  * automatically set as dma devices are registered.
  */
+// dma传输方式类型,内存到内存,...
 enum dma_transaction_type {
 	DMA_MEMCPY,
 	DMA_XOR,
@@ -77,6 +78,7 @@ enum dma_transaction_type {
  * @DMA_DEV_TO_MEM: Slave mode & From Device to Memory
  * @DMA_DEV_TO_DEV: Slave mode & From Device to Device
  */
+// dma传输方向定义
 enum dma_transfer_direction {
 	DMA_MEM_TO_MEM,
 	DMA_MEM_TO_DEV,
@@ -327,6 +329,7 @@ struct dma_router {
  * @route_data: channel specific data for the router
  * @private: private data for certain client-channel associations
  */
+// dma通道
 struct dma_chan {
 	struct dma_device *device;
 	struct device *slave;
@@ -851,8 +854,10 @@ struct dma_filter {
  *     will be used when this is omitted, but custom code can show extra,
  *     controller specific information.
  */
+// 表示dma设备,在硬件上对应一个dma控制器
 struct dma_device {
 	struct kref ref;
+	// dma通道个数
 	unsigned int chancnt;
 	unsigned int privatecnt;
 	struct list_head channels;

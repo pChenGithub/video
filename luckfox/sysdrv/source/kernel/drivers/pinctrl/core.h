@@ -41,6 +41,7 @@ struct pinctrl_gpio_range;
  */
 struct pinctrl_dev {
 	struct list_head node;
+	// 引脚描述符数组
 	struct pinctrl_desc *desc;
 	struct radix_tree_root pin_desc_tree;
 #ifdef CONFIG_GENERIC_PINCTRL_GROUPS
@@ -226,6 +227,7 @@ const char *pin_get_name(struct pinctrl_dev *pctldev, const unsigned pin);
 int pinctrl_get_group_selector(struct pinctrl_dev *pctldev,
 			       const char *pin_group);
 
+// 从pinctrl_dev 的 pin_desc_tree 中寻找 指定编号的 引脚,返回引脚描述符
 static inline struct pin_desc *pin_desc_get(struct pinctrl_dev *pctldev,
 					    unsigned int pin)
 {

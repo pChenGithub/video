@@ -3831,6 +3831,8 @@ static int rockchip_pinctrl_register(struct platform_device *pdev,
 	if (ret)
 		return ret;
 
+	// 这里才是pinctrl子系统的注册函数
+	// 注册一个引脚控制描述符到内核,,
 	info->pctl_dev = devm_pinctrl_register(dev, ctrldesc, info);
 	if (IS_ERR(info->pctl_dev))
 		return dev_err_probe(dev, PTR_ERR(info->pctl_dev), "could not register pinctrl driver\n");
@@ -4165,11 +4167,14 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 			return ret;
 	}
 
+	// 注册
 	ret = rockchip_pinctrl_register(pdev, info);
 	if (ret)
 		return ret;
 
+	// 把info设置为平台设备的私有数据
 	platform_set_drvdata(pdev, info);
+	// pinctrl_dev 由全局变量维护
 	g_pctldev = info->pctl_dev;
 
 	ret = of_platform_populate(np, NULL, NULL, &pdev->dev);
@@ -5080,9 +5085,11 @@ MODULE_DEVICE_TABLE(of, rockchip_pinctrl_dt_match);
 // 模块中定义的几个重要结构体
 // 他们之间的关系是:
 // 1 1106_pin_ctrl 是挂载在 of_device_id 的 data 上
+
 // 2 106_pin_banks 是挂载在 1106_pin_ctrl 的 banks 上 
 // static struct rockchip_pin_ctrl rv1106_pin_ctrl __maybe_unused = {
 // static struct rockchip_pin_bank rv1106_pin_banks[] = {
+
 // 3 struct rockchip_pinctrl *info 是在 probe 里分配的一块内存 
 // info = devm_kzalloc(dev, sizeof(*info), GFP_KERNEL);
 // info 维护了 ctrl结构体， info->ctrl = ctrl;

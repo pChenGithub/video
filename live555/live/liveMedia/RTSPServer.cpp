@@ -357,8 +357,10 @@ RTSPServer::RTSPClientConnection::~RTSPClientConnection() {
 // Handler routines for specific RTSP commands:
 
 void RTSPServer::RTSPClientConnection::handleCmd_OPTIONS() {
+	// 这里回复,,,允许的命令的名称
   snprintf((char*)fResponseBuffer, sizeof fResponseBuffer,
 	   "RTSP/1.0 200 OK\r\nCSeq: %s\r\n%sPublic: %s\r\n\r\n",
+	// dateHeader 获取 DATE: xxx 字段,字符串返回
 	   fCurrentCSeq, dateHeader(), fOurRTSPServer.allowedCommandNames());
 }
 
@@ -367,6 +369,7 @@ void RTSPServer::RTSPClientConnection
   // By default, we implement "GET_PARAMETER" (on the entire server) just as a 'no op', and send back a dummy response.
   // (If you want to handle this type of "GET_PARAMETER" differently, you can do so by defining a subclass of "RTSPServer"
   // and "RTSPServer::RTSPClientConnection", and then reimplement this virtual function in your subclass.)
+	// 第一个参数是放在回复头的,信息描述中
   setRTSPResponse("200 OK", LIVEMEDIA_LIBRARY_VERSION_STRING);
 }
 

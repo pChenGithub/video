@@ -128,8 +128,10 @@ GenericMediaServer
 ::GenericMediaServer(UsageEnvironment& env, int ourSocketIPv4, int ourSocketIPv6, Port ourPort,
 		     unsigned reclamationSeconds)
   : Medium(env),
+	// 
     fServerSocketIPv4(ourSocketIPv4), fServerSocketIPv6(ourSocketIPv6),
     fServerPort(ourPort), fReclamationSeconds(reclamationSeconds),
+	// 创建3个hash表,,,
     fServerMediaSessions(HashTable::create(STRING_HASH_KEYS)),
     fClientConnections(HashTable::create(ONE_WORD_HASH_KEYS)),
     fClientSessions(HashTable::create(STRING_HASH_KEYS)),
@@ -139,7 +141,7 @@ GenericMediaServer
   ignoreSigPipeOnSocket(fServerSocketIPv4); // so that clients on the same host that are killed don't also kill us
   ignoreSigPipeOnSocket(fServerSocketIPv6); // ditto
   
-	// 将 socket加入集合，监听是否可读，一旦可读，会执行 incomingConnectionHandlerIPv4
+	// 将 socket加入集合，监听是否可读，一旦可读，会执行 incomingConnectionHandlerIPv4,,,这里只考虑ipv4
   // Arrange to handle connections from others:
   env.taskScheduler().turnOnBackgroundReadHandling(fServerSocketIPv4, incomingConnectionHandlerIPv4, this);
   env.taskScheduler().turnOnBackgroundReadHandling(fServerSocketIPv6, incomingConnectionHandlerIPv6, this);

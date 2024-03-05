@@ -44,6 +44,7 @@ public:
 			      RTSPServer*& resultServer);
 
   typedef void (responseHandlerForREGISTER)(RTSPServer* rtspServer, unsigned requestId, int resultCode, char* resultString);
+	// 注册一个stream
   unsigned registerStream(ServerMediaSession* serverMediaSession,
 			  char const* remoteClientNameOrAddress, portNumBits remoteClientPortNum,
 			  responseHandlerForREGISTER* responseHandler,
@@ -62,6 +63,7 @@ public:
   //   It tells the proxy server the suffix that it should use in its "rtsp://" URL (when front-end clients access the stream)
 
   typedef void (responseHandlerForDEREGISTER)(RTSPServer* rtspServer, unsigned requestId, int resultCode, char* resultString);
+	// 注销一个stream
   unsigned deregisterStream(ServerMediaSession* serverMediaSession,
 			    char const* remoteClientNameOrAddress, portNumBits remoteClientPortNum,
 			    responseHandlerForDEREGISTER* responseHandler,
@@ -184,6 +186,8 @@ public: // should be protected, but some old compilers complain otherwise
     friend class RTSPServer;
     friend class RTSPClientSession;
 
+	// 实现了 rtsp 的命令协议 rtsp协议,回复消息
+	// 这部分在自己实现协议的时候可以参考
     // Make the handler functions for each command virtual, to allow subclasses to reimplement them, if necessary:
     virtual void handleCmd_OPTIONS();
         // You probably won't need to subclass/reimplement this function; reimplement "RTSPServer::allowedCommandNames()" instead.
@@ -240,6 +244,7 @@ public: // should be protected, but some old compilers complain otherwise
     Boolean fIsActive;
     unsigned char* fLastCRLF;
     unsigned fRecursionCount;
+	// 当前协议包序号
     char const* fCurrentCSeq;
     Authenticator fCurrentAuthenticator; // used if access control is needed
     char* fOurSessionCookie; // used for optional RTSP-over-HTTP tunneling
@@ -329,7 +334,9 @@ private:
   friend class RTSPClientSession;
   friend class RegisterRequestRecord;
   friend class DeregisterRequestRecord;
+	// rtsp http 服务socket描述符
   int fHTTPServerSocketIPv4, fHTTPServerSocketIPv6; // for optional RTSP-over-HTTP tunneling
+	// 端口
   Port fHTTPServerPort; // ditto
   HashTable* fClientConnectionsForHTTPTunneling; // maps client-supplied 'session cookie' strings to "RTSPClientConnection"s
     // (used only for optional RTSP-over-HTTP tunneling)

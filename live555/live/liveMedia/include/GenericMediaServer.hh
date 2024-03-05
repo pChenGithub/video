@@ -181,7 +181,9 @@ protected:
   friend class ClientConnection;
   friend class ClientSession;	
   friend class ServerMediaSessionIterator;
+	// 保存 544/8544端口绑定的socket描述符
   int fServerSocketIPv4, fServerSocketIPv6;
+	// 记录 服务端口 为 544/8544
   Port fServerPort;
   unsigned fReclamationSeconds;
   HashTable* fServerMediaSessions; // maps 'stream name' strings to "ServerMediaSession" objects

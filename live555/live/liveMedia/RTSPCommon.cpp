@@ -351,9 +351,13 @@ Boolean RTSPOptionIsSupported(char const* commandName, char const* optionsRespon
   return False;
 }
 
+// 获取rtsp协议头中的日期字段,,,字符串返回
+// DATA: 
 char const* dateHeader() {
+	// 定义缓存,,使用static是为了函数退出后,,变量依然存在
   static char buf[200];
 #if !defined(_WIN32_WCE)
+	// 获取时间
   time_t tt = time(NULL);
   tm time_tm;
 #ifdef _WIN32
@@ -361,10 +365,12 @@ char const* dateHeader() {
       time_tm = tm{};
   }
 #else
+	// 转变时间格式
   if (gmtime_r(&tt, &time_tm) == nullptr) {
     time_tm = tm();
   }
 #endif
+	// 格式化显示时间
   strftime(buf, sizeof buf, "Date: %a, %b %d %Y %H:%M:%S GMT\r\n", &time_tm);
 #else
   // WinCE apparently doesn't have "time()", "strftime()", or "gmtime()",

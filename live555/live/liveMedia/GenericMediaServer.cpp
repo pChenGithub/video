@@ -117,6 +117,13 @@ void GenericMediaServer::deleteServerMediaSession(char const* streamName) {
   lookupServerMediaSession(streamName, &GenericMediaServer::deleteServerMediaSession);
 }
 
+// 这个类构造主要作了如下：
+// 记录 服务socket，，即，绑定554/8554端口的socket
+// 记录 服务端口用的是 554/8556
+// 创建3个哈希表，分别保存什么???
+// 初始化一个全局的seeionid为0
+// 初始化ssl证书文件路径，，现在先不考虑证书
+// 将创建的 socket 加入集合管理，，监听其可读，执行回调处理数据读取
 GenericMediaServer
 ::GenericMediaServer(UsageEnvironment& env, int ourSocketIPv4, int ourSocketIPv6, Port ourPort,
 		     unsigned reclamationSeconds)
@@ -128,9 +135,11 @@ GenericMediaServer
     fClientSessions(HashTable::create(STRING_HASH_KEYS)),
     fPreviousClientSessionId(0),
     fTLSCertificateFileName(NULL), fTLSPrivateKeyFileName(NULL) {
+	// 忽略一些信号
   ignoreSigPipeOnSocket(fServerSocketIPv4); // so that clients on the same host that are killed don't also kill us
   ignoreSigPipeOnSocket(fServerSocketIPv6); // ditto
   
+	// 将 socket加入集合，监听是否可读，一旦可读，会执行 incomingConnectionHandlerIPv4
   // Arrange to handle connections from others:
   env.taskScheduler().turnOnBackgroundReadHandling(fServerSocketIPv4, incomingConnectionHandlerIPv4, this);
   env.taskScheduler().turnOnBackgroundReadHandling(fServerSocketIPv6, incomingConnectionHandlerIPv6, this);

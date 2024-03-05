@@ -25,6 +25,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "RTSPServer.hh"
 #endif
 
+// 实现了对象实例化 和 查询 对话的接口
 class DynamicRTSPServer: public RTSPServer {
 public:
 	// 实例化函数

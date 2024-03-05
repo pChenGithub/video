@@ -24,6 +24,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 ////////// Medium //////////
 
 Medium::Medium(UsageEnvironment& env)
+	// 有一个变量记录 运行环境
 	: fEnviron(env), fNextTask(NULL) {
   // First generate a name for the new medium:
   MediaLookupTable::ourMedia(env)->generateNewName(fMediumName, mediumNameMaxLen);

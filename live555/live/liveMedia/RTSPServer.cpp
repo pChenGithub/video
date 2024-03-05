@@ -183,6 +183,7 @@ RTSPServer::RTSPServer(UsageEnvironment& env,
 		       int ourSocketIPv4, int ourSocketIPv6, Port ourPort,
 		       UserAuthenticationDatabase* authDatabase,
 		       unsigned reclamationSeconds)
+	// 父类的构造函数
   : GenericMediaServer(env, ourSocketIPv4, ourSocketIPv6, ourPort, reclamationSeconds),
     fHTTPServerSocketIPv4(-1), fHTTPServerSocketIPv6(-1), fHTTPServerPort(0),
     fClientConnectionsForHTTPTunneling(NULL), // will get created if needed

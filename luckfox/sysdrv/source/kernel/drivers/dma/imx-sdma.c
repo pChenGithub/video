@@ -2240,6 +2240,7 @@ MODULE_FIRMWARE("imx/sdma/sdma-imx7d.bin");
 MODULE_LICENSE("GPL");
 
 // 参考博客:https://www.cnblogs.com/jliuxin/p/14129414.html
+// https://zhuanlan.zhihu.com/p/409606039
 // DMA 的Provider层,对应的实际的DMA控制器,提供实际的数据处理实现
 // DMA核心层,对DMA client提供操作接口,并且提供 DMA控制器注册接口,提供容器维护
 // 控制器,,总要数据 dma_device,,,

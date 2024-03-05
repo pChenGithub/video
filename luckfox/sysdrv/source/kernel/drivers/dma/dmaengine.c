@@ -1137,6 +1137,9 @@ EXPORT_SYMBOL_GPL(dma_async_device_channel_unregister);
  * device_release() callback which will be called after
  * dma_async_device_unregister() is called and no further references are taken.
  */
+// 对dma 控制器设备实例做一下检查,以及一些初始化
+// 然后将 dma设备注册到内核,实际上是加入 dma_device_list 链表维护
+// dma_device_list 是dma核心层维护的一个全局链表
 int dma_async_device_register(struct dma_device *device)
 {
 	int rc;

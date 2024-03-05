@@ -423,13 +423,16 @@ struct sdma_driver_data {
 	bool check_ratio;
 };
 
+// imx dma控制器实例结构体
 struct sdma_engine {
+	// 所属设备
 	struct device			*dev;
 	struct sdma_channel		channel[MAX_DMA_CHANNELS];
 	struct sdma_channel_control	*channel_control;
 	void __iomem			*regs;
 	struct sdma_context_data	*context;
 	dma_addr_t			context_phys;
+	// dma设备,对应一个dma控制器
 	struct dma_device		dma_device;
 	struct clk			*clk_ipg;
 	struct clk			*clk_ahb;
@@ -1972,8 +1975,10 @@ static struct dma_chan *sdma_xlate(struct of_phandle_args *dma_spec,
 
 static int sdma_probe(struct platform_device *pdev)
 {
+	// 获取匹配的是哪个适配器,有私有数据的
 	const struct of_device_id *of_id =
 			of_match_device(sdma_dt_ids, &pdev->dev);
+	// 获取匹配的设备树的节点
 	struct device_node *np = pdev->dev.of_node;
 	struct device_node *spba_bus;
 	const char *fw_name;
@@ -1981,12 +1986,15 @@ static int sdma_probe(struct platform_device *pdev)
 	int irq;
 	struct resource *iores;
 	struct resource spba_res;
+	// 获取平台设备私有数据
 	struct sdma_platform_data *pdata = dev_get_platdata(&pdev->dev);
 	int i;
+	// imx dma控制器实例,扩展 dma_device
 	struct sdma_engine *sdma;
 	s32 *saddr_arr;
 	const struct sdma_driver_data *drvdata = NULL;
 
+	// 获取适配器的私有数据,作为平台设备驱动的私有数据
 	if (of_id)
 		drvdata = of_id->data;
 	else if (pdev->id_entry)
@@ -2001,24 +2009,29 @@ static int sdma_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
+	// 创建imx dma实例
 	sdma = devm_kzalloc(&pdev->dev, sizeof(*sdma), GFP_KERNEL);
 	if (!sdma)
 		return -ENOMEM;
 
 	spin_lock_init(&sdma->channel_0_lock);
 
+	// 指定属于哪个设备,和平台设备同属一个设备
 	sdma->dev = &pdev->dev;
 	sdma->drvdata = drvdata;
 
+	// 获取中断
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)
 		return irq;
 
+	// 获取寄存器地址并映射为虚拟地址
 	iores = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	sdma->regs = devm_ioremap_resource(&pdev->dev, iores);
 	if (IS_ERR(sdma->regs))
 		return PTR_ERR(sdma->regs);
 
+	// 获取时钟源
 	sdma->clk_ipg = devm_clk_get(&pdev->dev, "ipg");
 	if (IS_ERR(sdma->clk_ipg))
 		return PTR_ERR(sdma->clk_ipg);
@@ -2027,6 +2040,7 @@ static int sdma_probe(struct platform_device *pdev)
 	if (IS_ERR(sdma->clk_ahb))
 		return PTR_ERR(sdma->clk_ahb);
 
+	// 使能时钟
 	ret = clk_prepare(sdma->clk_ipg);
 	if (ret)
 		return ret;
@@ -2035,6 +2049,7 @@ static int sdma_probe(struct platform_device *pdev)
 	if (ret)
 		goto err_clk;
 
+	// 请求中断
 	ret = devm_request_irq(&pdev->dev, irq, sdma_int_handler, 0, "sdma",
 			       sdma);
 	if (ret)
@@ -2092,8 +2107,13 @@ static int sdma_probe(struct platform_device *pdev)
 
 	sdma->dma_device.dev = &pdev->dev;
 
+	// 初始化一些回调函数,,,dma使用者在调用dma核心接口之后,dma和核心会
+	// 调用到这些接口做一下实际操作,,,
+	// 从这里看得出,,,核心层对 dma client来说是务虚的,,,
+	// 
 	sdma->dma_device.device_alloc_chan_resources = sdma_alloc_chan_resources;
 	sdma->dma_device.device_free_chan_resources = sdma_free_chan_resources;
+	// 
 	sdma->dma_device.device_tx_status = sdma_tx_status;
 	sdma->dma_device.device_prep_slave_sg = sdma_prep_slave_sg;
 	sdma->dma_device.device_prep_dma_cyclic = sdma_prep_dma_cyclic;
@@ -2109,8 +2129,10 @@ static int sdma_probe(struct platform_device *pdev)
 	sdma->dma_device.copy_align = 2;
 	dma_set_max_seg_size(sdma->dma_device.dev, SDMA_BD_MAX_CNT);
 
+	// imx dma 实例设置为,平台设备驱动私有数据
 	platform_set_drvdata(pdev, sdma);
 
+	// 调用 dma 核心层接口注册一个 dma控制器
 	ret = dma_async_device_register(&sdma->dma_device);
 	if (ret) {
 		dev_err(&pdev->dev, "unable to register\n");
@@ -2216,3 +2238,17 @@ MODULE_FIRMWARE("imx/sdma/sdma-imx6q.bin");
 MODULE_FIRMWARE("imx/sdma/sdma-imx7d.bin");
 #endif
 MODULE_LICENSE("GPL");
+
+// 参考博客:https://www.cnblogs.com/jliuxin/p/14129414.html
+// DMA 的Provider层,对应的实际的DMA控制器,提供实际的数据处理实现
+// DMA核心层,对DMA client提供操作接口,并且提供 DMA控制器注册接口,提供容器维护
+// 控制器,,总要数据 dma_device,,,
+// DMA Consumer 层,,,是DMA的使用者,,,调用核心层提供的接口
+// dma client 发送数据过程
+// 	1 请求通道
+//	2 配置通道
+//	3 启动传输
+//	4 监听状态
+//	4 停止传输
+
+

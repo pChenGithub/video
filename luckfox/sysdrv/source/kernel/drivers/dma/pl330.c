@@ -3307,6 +3307,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 		dma_cap_set(DMA_PRIVATE, pd->cap_mask);
 	}
 
+	// 实现回调函数
 	pd->device_alloc_chan_resources = pl330_alloc_chan_resources;
 	pd->device_free_chan_resources = pl330_free_chan_resources;
 	pd->device_prep_dma_memcpy = pl330_prep_dma_memcpy;
@@ -3323,12 +3324,14 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 	pd->residue_granularity = DMA_RESIDUE_GRANULARITY_BURST;
 	pd->max_burst = PL330_MAX_BURST;
 
+	// 注册dma设备
 	ret = dma_async_device_register(pd);
 	if (ret) {
 		dev_err(&adev->dev, "unable to register DMAC\n");
 		goto probe_err3;
 	}
 
+	// 新建一个对象加入 of_dma  模块的全局链表
 	if (adev->dev.of_node) {
 		ret = of_dma_controller_register(adev->dev.of_node,
 					 of_dma_pl330_xlate, pl330);
@@ -3455,3 +3458,6 @@ module_amba_driver(pl330_driver);
 MODULE_AUTHOR("Jaswinder Singh <jassisinghbrar@gmail.com>");
 MODULE_DESCRIPTION("API Driver for PL330 DMAC");
 MODULE_LICENSE("GPL");
+
+// rk用的是这个DMA控制器驱动
+

@@ -49,17 +49,23 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 class Medium {
 public:
+	// 按名称查询多媒体,并返回
   static Boolean lookupByName(UsageEnvironment& env,
 			      char const* mediumName,
 			      Medium*& resultMedium);
+	// 关闭指定名称的多媒体
   static void close(UsageEnvironment& env, char const* mediumName);
+	// 关闭指定的多媒体对象
   static void close(Medium* medium); // alternative close() method using ptrs
       // (has no effect if medium == NULL)
 
+	// 返回多媒体的运行环境
   UsageEnvironment& envir() const {return fEnviron;}
 
+	// 返回多媒体的名称
   char const* name() const {return fMediumName;}
 
+	// 几个接口判断指定多媒体的类型
   // Test for specific types of media:
   virtual Boolean isSource() const;
   virtual Boolean isSink() const;
@@ -71,16 +77,21 @@ public:
 
 protected:
   friend class MediaLookupTable;
+	// 构造函数,从这里看,多媒体对象,不能直接调用构造函数创建
   Medium(UsageEnvironment& env); // abstract base class
   virtual ~Medium(); // instances are deleted using close() only
 
+	// 返回后一个多媒体
   TaskToken& nextTask() {
 	return fNextTask;
   }
 
 private:
+	// 运行环境句柄
   UsageEnvironment& fEnviron;
+	// 多媒体的名称
   char fMediumName[mediumNameMaxLen];
+	// 多媒体放在一个链表中,fNextTask指向下一个多媒体
   TaskToken fNextTask;
 };
 
@@ -90,7 +101,9 @@ private:
 //  the whole set of "Medium" objects that we've created.)
 class MediaLookupTable {
 public:
+	// 返回
   static MediaLookupTable* ourMedia(UsageEnvironment& env);
+	// 返回哈希表实例
   HashTable const& getTable() { return *fTable; }
 
 protected:
@@ -109,7 +122,9 @@ private:
   void generateNewName(char* mediumName, unsigned maxLen);
 
 private:
+	// 运行环境实例
   UsageEnvironment& fEnv;
+	// 哈希表对象,
   HashTable* fTable;
   unsigned fNameGenerator;
 };
@@ -118,12 +133,15 @@ private:
 // The structure pointed to by the "liveMediaPriv" UsageEnvironment field:
 class _Tables {
 public:
+	// 静态方法,返回表实例,如果没有这个实例,创建一个,再返回
   static _Tables* getOurTables(UsageEnvironment& env, Boolean createIfNotPresent = True);
       // returns a pointer to a "_Tables" structure (creating it if necessary)
   void reclaimIfPossible();
       // used to delete ourselves when we're no longer used
 
+	// 多媒体查询表实例
   MediaLookupTable* mediaTable;
+	// 指向socket表
   void* socketTable;
 
 protected:
@@ -131,6 +149,7 @@ protected:
   virtual ~_Tables();
 
 private:
+	// 运行环境
   UsageEnvironment& fEnv;
 };
 

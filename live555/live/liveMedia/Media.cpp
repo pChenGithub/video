@@ -51,9 +51,12 @@ Boolean Medium::lookupByName(UsageEnvironment& env, char const* mediumName,
 }
 
 void Medium::close(UsageEnvironment& env, char const* name) {
+	// 单例模式获取 MediaLookupTable对象,调用 MediaLookupTable的remove方法
+	// 这里表示 Medium 是被 MediaLookupTable 来管理的
   MediaLookupTable::ourMedia(env)->remove(name);
 }
 
+// 调用另一个关闭接口
 void Medium::close(Medium* medium) {
   if (medium == NULL) return;
 
@@ -91,6 +94,8 @@ Boolean Medium::isServerMediaSession() const {
 
 ////////// _Tables implementation //////////
 
+// 单例模式,获取 _Tables对象
+// Tables的静态方法,返回实例,单例,如果不存在实例,创建再返回
 _Tables* _Tables::getOurTables(UsageEnvironment& env, Boolean createIfNotPresent) {
   if (env.liveMediaPriv == NULL && createIfNotPresent) {
     env.liveMediaPriv = new _Tables(env);
@@ -115,13 +120,19 @@ _Tables::~_Tables() {
 
 ////////// MediaLookupTable implementation //////////
 
+// 单例模式获取 MediaLookupTable 对象
+// 这个接口,返回多媒体查询表的哈希表对象,如果没有对象就创建
+// 这里显示了一种关系,,,MediaLookupTable 对象是被 _Tables 管理的
 MediaLookupTable* MediaLookupTable::ourMedia(UsageEnvironment& env) {
+	// 获取表对象,单例方式获取 _Tables对象
   _Tables* ourTables = _Tables::getOurTables(env);
+	// 如果没有多媒体查询表对象,,,这里创建一个对象
   if (ourTables->mediaTable == NULL) {
     // Create a new table to record the media that are to be created in
     // this environment:
     ourTables->mediaTable = new MediaLookupTable(env);
   }
+	// 返回这个表对象
   return ourTables->mediaTable;
 }
 
@@ -134,8 +145,10 @@ void MediaLookupTable::addNew(Medium* medium, char* mediumName) {
 }
 
 void MediaLookupTable::remove(char const* name) {
+	// 查询 指定名字的 Medium
   Medium* medium = lookup(name);
   if (medium != NULL) {
+	// cong哈希表移除这个
     fTable->Remove(name);
     if (fTable->IsEmpty()) {
       // We can also delete ourselves (to reclaim space):

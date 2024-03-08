@@ -25,8 +25,12 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 Medium::Medium(UsageEnvironment& env)
 	// 有一个变量记录 运行环境
+	// 初始化下一个节点为NULL
 	: fEnviron(env), fNextTask(NULL) {
   // First generate a name for the new medium:
+	// 单例获取 MediaLookupTable 对象
+	// 然后获取媒体名称,填入 Medium 的 fMediumName 属性
+// #define mediumNameMaxLen 30
   MediaLookupTable::ourMedia(env)->generateNewName(fMediumName, mediumNameMaxLen);
   env.setResultMsg(fMediumName);
 
@@ -132,7 +136,7 @@ MediaLookupTable* MediaLookupTable::ourMedia(UsageEnvironment& env) {
     // this environment:
     ourTables->mediaTable = new MediaLookupTable(env);
   }
-	// 返回这个表对象
+	// 返回这个媒体查询表对象
   return ourTables->mediaTable;
 }
 
@@ -165,6 +169,7 @@ void MediaLookupTable::remove(char const* name) {
 void MediaLookupTable::generateNewName(char* mediumName,
 				       unsigned /*maxLen*/) {
   // We should really use snprintf() here, but not all systems have it
+	// 名称定义格式,前缀 liveMedia 后带编号
   sprintf(mediumName, "liveMedia%d", fNameGenerator++);
 }
 

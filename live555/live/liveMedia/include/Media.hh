@@ -99,6 +99,7 @@ private:
 // A data structure for looking up a Medium by its string name.
 // (It is used only to implement "Medium", but we make it visible here, in case developers want to use it to iterate over
 //  the whole set of "Medium" objects that we've created.)
+// MediaLookupTable 类型的属性有,,,运行环境,,一个哈希表对象,,fNameGenerator 不知道干嘛用的
 class MediaLookupTable {
 public:
 	// 返回
@@ -131,6 +132,7 @@ private:
 
 
 // The structure pointed to by the "liveMediaPriv" UsageEnvironment field:
+// 这个_Tables 类的属性,,, 多媒体查询表对象(单例),,socket表,,运行环境
 class _Tables {
 public:
 	// 静态方法,返回表实例,如果没有这个实例,创建一个,再返回
@@ -141,7 +143,7 @@ public:
 
 	// 多媒体查询表实例
   MediaLookupTable* mediaTable;
-	// 指向socket表
+	// 指向socket表,目前不清楚这个socket表的作用
   void* socketTable;
 
 protected:

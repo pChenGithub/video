@@ -772,7 +772,9 @@ else
 DO_STATIC_RELA =
 endif
 
+# 根据配置 准备要编译的目标
 # Always append ALL so that arch config.mk's can add custom ones
+# 这里是 y 所以，总是选中的,这里 u-boot.bin 是最终的编译目标
 ALL-y += u-boot.srec u-boot.bin u-boot.sym System.map binary_size_check
 ALL-$(CONFIG_SUPPORT_USBPLUG) += usbplug.bin
 
@@ -825,6 +827,7 @@ LDFLAGS_u-boot += $(LDFLAGS_FINAL)
 # Avoid 'Not enough room for program headers' error on binutils 2.28 onwards.
 LDFLAGS_u-boot += $(call ld-option, --no-dynamic-linker)
 
+# rv1106 没有定义 CONFIG_SYS_TEXT_BASE
 ifneq ($(CONFIG_SYS_TEXT_BASE),)
 LDFLAGS_u-boot += -Ttext $(CONFIG_SYS_TEXT_BASE)
 endif
@@ -905,7 +908,10 @@ u-boot-fit-dtb.bin: u-boot-nodtb.bin fit-dtb.blob
 u-boot.bin: u-boot-fit-dtb.bin FORCE
 	$(call if_changed,copy)
 else ifeq ($(CONFIG_OF_SEPARATE),y)
+# rv1106 有 CONFIG_OF_SEPARATE 定义，所以走这里
 
+# 依赖 u-boot-nodtb.bin 和 dt.dtb
+# $(call if_changed,cat) 会把 u-boot-nodtb.bin 和 dts/dt.dtb 连接在一起生成 u-boot-dtb.bin
 u-boot-dtb.bin: u-boot-nodtb.bin dts/dt.dtb FORCE
 	$(call if_changed,cat)
 
@@ -917,6 +923,8 @@ u-boot-dtb-kern.bin: u-boot-dtb.bin FORCE
 u-boot.bin: u-boot-dtb-kern.bin $(EMBED_KERN_DTB) FORCE
 	$(call if_changed,cat)
 else
+# EMBED_KERN_DTB 没有定义，rv1106 走这里
+# 这里会将 u-boot-dtb.bin 拷贝成 u-boot.bin
 u-boot.bin: u-boot-dtb.bin FORCE
 	$(call if_changed,copy)
 	$(call if_changed,truncate)
@@ -968,6 +976,9 @@ binary_size_check: u-boot-nodtb.bin FORCE
 		fi \
 	fi
 
+# 由 u-boot 拷贝 成 u-boot-nodtb.bin
+# $(call if_changed,objcopy) 在变化时会作 objcopy 处理
+# objcopy 操作会去掉一些符号信息
 u-boot-nodtb.bin: u-boot FORCE
 	$(call if_changed,objcopy)
 	$(call DO_STATIC_RELA,$<,$@,$(CONFIG_SYS_TEXT_BASE))
@@ -1267,6 +1278,10 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(ARCH)/Makefile.postlink)
 # Rule to link u-boot
 # May be overridden by arch/$(ARCH)/config.mk
 quiet_cmd_u-boot__ ?= LD      $@
+# cmd_u-boot__ 命令，做了一个链接工作，其中使用了 链接脚本 -T u-boot.lds
+# 把 $(u-boot-init) 、$(u-boot-main) 指定的文件链接到目标
+# 这里有个重点的链接参数 LDFLAGS_u-boot，看看是什么
+
       cmd_u-boot__ ?= $(LD) $(LDFLAGS) $(LDFLAGS_u-boot) -o $@ \
       -T u-boot.lds $(u-boot-init)                             \
       --start-group $(u-boot-main) --end-group                 \
@@ -1280,6 +1295,7 @@ cmd_smap = \
 	$(CC) $(c_flags) -DSYSTEM_MAP="\"$${smap}\"" \
 		-c $(srctree)/common/system_map.c -o common/system_map.o
 
+# 重点来了，这里最终对目标和依赖，执行了 cmd_u-boot__
 u-boot:	$(u-boot-init) $(u-boot-main) u-boot.lds FORCE
 	+$(call if_changed,u-boot__)
 ifeq ($(CONFIG_KALLSYMS),y)

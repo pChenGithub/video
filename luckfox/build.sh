@@ -1,4 +1,5 @@
 #!/bin/bash
+# set -e 出现错误脚本也向下执行
 set -eE
 
 export LC_ALL=C
@@ -11,14 +12,18 @@ function unset_env_config_rk()
 	source $tmp_file
 	rm -f $tmp_file
 }
+# 取消rk的环境变量设置
 unset_env_config_rk
 
 ################################################################################
 # Global Variable Configure
 ################################################################################
 _FDS="\\ \n"
+# realpath file 查看文件的绝对路径
 cmd=`realpath $0`
+# 获取绝对路径文件的目录
 COMMON_DIR=`dirname $cmd`
+# 获取路径的绝对路径，这里是工程目录
 PROJECT_TOP_DIR=$(realpath $COMMON_DIR/)
 SDK_ROOT_DIR=$(realpath $COMMON_DIR/..)
 SDK_SYSDRV_DIR=${SDK_ROOT_DIR}/sysdrv
@@ -26,6 +31,7 @@ SDK_MEDIA_DIR=${SDK_ROOT_DIR}/media
 SDK_APP_DIR=${PROJECT_TOP_DIR}/app
 BOARD_CONFIG=$SDK_ROOT_DIR/.BoardConfig.mk
 TARGET_PRODUCT_DIR=${PROJECT_TOP_DIR}/cfg
+# 以上都是获取工程的一些目录
 GLOBAL_ROOT_FILESYSTEM_NAME=rootfs
 GLOBAL_OEM_NAME=oem
 GLOBAL_FS_TYPE_SUFFIX=_fs_type
@@ -33,14 +39,19 @@ GLOBAL_INITRAMFS_BOOT_NAME=""
 GLOBAL_PARTITIONS=""
 GLOBAL_SDK_VERSION=""
 
+# getconf 获取系统信息,可以搭配其他参数
+# getconf _NPROCESSORS_ONLN 查看设备有多少核
+# RK_JOBS=1 保存设备有多少核
 if [ `getconf _NPROCESSORS_ONLN` -eq 1 ]; then
 	export RK_JOBS=1
 else
 	export RK_JOBS=$((`getconf _NPROCESSORS_ONLN` - 1 ))
 fi
 
+# 编译类型
 export RK_BUILD_VERSION_TYPE=RELEASE
 
+# 导出其他一些路径
 export SDK_ROOT_DIR=$SDK_ROOT_DIR
 export RK_PROJECT_OUTPUT=$SDK_ROOT_DIR/output/out
 export RK_PROJECT_TOP_DIR=$PROJECT_TOP_DIR
@@ -53,12 +64,14 @@ export RK_PROJECT_PATH_RAMDISK=$SDK_ROOT_DIR/output/out/ramdisk
 export RK_PROJECT_PATH_FASTBOOT=$SDK_ROOT_DIR/output/out/fastboot
 export RK_PROJECT_PATH_RAMDISK_TINY_ROOTFS=$RK_PROJECT_PATH_RAMDISK/tiny_rootfs
 
+# 导出编译后的pc工具环境变量
 export PATH=$RK_PROJECT_PATH_PC_TOOLS:$PATH
 
 export RK_PROJECT_FILE_ROOTFS_SCRIPT=$RK_PROJECT_OUTPUT/S20linkmount
 export RK_PROJECT_FILE_OEM_SCRIPT=$RK_PROJECT_OUTPUT/S21appinit
 export RK_PROJECT_FILE_RECOVERY_SCRIPT=$RK_PROJECT_PATH_RAMDISK_TINY_ROOTFS/etc/init.d/S10linkdev
 export RK_PROJECT_FILE_RECOVERY_LUNCH_SCRIPT=$RK_PROJECT_PATH_RAMDISK_TINY_ROOTFS/etc/init.d/S99lunch_recovery
+# 导出一些编译脚本
 export RK_PROJECT_TOOLS_MKFS_SQUASHFS=mkfs_squashfs.sh
 export RK_PROJECT_TOOLS_MKFS_EXT4=mkfs_ext4.sh
 export RK_PROJECT_TOOLS_MKFS_UBIFS=mkfs_ubi.sh
@@ -76,6 +89,7 @@ ENV_OFFSET=""
 ################################################################################
 # Plubic Configure
 ################################################################################
+# 导出颜色编码
 C_BLACK="\e[30;1m"
 C_RED="\e[31;1m"
 C_GREEN="\e[32;1m"
@@ -143,6 +157,7 @@ function choose_target_board()
 	echo ""
 
 	local cnt=0 space8="        "
+	# 列出所有支持的板子
 	for item in ${RK_TARGET_BOARD_ARRAY[@]}
 	do
 		local f0 boot_medium ddr sys_ver hardware_version product_name
@@ -170,10 +185,13 @@ function choose_target_board()
 	done
 
 	local INDEX
+	# 输入想要配置的板子序号
 	read -p "Which would you like? [0]: " INDEX
+	# 减1，数组从0开始
 	INDEX=$((${INDEX:-0}))
 
 	if echo $INDEX | grep -vq [^0-9]; then
+		# 记录选择的板子，记录到变量
 		RK_BUILD_TARGET_BOARD="${RK_TARGET_BOARD_ARRAY[$INDEX]}"
 	else
 		RK_BUILD_TARGET_BOARD="${RK_TARGET_BOARD_ARRAY[0]}"
@@ -183,6 +201,7 @@ function choose_target_board()
 
 function build_select_board()
 {
+	# 统计支持的板子，记录在数组中，统计数组大小
 	RK_TARGET_BOARD_ARRAY=( $(cd ${TARGET_PRODUCT_DIR}/; ls BoardConfig*.mk BoardConfig_*/BoardConfig*.mk | sort) )
 
 	RK_TARGET_BOARD_ARRAY_LEN=${#RK_TARGET_BOARD_ARRAY[@]}
@@ -191,11 +210,14 @@ function build_select_board()
 		return
 	fi
 
+	# 选择板子
 	choose_target_board
 	rm -f $BOARD_CONFIG
+	# 重新链接 BOARD_CONFIG 文件，是顶层目录的 .BoardConfig.mk 文件
 	ln -rfs $TARGET_PRODUCT_DIR/$RK_BUILD_TARGET_BOARD $BOARD_CONFIG
 	msg_info "switching to board: `realpath $BOARD_CONFIG`"
 
+	# 用了 LUNCH-FORCE 变量，执行后就会退出
 	if [ "$1" = "LUNCH-FORCE" ]; then
 		finish_build
 		exit 0
@@ -460,6 +482,7 @@ function build_uboot(){
 	echo "TARGET_UBOOT_CONFIG=$RK_UBOOT_DEFCONFIG $RK_UBOOT_DEFCONFIG_FRAGMENT"
 	echo "========================================="
 
+	# 编译uboot，指定了2个参数和，makefile位置 在 sysdrv
 	make uboot -C ${SDK_SYSDRV_DIR} UBOOT_CFG=${RK_UBOOT_DEFCONFIG} UBOOT_CFG_FRAGMENT=${RK_UBOOT_DEFCONFIG_FRAGMENT}
 
 	finish_build
@@ -1655,6 +1678,7 @@ __GET_BOOTARGS_FROM_BOARD_CFG()
 
 function __PREPARE_BOARD_CFG()
 {
+	# 解析分区文件
 	parse_partition_file
 	__GET_TARGET_PARTITION_FS_TYPE
 	if [ "$RK_ENABLE_FASTBOOT" = "y" ]; then
@@ -1972,12 +1996,17 @@ function build_allsave(){
 #=========================
 # build targets
 #=========================
+# trap 指定接收到信号的操作
+# 这里接收到 ERR 信号，执行err_handler 命令
 trap 'err_handler' ERR
+# 进入工程目录
 cd $PROJECT_TOP_DIR
 unset_board_config_all
 if [ "$1" = "lunch" ];then
+	# 处理lunch
 	build_select_board LUNCH-FORCE
 fi
+# BOARD_CONFIG 在lunch过后会创建一个链接文件
 if [ ! -e "$BOARD_CONFIG" ];then
 	build_select_board
 fi
@@ -2031,9 +2060,12 @@ export RK_PROJECT_PACKAGE_OEM_DIR=$RK_PROJECT_OUTPUT/oem
 export RK_PROJECT_PACKAGE_USERDATA_DIR=$RK_PROJECT_OUTPUT/userdata
 export RK_PROJECT_PATH_BOARD_BIN=$RK_PROJECT_PATH_SYSDRV/board_${RK_LIBC_TPYE}_${RK_CHIP}
 
+# 检查一些需要安装的环境
 build_check
+# 准备板级配置
 __PREPARE_BOARD_CFG
 
+# 根据不同的目标，将会执行不同的函数
 num=$#
 option=""
 while [ $# -ne 0 ]

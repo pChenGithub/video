@@ -560,6 +560,9 @@ ifndef LDSCRIPT
 endif
 
 # If there is no specified link script, we look in a number of places for it
+# srctree 是源码路径
+# 这里说明分别从 board/板子目录，CPUDIR(?)，arch/arm/cpu 目录中查找 u-boot.lds 这个文件
+# 在 arch/arm/cpu 中找到了 u-boot.lds 文件
 ifndef LDSCRIPT
 	ifeq ($(wildcard $(LDSCRIPT)),)
 		LDSCRIPT := $(srctree)/board/$(BOARDDIR)/u-boot.lds
@@ -717,6 +720,8 @@ u-boot-alldirs	:= $(sort $(u-boot-dirs) $(patsubst %/,%,$(filter %/, $(libs-))))
 
 libs-y		:= $(patsubst %/, %/built-in.o, $(libs-y))
 
+# head-y 定义在 arch/arm/Makefile
+# head-y := arch/arm/cpu/$(CPU)/start.o
 u-boot-init := $(head-y)
 u-boot-main := $(libs-y)
 
@@ -822,12 +827,14 @@ ifneq ($(CONFIG_BUILD_TARGET),)
 ALL-y += $(CONFIG_BUILD_TARGET:"%"=%)
 endif
 
+# 在 config.mk 和 arch/arm/config.mk 也有 LDFLAGS_FINAL 的定义，要看 链接参数，这两个文件也要看
 LDFLAGS_u-boot += $(LDFLAGS_FINAL)
 
 # Avoid 'Not enough room for program headers' error on binutils 2.28 onwards.
 LDFLAGS_u-boot += $(call ld-option, --no-dynamic-linker)
 
-# rv1106 没有定义 CONFIG_SYS_TEXT_BASE
+# 在 include/configs/rv1106_common.h 定义了 #define CONFIG_SYS_TEXT_BASE            0x00200000
+# 看配置(一般是宏定义)不仅是在 configs 文件夹下，include/configs 下的对应头文件也有
 ifneq ($(CONFIG_SYS_TEXT_BASE),)
 LDFLAGS_u-boot += -Ttext $(CONFIG_SYS_TEXT_BASE)
 endif
@@ -1280,7 +1287,9 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(ARCH)/Makefile.postlink)
 quiet_cmd_u-boot__ ?= LD      $@
 # cmd_u-boot__ 命令，做了一个链接工作，其中使用了 链接脚本 -T u-boot.lds
 # 把 $(u-boot-init) 、$(u-boot-main) 指定的文件链接到目标
+# LDFLAGS 是空的，没有内容
 # 这里有个重点的链接参数 LDFLAGS_u-boot，看看是什么
+# 这里注意，LDFLAGS_u-boot 除了在Makefile 还有在 config.mk 和 arch/arm/config.mk 中也有定义
 
       cmd_u-boot__ ?= $(LD) $(LDFLAGS) $(LDFLAGS_u-boot) -o $@ \
       -T u-boot.lds $(u-boot-init)                             \
@@ -1437,6 +1446,8 @@ quiet_cmd_cpp_lds = LDS     $@
 cmd_cpp_lds = $(CPP) -Wp,-MD,$(depfile) $(cpp_flags) $(LDPPFLAGS) \
 		-D__ASSEMBLY__ -x assembler-with-cpp -P -o $@ $<
 
+# 这里是链接脚本的生成
+# 这里注意 LDSCRIPT 的定义
 u-boot.lds: $(LDSCRIPT) prepare FORCE
 	$(call if_changed_dep,cpp_lds)
 

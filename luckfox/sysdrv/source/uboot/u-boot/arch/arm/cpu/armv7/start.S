@@ -367,6 +367,7 @@ ENTRY(cpu_init_crit)
 	 * basic memory. Go here to bump up clock rate and handle
 	 * wake up conditions.
 	 */
+# 对于 rv1106 属于 rockchip，lowlevel_init.S 在 arch/arm/mach-rockchip 目录下
 	b	lowlevel_init		@ go setup pll,mux,memory
 ENDPROC(cpu_init_crit)
 #endif

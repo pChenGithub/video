@@ -14,3 +14,7 @@ https://www.geek-share.com/detail/2710519159.html
 
 系列
 https://www.cnblogs.com/leaven/category/236579.html
+
+
+Rockchip RK3399 - 引导流程和准备工作
+https://www.cnblogs.com/zyly/p/17380243.html

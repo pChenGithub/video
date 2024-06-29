@@ -90,6 +90,8 @@ switch_to_hypervisor_ret:
 	bic	r0, r0, #0x100		@ CPSR.A bit
 	msr	cpsr_x,r0
 
+// rv1106 定义了 CONFIG_SKIP_LOWLEVEL_INIT
+// cpu_init_cp15 和 cpu_init_crit 跳过了
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_cp15
@@ -98,6 +100,7 @@ switch_to_hypervisor_ret:
 #endif
 #endif
 
+// _main 在文件 arch/arm/lib/crt0.S
 	bl	_main
 
 /*------------------------------------------------------------------------------*/

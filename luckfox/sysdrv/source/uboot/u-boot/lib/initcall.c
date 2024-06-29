@@ -42,12 +42,16 @@ int initcall_run_list(const init_fnc_t init_sequence[])
 			debug(" (relocated to %p)\n", (char *)*init_fnc_ptr);
 		else
 			debug("\n");
+// 开始获取滴答
 		call_get_ticks(&start);
+// 执行队列中的初始化任务
 		ret = (*init_fnc_ptr)();
+// 结束再获取滴答
 		call_get_ticks(&end);
 
 		if (start != end) {
 			sum = TICKS_TO_US(end - gd->sys_start_tick);
+// 打印当前任务初始化使用时间，和初始化任务已经使用时间
 			debug("\t\t\t\t\t\t\t\t#%8ld us #%4ld.%3ld ms\n",
 			      TICKS_TO_US(end - start), US_TO_MS(sum), US_TO_US(sum));
 		}

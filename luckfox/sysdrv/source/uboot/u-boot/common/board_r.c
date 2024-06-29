@@ -1065,6 +1065,7 @@ static init_fnc_t init_sequence_r[] = {
 #ifdef CONFIG_PS2KBD
 	initr_kbd,
 #endif
+// board_init_r 执行的最后一个任务是 main_loop
 	run_main_loop,
 };
 

@@ -64,8 +64,13 @@
  * entry point of crt0 sequence
  */
 
+// 来自 bl _main 处于 arch/arm/cpu/armv7/start.S
 ENTRY(_main)
 
+// 初始化C运行环境，并且调用board_init_f(0)
+// 初始化堆栈 在栈里面分配一个gd结构体，里面有保存堆的增长地址
+// 栈增长地址 放在sp中
+// gd地址保存在r9中
 /*
  * Set up initial C runtime environment and call board_init_f(0).
  */
@@ -79,9 +84,12 @@ ENTRY(_main)
 #endif
 	bic	r0, r0, #7	/* 8-byte alignment for ABI compliance */
 	mov	sp, r0
+// 上面设置栈地址后，在内存分配一段地址，方gd用
 	bl	board_init_f_alloc_reserve
+// 移动栈地址
 	mov	sp, r0
 	/* set up gd here, outside any C code */
+// 把gd地址保存在 r9中
 	mov	r9, r0
 	bl	board_init_f_init_reserve
 	bl	board_init_f_boot_flags
@@ -124,6 +132,7 @@ here:
 	b	c_runtime
 #endif
 
+// 重定位 异常向量
 /*
  * now relocate vectors
  */
@@ -167,6 +176,8 @@ clbss_l:cmp	r0, r1			/* while not at end of BSS */
 	bl coloured_LED_init
 	bl red_led_on
 #endif
+
+// 开始准备执行 board_init_r 了 这里有2个参数 r0 r1
 	/* call board_init_r(gd_t *id, ulong dest_addr) */
 	mov     r0, r9                  /* gd_t */
 	ldr	r1, [r9, #GD_RELOCADDR]	/* dest_addr */

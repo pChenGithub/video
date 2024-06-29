@@ -818,6 +818,7 @@ __weak int arch_cpu_init_dm(void)
 	return 0;
 }
 
+// board_init_f 初始化的任务队列
 static const init_fnc_t init_sequence_f[] = {
 	setup_mon_len,
 #ifdef CONFIG_OF_CONTROL

@@ -43,6 +43,7 @@ __weak void arch_setup_gd(struct global_data *gd_ptr)
  *   the calling context need it.
  */
 
+// 参数top是r0，当前是sp
 ulong board_init_f_alloc_reserve(ulong top)
 {
 	/* Reserve early malloc arena */
@@ -97,6 +98,7 @@ ulong board_init_f_alloc_reserve(ulong top)
  * (seemingly useless) incrementation causes no code increase.
  */
 
+// 这里的 base ，是gb开始地址，低地址
 void board_init_f_init_reserve(ulong base)
 {
 	struct global_data *gd_ptr;
@@ -113,6 +115,7 @@ void board_init_f_init_reserve(ulong base)
 #if !defined(CONFIG_ARM)
 	arch_setup_gd(gd_ptr);
 #endif
+// base 重新回到栈顶位置了
 	/* next alloc will be higher by one GD plus 16-byte alignment */
 	base += roundup(sizeof(struct global_data), 16);
 
@@ -123,6 +126,9 @@ void board_init_f_init_reserve(ulong base)
 
 #if CONFIG_VAL(SYS_MALLOC_F_LEN)
 	/* go down one 'early malloc arena' */
+// 表示 base 是堆地址开始地址？？？
+// 这样理解的话，堆栈在同一个地址开始，堆往上长，栈往下长
+// 堆地址保存在 gd中
 	gd->malloc_base = base;
 	/* next alloc will be higher by one 'early malloc arena' size */
 	base += CONFIG_VAL(SYS_MALLOC_F_LEN);

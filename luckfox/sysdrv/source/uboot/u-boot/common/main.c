@@ -25,6 +25,7 @@ static void run_preboot_environment_command(void)
 #ifdef CONFIG_PREBOOT
 	char *p;
 
+// 获取环境变量 preboot
 	p = env_get("preboot");
 	if (p != NULL) {
 # ifdef CONFIG_AUTOBOOT_KEYED
@@ -43,10 +44,12 @@ static void run_preboot_environment_command(void)
 /* We come here after U-Boot is initialised and ready to process commands */
 void main_loop(void)
 {
+// main_loop 在死循环里面
 	const char *s;
 
 	bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
 
+// 设置环境变量 ver
 #ifdef CONFIG_VERSION_VARIABLE
 	env_set("ver", version_string);  /* set version variable */
 #endif /* CONFIG_VERSION_VARIABLE */
@@ -60,6 +63,7 @@ void main_loop(void)
 #endif /* CONFIG_UPDATE_TFTP */
 
 	s = bootdelay_process();
+// 设备数获取 bootcmd
 	if (cli_process_fdt(&s))
 		cli_secure_boot_cmd(s);
 

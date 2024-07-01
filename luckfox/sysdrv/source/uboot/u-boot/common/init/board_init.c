@@ -15,6 +15,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #if !defined(CONFIG_X86) && !defined(CONFIG_ARM)
 __weak void arch_setup_gd(struct global_data *gd_ptr)
 {
+// 赋值到全局变量？？？
 	gd = gd_ptr;
 }
 #endif /* !CONFIG_X86 && !CONFIG_ARM */
@@ -46,11 +47,13 @@ __weak void arch_setup_gd(struct global_data *gd_ptr)
 // 参数top是r0，当前是sp
 ulong board_init_f_alloc_reserve(ulong top)
 {
+// 这里如果设置了分配malloc区的大小，那么就分配一个malloc区
 	/* Reserve early malloc arena */
 #if CONFIG_VAL(SYS_MALLOC_F_LEN)
 	top -= CONFIG_VAL(SYS_MALLOC_F_LEN);
 #endif
 	/* LAST : reserve GD (rounded up to a multiple of 16 bytes) */
+// 分配一段gd区
 	top = rounddown(top-sizeof(struct global_data), 16);
 
 	return top;
@@ -108,14 +111,16 @@ void board_init_f_init_reserve(ulong base)
 	 * Use gd_ptr, as gd may not be properly set yet.
 	 */
 
+// 地址强转
 	gd_ptr = (struct global_data *)base;
 	/* zero the area */
+// gd清0
 	memset(gd_ptr, '\0', sizeof(*gd));
 	/* set GD unless architecture did it already */
 #if !defined(CONFIG_ARM)
 	arch_setup_gd(gd_ptr);
 #endif
-// base 重新回到栈顶位置了
+// base 往上曾大gd大小，base变成了gd的尾地址
 	/* next alloc will be higher by one GD plus 16-byte alignment */
 	base += roundup(sizeof(struct global_data), 16);
 
@@ -127,8 +132,9 @@ void board_init_f_init_reserve(ulong base)
 #if CONFIG_VAL(SYS_MALLOC_F_LEN)
 	/* go down one 'early malloc arena' */
 // 表示 base 是堆地址开始地址？？？
-// 这样理解的话，堆栈在同一个地址开始，堆往上长，栈往下长
 // 堆地址保存在 gd中
+// 之前分配gd的时候，如果定义了malloc长度，会分配，
+// 这里修改后的base作为gd的尾，刚好是malloc的起始地址
 	gd->malloc_base = base;
 	/* next alloc will be higher by one 'early malloc arena' size */
 	base += CONFIG_VAL(SYS_MALLOC_F_LEN);

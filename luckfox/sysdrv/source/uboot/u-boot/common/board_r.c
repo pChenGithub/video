@@ -1095,6 +1095,8 @@ void board_init_r(gd_t *new_gd, ulong dest_addr)
 		init_sequence_r[i] += gd->reloc_off;
 #endif
 
+// 函数指针调用
+// 最后一个是一个不返回的main_loop
 	if (initcall_run_list(init_sequence_r))
 		hang();
 

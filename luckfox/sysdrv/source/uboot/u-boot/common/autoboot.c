@@ -192,6 +192,7 @@ static int __abortboot(int bootdelay)
 	 * CONFIG_AUTOBOOT_PROMPT includes the %d for all boards.
 	 * To print the bootdelay value upon bootup.
 	 */
+// 打印 bootdelay 倒计时
 	printf(CONFIG_AUTOBOOT_PROMPT, bootdelay);
 #  endif
 
@@ -306,10 +307,13 @@ const char *bootdelay_process(void)
 	bootlimit = env_get_ulong("bootlimit", 10, 0);
 #endif /* CONFIG_BOOTCOUNT_LIMIT */
 
+// 获取环境变量 bootdelay
 	s = env_get("bootdelay");
+// 转数字
 	bootdelay = s ? (int)simple_strtol(s, NULL, 10) : CONFIG_BOOTDELAY;
 
 #ifdef CONFIG_OF_CONTROL
+// 使用设备树定义的 bootdelay ,如果有
 	bootdelay = fdtdec_get_config_int(gd->fdt_blob, "bootdelay",
 			bootdelay);
 #endif
@@ -333,11 +337,14 @@ const char *bootdelay_process(void)
 		s = env_get("altbootcmd");
 	} else
 #endif /* CONFIG_BOOTCOUNT_LIMIT */
+// 获取 bootcmd
 		s = env_get("bootcmd");
 
 	process_fdt_options(gd->fdt_blob);
+// 修改 bootdelay到全局变量
 	stored_bootdelay = bootdelay;
 
+// 最终返回的是 bootcmd
 	return s;
 }
 

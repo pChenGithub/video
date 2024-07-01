@@ -75,6 +75,8 @@ ENTRY(_main)
  * Set up initial C runtime environment and call board_init_f(0).
  */
 
+// 设置 栈地址，设置栈地址后可以运行C了
+// 这里应用用的还是sram
 #if defined(CONFIG_TPL_BUILD) && defined(CONFIG_TPL_NEEDS_SEPARATE_STACK)
 	ldr	r0, =(CONFIG_TPL_STACK)
 #elif defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_STACK)
@@ -82,14 +84,18 @@ ENTRY(_main)
 #else
 	ldr	r0, =(CONFIG_SYS_INIT_SP_ADDR)
 #endif
+// 对r0作8字节对齐
 	bic	r0, r0, #7	/* 8-byte alignment for ABI compliance */
+// 上面设置栈地址后，在内存分配一段地址，放gd用
+// sp=r0，
+// r0刚好也是是作为下面调用 board_init_f_alloc_reserve 的参数
 	mov	sp, r0
-// 上面设置栈地址后，在内存分配一段地址，方gd用
 	bl	board_init_f_alloc_reserve
-// 移动栈地址
+// sp=r0，gd在栈中分配之后，栈地址下移，这里重新赋值sp
+// r0是函数的返回值，也是gd的首地址,
 	mov	sp, r0
 	/* set up gd here, outside any C code */
-// 把gd地址保存在 r9中
+// 把gd地址保存在 r9中，同时r0又作为下面函数的参数(gd首地址)
 	mov	r9, r0
 	bl	board_init_f_init_reserve
 	bl	board_init_f_boot_flags

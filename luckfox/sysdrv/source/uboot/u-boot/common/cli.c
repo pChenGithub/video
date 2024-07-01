@@ -74,12 +74,17 @@ int run_command_repeatable(const char *cmd, int flag)
 #endif
 }
 
+// 执行命令列表
+// cmd可能只有一条命令，也可能是多条命令
+// 当有多条命令的时候，len传-1
 int run_command_list(const char *cmd, int len, int flag)
 {
 	int need_buff = 1;
 	char *buff = (char *)cmd;	/* cast away const */
 	int rcode = 0;
 
+// 传进来的len为-1，就重新计算cmd的长度，重新标记need_buff
+// 如果命令中有\n，需要创建buff，need_buff需要标记为1
 	if (len == -1) {
 		len = strlen(cmd);
 #ifdef CONFIG_HUSH_PARSER
@@ -87,6 +92,8 @@ int run_command_list(const char *cmd, int len, int flag)
 		need_buff = 0;
 #else
 		/* the built-in parser will change our string if it sees \n */
+// strchr 查找第一次出现\n的位置，返回指针或者NULL
+// 有\n说明有多条命令，为了不修改cmd，这里需要重新创建buff
 		need_buff = strchr(cmd, '\n') != NULL;
 #endif
 	}

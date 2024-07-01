@@ -172,6 +172,7 @@ void cli_simple_process_macros(const char *input, char *output)
  * the environment data, which may change magicly when the command we run
  * creates or modifies environment variables (like "bootp" does).
  */
+// 执行一条命令
 int cli_simple_run_command(const char *cmd, int flag)
 {
 	char cmdbuf[CONFIG_SYS_CBSIZE];	/* working copy of cmd		*/
@@ -306,6 +307,7 @@ void cli_simple_loop(void)
 	}
 }
 
+// 执行类似 cmd1\ncmd2\ncmd3\n... 的多条命令
 int cli_simple_run_command_list(char *cmd, int flag)
 {
 	char *line, *next;
@@ -318,6 +320,8 @@ int cli_simple_run_command_list(char *cmd, int flag)
 	next = cmd;
 	line = cmd;
 	while (*next) {
+// cmd1\ncmd2\ncmd3\n...
+// 对于多个命令，\n分开的处理
 		if (*next == '\n') {
 			*next = '\0';
 			/* run only non-empty commands */
@@ -332,6 +336,7 @@ int cli_simple_run_command_list(char *cmd, int flag)
 		}
 		++next;
 	}
+// 如果最后一个不带\n的命令，这里会执行
 	if (rcode == 0 && *line)
 		rcode = (cli_simple_run_command(line, 0) < 0);
 

@@ -29,8 +29,10 @@
  *
  *************************************************************************/
 
+// 声明标号是全局有效
 	.globl	reset
 	.globl	save_boot_params_ret
+// .type 设置符号属性
 	.type   save_boot_params_ret,%function
 #ifdef CONFIG_ARMV7_LPAE
 	.global	switch_to_hypervisor_ret
@@ -38,9 +40,12 @@
 
 #if !CONFIG_IS_ENABLED(TINY_FRAMEWORK)
 
+// 定义标号 reset，这个位置，存放指令 b       save_boot_params
+// 刚上电，执行 b reset
 reset:
 	/* Allow the board to save important registers */
 	b	save_boot_params
+// 当前位置 开始 save_boot_params_ret 相关的指令
 save_boot_params_ret:
 #ifdef CONFIG_ARMV7_LPAE
 /*
@@ -60,7 +65,7 @@ switch_to_hypervisor_ret:
 	and	r1, r0, #0x1f		@ mask mode bits
 	teq	r1, #0x1a		@ test for HYP mode
 	bicne	r0, r0, #0x1f		@ clear all mode bits
-// 设置cpu32未svc模式，禁止中断
+// 设置cpu为svc32模式，禁止中断
 	orrne	r0, r0, #0x13		@ set SVC mode
 	orr	r0, r0, #0xc0		@ disable FIQ and IRQ
 	msr	cpsr,r0

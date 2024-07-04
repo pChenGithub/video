@@ -85,11 +85,15 @@ ENTRY(_main)
 	ldr	r0, =(CONFIG_SYS_INIT_SP_ADDR)
 #endif
 // 对r0作8字节对齐
+// bic 指令，根据 #7的置1位，清除r0(2)对应位，结果保存在r0(1)
+// 这里是清除r0的低3位，那么r0就是8的整数倍了，r0的值就是8字节对齐的
+// 清除r0低3位，r0是减小的，正好对应栈也是向下增长的
+// 栈地址 0x400000 开始
 	bic	r0, r0, #7	/* 8-byte alignment for ABI compliance */
-// 上面设置栈地址后，在内存分配一段地址，放gd用
 // sp=r0，
-// r0刚好也是是作为下面调用 board_init_f_alloc_reserve 的参数
 	mov	sp, r0
+// 上面设置栈地址后，在内存分配一段空间，放gd用
+// r0作为下面调用 board_init_f_alloc_reserve 的参数
 	bl	board_init_f_alloc_reserve
 // sp=r0，gd在栈中分配之后，栈地址下移，这里重新赋值sp
 // r0是函数的返回值，也是gd的首地址,
@@ -97,6 +101,7 @@ ENTRY(_main)
 	/* set up gd here, outside any C code */
 // 把gd地址保存在 r9中，同时r0又作为下面函数的参数(gd首地址)
 	mov	r9, r0
+// r0作为下面函数的参数
 	bl	board_init_f_init_reserve
 	bl	board_init_f_boot_flags
 
@@ -110,10 +115,16 @@ ENTRY(_main)
  * 'here' but relocated.
  */
 
+// GD_START_ADDR_SP 0x40
+// 现在不确定 start_addr_sp 是在哪里赋值的
+// 这里是把sp重新给了一个地址，之前给的是 0x400000
 	ldr	r0, [r9, #GD_START_ADDR_SP]	/* sp = gd->start_addr_sp */
 	bic	r0, r0, #7	/* 8-byte alignment for ABI compliance */
 	mov	sp, r0
+// bd是gd的第一个域，是一个指针变量，这里刚好 GD_BD 是0
+// 那么 r9中保存的是 bd保存的地址，bd保存的是什么地址？？？
 	ldr	r9, [r9, #GD_BD]		/* r9 = gd->bd */
+// bd 地址下移 gd大小，变化后的 地址保存在 r9中
 	sub	r9, r9, #GD_SIZE		/* new GD is below bd */
 
 #ifndef CONFIG_SKIP_RELOCATE_UBOOT

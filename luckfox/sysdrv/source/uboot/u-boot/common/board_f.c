@@ -884,6 +884,7 @@ static const init_fnc_t init_sequence_f[] = {
 	announce_serial,
 
 	announce_dram_init,
+// 获取ram大小
 	dram_init,		/* configure available RAM banks */
 #ifdef CONFIG_POST
 	post_init_f,

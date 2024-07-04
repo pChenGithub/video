@@ -19,6 +19,7 @@
  * A macro to allow insertion of an ARM exception vector either
  * for the non-boot0 case or by a boot0-header.
  */
+// 这里是定义了一个宏ARM_VECTORS，后面有用到
         .macro ARM_VECTORS
 	b	reset
 	ldr	pc, _undefined_instruction
@@ -82,6 +83,8 @@ _start:
 #ifdef CONFIG_SYS_DV_NOR_BOOT_CFG
 	.word	CONFIG_SYS_DV_NOR_BOOT_CFG
 #endif
+// 这个宏被替换为异常向量表
+// 有几条跳转指令，每条指令占4个字节
 	ARM_VECTORS
 #endif /* !defined(CONFIG_ENABLE_ARM_SOC_BOOT0_HOOK) */
 
@@ -95,6 +98,8 @@ _start:
  *************************************************************************
  */
 
+// 导出全局遍历，表示这些标号全局有效，
+// 这个声明，不占空间
 	.globl	_undefined_instruction
 	.globl	_software_interrupt
 	.globl	_prefetch_abort
@@ -103,6 +108,10 @@ _start:
 	.globl	_irq
 	.globl	_fiq
 
+// 标号为_undefined_instruction的存放了undefined_instruction的地址
+// 分配一个4字节空间，定义当前位置记为标号 _undefined_instruction ， 
+// 里面放的是 undefined_instruction 所标识的地址
+// .word 会产生空间分配
 _undefined_instruction:	.word undefined_instruction
 _software_interrupt:	.word software_interrupt
 _prefetch_abort:	.word prefetch_abort
@@ -144,6 +153,7 @@ IRQ_STACK_START_IN:
 #ifdef IRAM_BASE_ADDR
 	.word   IRAM_BASE_ADDR + 0x20
 #else
+// 当前位置分配4字节，放0x0badc0de
 	.word	0x0badc0de
 #endif
 
@@ -256,6 +266,7 @@ IRQ_STACK_START:
  * exception handlers
  */
 
+// 异常向量的实际实现
 	.align  5
 undefined_instruction:
 	get_bad_stack
@@ -306,4 +317,5 @@ fiq:
 	bad_save_user_regs
 	bl	do_fiq
 
+// vectors 文件结束，接下来 start.S文件，开始 bl reset
 #endif	/* CONFIG_SPL_BUILD */

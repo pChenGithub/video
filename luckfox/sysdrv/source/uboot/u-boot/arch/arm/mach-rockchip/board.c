@@ -747,10 +747,12 @@ int board_init_f_boot_flags(void)
 #ifdef CONFIG_PSTORE
 	param_parse_pstore();
 #endif
+// 对于rv1106，上面2个函数都不会执行
 	param_parse_pre_serial(&boot_flags);
 
 	/* The highest priority to turn off (override) console */
 #if defined(CONFIG_DISABLE_CONSOLE)
+// 对于rv1196，这里不会执行
 	boot_flags |= GD_FLG_DISABLE_CONSOLE;
 #endif
 
